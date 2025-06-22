@@ -1,0 +1,17 @@
+# Build folders
+bin/
+obj/
+
+# User-specific files
+*.user
+*.suo
+
+# Log files
+*.log
+
+# Visual Studio Code
+.vs/
+
+# Temporary files
+*.tmp
+*.temp
