@@ -6,7 +6,8 @@ using System.Threading.Tasks;
 
 namespace RewardsAndRecognitionRepository.Interfaces
 {
-    internal interface ITeamRepo
+    public interface ITeamRepo
     {
+
     }
 }

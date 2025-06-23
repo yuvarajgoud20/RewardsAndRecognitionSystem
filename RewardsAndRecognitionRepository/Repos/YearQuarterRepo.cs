@@ -3,10 +3,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using RewardsAndRecognitionRepository.Interfaces;
 
 namespace RewardsAndRecognitionRepository.Repos
 {
-    internal class YearQuarterRepo
+    public class YearQuarterRepo : IYearQuarterRepo
     {
     }
 }

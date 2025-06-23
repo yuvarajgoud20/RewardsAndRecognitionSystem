@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace RewardsAndRecognitionRepository.Interfaces
 {
-    internal interface INominationRepo
+    public  interface INominationRepo
     {
     }
 }

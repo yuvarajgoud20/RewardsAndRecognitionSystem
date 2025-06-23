@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace RewardsAndRecognitionRepository.Interfaces
 {
-    internal class ICategoryRepo
+    public class ICategoryRepo
     {
     }
 }
