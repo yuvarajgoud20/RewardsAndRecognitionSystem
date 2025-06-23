@@ -1,6 +1,8 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using RewardsAndRecognitionRepository.Interfaces;
 using RewardsAndRecognitionRepository.Models;
+using RewardsAndRecognitionRepository.Repos;
 
 
 var builder = WebApplication.CreateBuilder(args);
@@ -17,6 +19,9 @@ builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 builder.Services.AddDefaultIdentity<IdentityUser>()
     .AddEntityFrameworkStores<ApplicationDbContext>();
 builder.Services.AddControllersWithViews();
+
+builder.Services.AddScoped<IUserRepo, UserRepo>();
+
 
 var app = builder.Build();
 

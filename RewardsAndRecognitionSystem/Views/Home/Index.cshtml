@@ -1,8 +1,106 @@
 ﻿@{
-    ViewData["Title"] = "Home Page";
+    ViewData["Title"] = "Home";
+    Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+<style>
+    .hero-section {
+        text-align: center;
+        padding: 80px 20px;
+        background-color: #fff;
+        color: #111;
+        font-family: 'Segoe UI', sans-serif;
+    }
+
+    .hero-title {
+        font-size: 3.2rem;
+        font-weight: bold;
+        margin-bottom: 20px;
+    }
+
+    .hero-subtitle {
+        font-size: 1.2rem;
+        max-width: 600px;
+        margin: 0 auto 30px;
+        color: #555;
+    }
+
+    .cta-button {
+        display: inline-block;
+        padding: 12px 28px;
+        font-size: 1rem;
+        background-color: black;
+        color: white;
+        border-radius: 5px;
+        text-decoration: none;
+        transition: background-color 0.3s ease;
+    }
+
+        .cta-button:hover {
+            background-color: #333;
+        }
+
+    .features {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        margin-top: 20px;
+        margin-bottom : 50px;
+    }
+
+    .feature-box {
+        width: 280px;
+        border: 1px solid #ddd;
+        padding: 24px;
+        margin: 15px;
+        border-radius: 10px;
+        background-color: #fafafa;
+        transition: box-shadow 0.3s ease;
+    }
+
+        .feature-box:hover {
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+        }
+
+    .feature-title {
+        font-weight: 600;
+        font-size: 1.2rem;
+        margin-bottom: 10px;
+    }
+
+    .feature-desc {
+        font-size: 0.95rem;
+        color: #555;
+    }
+</style>
+
+<div class="hero-section">
+    <h1 class="hero-title">Welcome to the Rewards & Recognition System</h1>
+    <p class="hero-subtitle">
+        Empower your teams. Celebrate excellence. This platform enables seamless employee nominations, structured approvals, and lasting recognition.
+    </p>
 </div>
+
+<div class="features">
+    <div class="feature-box">
+        <div class="feature-title">🌟 Nominate Talents</div>
+        <div class="feature-desc">
+            Team leads can nominate outstanding performers every quarter with ease.
+        </div>
+    </div>
+
+    <div class="feature-box">
+        <div class="feature-title">✅ Multi-Level Approvals</div>
+        <div class="feature-desc">
+            Built-in approval flow ensures transparency with manager and director validations.
+        </div>
+    </div>
+
+    <div class="feature-box">
+        <div class="feature-title">📈 Recognition Dashboard</div>
+        <div class="feature-desc">
+            Approved recognitions are showcased in an organized, historical dashboard.
+        </div>
+    </div>
+</div>
+
