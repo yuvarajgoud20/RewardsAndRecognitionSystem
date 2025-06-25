@@ -25,6 +25,15 @@ namespace RewardsAndRecognitionSystem.Controllers
         public async Task<IActionResult> Index()
         {
             var users = await _userRepo.GetAllAsync();
+            var userRoles = new Dictionary<string, string>();
+
+            foreach (var user in users)
+            {
+                var roles = await _userManager.GetRolesAsync(user);
+                userRoles[user.Id] = roles.FirstOrDefault() ?? "No Role";
+            }
+
+            ViewBag.UserRoles = userRoles;
             return View(users);
         }
 

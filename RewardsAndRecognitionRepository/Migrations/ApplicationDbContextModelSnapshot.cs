@@ -215,8 +215,8 @@ namespace RewardsAndRecognitionRepository.Migrations
                     b.HasData(
                         new
                         {
-                            Id = new Guid("b61d3fd2-dcca-467e-8984-743931f32f13"),
-                            CreatedAt = new DateTime(2025, 6, 24, 6, 2, 11, 528, DateTimeKind.Utc).AddTicks(125),
+                            Id = new Guid("375f230a-e461-4830-b91e-9941c86b04a0"),
+                            CreatedAt = new DateTime(2025, 6, 25, 6, 9, 15, 833, DateTimeKind.Utc).AddTicks(8067),
                             Description = "Awarded to best overall performer",
                             Name = "Best Performer"
                         });
@@ -298,9 +298,9 @@ namespace RewardsAndRecognitionRepository.Migrations
                     b.HasData(
                         new
                         {
-                            Id = new Guid("95b15c20-8c96-4eea-a4d4-2763df66382f"),
+                            Id = new Guid("3dadcde7-1580-4fbd-8246-25ae55559236"),
                             Name = "Alpha Team",
-                            TeamLeadId = "dd6526eb-50d3-4916-9598-bad83997ec92"
+                            TeamLeadId = "ceaeee27-e938-4304-be9e-c6c39dd38275"
                         });
                 });
 
@@ -398,10 +398,10 @@ namespace RewardsAndRecognitionRepository.Migrations
                     b.HasData(
                         new
                         {
-                            Id = "48f87d4d-873d-4b1c-9214-eaad1b3e8ff6",
+                            Id = "fbc9e986-0c46-469d-9a91-8e27ce5da80d",
                             AccessFailedCount = 0,
-                            ConcurrencyStamp = "a91d3224-ade9-4d01-b80b-e3cb57df2f13",
-                            CreatedAt = new DateTime(2025, 6, 24, 6, 2, 11, 527, DateTimeKind.Utc).AddTicks(9541),
+                            ConcurrencyStamp = "0cbc03d1-f9bd-4b09-94f2-1da7e7957505",
+                            CreatedAt = new DateTime(2025, 6, 25, 6, 9, 15, 833, DateTimeKind.Utc).AddTicks(7697),
                             Email = "admin@company.com",
                             EmailConfirmed = false,
                             IsActive = true,
@@ -409,15 +409,15 @@ namespace RewardsAndRecognitionRepository.Migrations
                             Name = "Admin User",
                             PasswordHash = "hashed_password_here",
                             PhoneNumberConfirmed = false,
-                            SecurityStamp = "3a79a451-3bb1-46b8-bde2-d2f5947a4b7f",
+                            SecurityStamp = "888e6d65-2278-45f2-b27d-30525368d853",
                             TwoFactorEnabled = false
                         },
                         new
                         {
-                            Id = "2a98c848-7437-4537-94f4-eb6c7a9991b6",
+                            Id = "3ae57138-7f02-4495-8fe7-f16ea1016b51",
                             AccessFailedCount = 0,
-                            ConcurrencyStamp = "5c7ba577-232b-44c9-95e5-a6ddc5ca614d",
-                            CreatedAt = new DateTime(2025, 6, 24, 6, 2, 11, 527, DateTimeKind.Utc).AddTicks(9683),
+                            ConcurrencyStamp = "b5fa6410-d7cf-4496-a57d-02067e81fbf2",
+                            CreatedAt = new DateTime(2025, 6, 25, 6, 9, 15, 833, DateTimeKind.Utc).AddTicks(7707),
                             Email = "manager@company.com",
                             EmailConfirmed = false,
                             IsActive = true,
@@ -425,42 +425,42 @@ namespace RewardsAndRecognitionRepository.Migrations
                             Name = "Manager User",
                             PasswordHash = "hashed_password_here",
                             PhoneNumberConfirmed = false,
-                            SecurityStamp = "d266a3a6-1af7-419b-aff2-441fa51502a9",
+                            SecurityStamp = "a5e866b0-1bed-4132-aeb6-4e88f31723af",
                             TwoFactorEnabled = false
                         },
                         new
                         {
-                            Id = "dd6526eb-50d3-4916-9598-bad83997ec92",
+                            Id = "ceaeee27-e938-4304-be9e-c6c39dd38275",
                             AccessFailedCount = 0,
-                            ConcurrencyStamp = "cf80c6d8-3471-40fe-87d7-76b461a8ad06",
-                            CreatedAt = new DateTime(2025, 6, 24, 6, 2, 11, 527, DateTimeKind.Utc).AddTicks(9714),
+                            ConcurrencyStamp = "bd6d4859-3474-4f19-9318-647daacb8d18",
+                            CreatedAt = new DateTime(2025, 6, 25, 6, 9, 15, 833, DateTimeKind.Utc).AddTicks(7724),
                             Email = "lead@company.com",
                             EmailConfirmed = false,
                             IsActive = true,
                             LockoutEnabled = false,
-                            ManagerId = "2a98c848-7437-4537-94f4-eb6c7a9991b6",
+                            ManagerId = "3ae57138-7f02-4495-8fe7-f16ea1016b51",
                             Name = "Team Lead User",
                             PasswordHash = "hashed_password_here",
                             PhoneNumberConfirmed = false,
-                            SecurityStamp = "38981046-af1c-4211-81c6-99360f3879f8",
+                            SecurityStamp = "35d34b04-010f-4c9a-991d-4682f03b5624",
                             TwoFactorEnabled = false
                         },
                         new
                         {
-                            Id = "b5bef854-6b8b-4d93-9cbb-47ec8677ec22",
+                            Id = "941e4342-c703-4700-82c9-791bb2217c68",
                             AccessFailedCount = 0,
-                            ConcurrencyStamp = "c45bd313-ecde-4e8d-8853-8a2c475dedba",
-                            CreatedAt = new DateTime(2025, 6, 24, 6, 2, 11, 527, DateTimeKind.Utc).AddTicks(9741),
+                            ConcurrencyStamp = "cae69003-ea18-4662-ac47-ab62166881c8",
+                            CreatedAt = new DateTime(2025, 6, 25, 6, 9, 15, 833, DateTimeKind.Utc).AddTicks(7736),
                             Email = "employee@company.com",
                             EmailConfirmed = false,
                             IsActive = true,
                             LockoutEnabled = false,
-                            ManagerId = "2a98c848-7437-4537-94f4-eb6c7a9991b6",
+                            ManagerId = "3ae57138-7f02-4495-8fe7-f16ea1016b51",
                             Name = "Employee One",
                             PasswordHash = "hashed_password_here",
                             PhoneNumberConfirmed = false,
-                            SecurityStamp = "538da704-7037-41ba-82a9-02495d3582d8",
-                            TeamId = new Guid("95b15c20-8c96-4eea-a4d4-2763df66382f"),
+                            SecurityStamp = "4dad9b49-b63b-464f-bc4d-f97dc8388712",
+                            TeamId = new Guid("3dadcde7-1580-4fbd-8246-25ae55559236"),
                             TwoFactorEnabled = false
                         });
                 });
@@ -494,7 +494,7 @@ namespace RewardsAndRecognitionRepository.Migrations
                     b.HasData(
                         new
                         {
-                            Id = new Guid("5de6e40c-28da-4440-a2be-fb2260544c31"),
+                            Id = new Guid("4ef7fb1d-6203-4438-ad41-c35692e1a811"),
                             EndDate = new DateTime(2025, 6, 30, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             IsActive = true,
                             Quarter = "Q2",
