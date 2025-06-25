@@ -29,7 +29,7 @@ namespace RewardsAndRecognitionRepository.Models
         public Guid YearQuarterId { get; set; }
         public YearQuarter YearQuarter { get; set; }
 
-        public ICollection<Approval> Approvals { get; set; }
+        public ICollection<Approval>? Approvals { get; set; }
     }
 
 }

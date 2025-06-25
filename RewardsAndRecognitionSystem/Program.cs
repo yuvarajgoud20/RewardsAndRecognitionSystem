@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using RewardsAndRecognitionRepository.Data;
 using RewardsAndRecognitionRepository.Interfaces;
 using RewardsAndRecognitionRepository.Models;
 using RewardsAndRecognitionRepository.Repos;
@@ -13,17 +14,28 @@ var connectionString = builder.Configuration.GetConnectionString("DefaultConnect
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
                options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
+builder.Services.AddRazorPages();
+
 
 builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 
-builder.Services.AddDefaultIdentity<IdentityUser>()
-    .AddEntityFrameworkStores<ApplicationDbContext>();
+builder.Services.AddIdentity<User,IdentityRole>()
+    .AddEntityFrameworkStores<ApplicationDbContext>()
+    .AddDefaultTokenProviders();
 builder.Services.AddControllersWithViews();
 
 builder.Services.AddScoped<IUserRepo, UserRepo>();
+builder.Services.AddScoped<ITeamRepo, TeamRepo>();
 
 
 var app = builder.Build();
+
+//using (var scope = app.Services.CreateScope())
+//{
+//    var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
+//    var userManager = scope.ServiceProvider.GetRequiredService<UserManager<User>>();
+//    await DbInitializer.SeedRolesAndUsersAsync(roleManager, userManager);
+//}
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())

@@ -1,0 +1,35 @@
+﻿@model RewardsAndRecognitionRepository.Models.User
+
+@{
+    ViewData["Title"] = "Delete User";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h2 class="mb-4 text-danger">Delete User</h2>
+
+<div class="card shadow-sm border border-danger-subtle p-4" style="max-width: 600px; margin: auto;">
+    <h5>Are you sure you want to delete this user?</h5>
+
+    <dl class="row mt-3">
+        <dt class="col-sm-4 fw-semibold">Name</dt>
+        <dd class="col-sm-8">@Model.Name</dd>
+
+        <dt class="col-sm-4 fw-semibold">Email</dt>
+        <dd class="col-sm-8">@Model.Email</dd>
+
+        <dt class="col-sm-4 fw-semibold">Team</dt>
+        <dd class="col-sm-8">@Model.Team?.Name</dd>
+
+        <dt class="col-sm-4 fw-semibold">Manager</dt>
+        <dd class="col-sm-8">@Model.Manager?.Name</dd>
+    </dl>
+
+    <form asp-action="Delete" method="post">
+        <input type="hidden" asp-for="Id" />
+        <div class="d-flex justify-content-between mt-4">
+            <a asp-action="Index" class="btn btn-outline-secondary px-4">Cancel</a>
+            <button type="submit" class="btn btn-danger px-4">Delete</button>
+        </div>
+    </form>
+</div>
+

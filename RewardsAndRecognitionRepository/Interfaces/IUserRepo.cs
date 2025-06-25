@@ -18,5 +18,7 @@ namespace RewardsAndRecognitionRepository.Interfaces
         Task UpdateAsync(User user);
         Task DeleteAsync(string userId);
         Task SaveAsync();
+
+        Task<IEnumerable<User>> GetAllManagersAsync();
     }
 }

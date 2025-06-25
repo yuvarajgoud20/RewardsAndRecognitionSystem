@@ -14,7 +14,7 @@ namespace RewardsAndRecognitionRepository.Models
 
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 
-        public ICollection<Nomination> Nominations { get; set; }
+        public ICollection<Nomination>? Nominations { get; set; }
     }
 
 }

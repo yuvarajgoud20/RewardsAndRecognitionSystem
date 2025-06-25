@@ -6,6 +6,27 @@
 }
 
 <style>
+    .user-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-top: 20px;
+    }
+
+    .create-btn {
+        background-color: black;
+        color: white;
+        padding: 8px 16px;
+        border-radius: 5px;
+        text-decoration: none;
+        font-weight: 500;
+    }
+
+        .create-btn:hover {
+            background-color: #333;
+            color: #fff;
+        }
+
     table {
         width: 100%;
         border-collapse: collapse;
@@ -53,7 +74,10 @@
     }
 </style>
 
-<h2>Users</h2>
+<div class="user-header">
+    <h2>Users</h2>
+    <a asp-action="Create" class="create-btn">+ Create User</a>
+</div>
 
 <table>
     <thead>
@@ -81,4 +105,3 @@
         }
     </tbody>
 </table>
-

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using RewardsAndRecognitionRepository.Interfaces;
 using RewardsAndRecognitionRepository.Models;
@@ -12,10 +13,12 @@ namespace RewardsAndRecognitionRepository.Repos
     public class UserRepo : IUserRepo
     {
         private readonly ApplicationDbContext _context;
+        private readonly UserManager<User> _userManager;
 
-        public UserRepo(ApplicationDbContext context)
+        public UserRepo(ApplicationDbContext context, UserManager<User> userManager)
         {
             _context = context;
+            _userManager = userManager;
         }
 
         public async Task<IEnumerable<User>> GetAllAsync()
@@ -72,6 +75,12 @@ namespace RewardsAndRecognitionRepository.Repos
         public async Task SaveAsync()
         {
             await _context.SaveChangesAsync();
+        }
+
+        public async Task<IEnumerable<User>> GetAllManagersAsync()
+        {
+            var managers = await _userManager.GetUsersInRoleAsync("Manager");
+            return managers;
         }
     }
 }

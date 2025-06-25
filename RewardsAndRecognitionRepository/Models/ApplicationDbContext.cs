@@ -12,7 +12,7 @@ using RewardsAndRecognitionRepository.Enums;
 namespace RewardsAndRecognitionRepository.Models
 {
 
-    public class ApplicationDbContext : IdentityDbContext<IdentityUser>
+    public class ApplicationDbContext : IdentityDbContext<User>
     {
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
             : base(options) { }
@@ -28,6 +28,10 @@ namespace RewardsAndRecognitionRepository.Models
         {
             base.OnModelCreating(modelBuilder);
             // Enums as strings
+
+            modelBuilder.Entity<User>().HasDiscriminator().HasValue("User");
+
+            
 
             modelBuilder
                 .Entity<Nomination>()
@@ -50,12 +54,20 @@ namespace RewardsAndRecognitionRepository.Models
                 .HasConversion<string>();
 
             // Relationships
-            modelBuilder
-                .Entity<Team>()
-                .HasOne(t => t.TeamLead)
-                .WithMany()
-                .HasForeignKey(t => t.TeamLeadId)
-                .OnDelete(DeleteBehavior.Restrict);
+            modelBuilder.Entity<Team>(entity =>
+            {
+                // Team Lead relationship
+                entity.HasOne(t => t.TeamLead)
+                      .WithMany()
+                      .HasForeignKey(t => t.TeamLeadId)
+                      .OnDelete(DeleteBehavior.Restrict);
+
+                // ✅ Manager relationship
+                entity.HasOne(t => t.Manager)
+                      .WithMany()
+                      .HasForeignKey(t => t.ManagerId)
+                      .OnDelete(DeleteBehavior.Restrict);
+            });
 
             modelBuilder
                 .Entity<User>()

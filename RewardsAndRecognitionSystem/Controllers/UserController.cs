@@ -1,93 +1,153 @@
 ﻿using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using RewardsAndRecognitionRepository.Interfaces;
+using RewardsAndRecognitionRepository.Models;
+using RewardsAndRecognitionRepository.Repos;
 
 namespace RewardsAndRecognitionSystem.Controllers
 {
     public class UserController : Controller
     {
-        // GET: UserController
         private readonly IUserRepo _userRepo;
+        private readonly UserManager<User> _userManager;
+        private readonly ITeamRepo _teamRepo;
 
-        public UserController(IUserRepo userRepository)
+        public UserController(IUserRepo userRepo, UserManager<User> userManager, ITeamRepo teamRepo)
         {
-            _userRepo = userRepository;
+            _userRepo = userRepo;
+            _userManager = userManager;
+            _teamRepo = teamRepo;
         }
 
+        // GET: User
         public async Task<IActionResult> Index()
         {
             var users = await _userRepo.GetAllAsync();
             return View(users);
         }
 
-
-        // GET: UserController/Details/5
-        public ActionResult Details(int id)
+        // GET: User/Create
+        public async Task<IActionResult> Create()
         {
+            await PopulateDropDowns();
             return View();
         }
 
-        // GET: UserController/Create
-        public ActionResult Create()
-        {
-            return View();
-        }
-
-        // POST: UserController/Create
+        // POST: User/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Create(IFormCollection collection)
+        public async Task<IActionResult> Create(User user, string password, string SelectedRole)
         {
-            try
+            if (ModelState.IsValid)
             {
-                return RedirectToAction(nameof(Index));
+                user.UserName = user.Email;
+                user.NormalizedEmail = user.Email.ToUpper();
+                user.EmailConfirmed = true;
+                user.CreatedAt = DateTime.UtcNow;
+
+                var result = await _userManager.CreateAsync(user, password);
+
+                if (result.Succeeded)
+                {
+                    // Add user to selected role or default to Employee
+                    var roleToAssign = string.IsNullOrEmpty(SelectedRole) ? "Employee" : SelectedRole;
+
+                    var roleResult = await _userManager.AddToRoleAsync(user, roleToAssign);
+                    if (!roleResult.Succeeded)
+                    {
+                        foreach (var error in roleResult.Errors)
+                            ModelState.AddModelError("", error.Description);
+                        await PopulateDropDowns();
+                        return View(user);
+                    }
+
+                    return RedirectToAction(nameof(Index));
+                }
+
+                foreach (var error in result.Errors)
+                    ModelState.AddModelError("", error.Description);
             }
-            catch
-            {
-                return View();
-            }
+
+            await PopulateDropDowns();
+            return View(user);
         }
 
-        // GET: UserController/Edit/5
-        public ActionResult Edit(int id)
+        // GET: User/Edit/5
+        public async Task<IActionResult> Edit(string id)
         {
-            return View();
+            var user = await _userManager.FindByIdAsync(id);
+            if (user == null) return NotFound();
+
+            await PopulateDropDowns();
+            return View(user);
         }
 
-        // POST: UserController/Edit/5
+        // POST: User/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Edit(int id, IFormCollection collection)
+        public async Task<IActionResult> Edit(string id, User updatedUser)
         {
-            try
+            var user = await _userManager.FindByIdAsync(id);
+            if (user == null) return NotFound();
+
+            if (ModelState.IsValid)
             {
-                return RedirectToAction(nameof(Index));
+                user.NormalizedUserName = updatedUser.Email.ToUpper();
+                user.UserName = updatedUser.Email;
+                user.Name = updatedUser.Name;
+                user.Email = updatedUser.Email;
+                user.NormalizedEmail = updatedUser.Email.ToUpper();
+                user.TeamId = updatedUser.TeamId;
+                user.ManagerId = updatedUser.ManagerId;
+
+                var result = await _userManager.UpdateAsync(user);
+                if (result.Succeeded)
+                    return RedirectToAction(nameof(Index));
+
+                foreach (var error in result.Errors)
+                    ModelState.AddModelError("", error.Description);
             }
-            catch
-            {
-                return View();
-            }
+
+            await PopulateDropDowns();
+            return View(updatedUser);
         }
 
-        // GET: UserController/Delete/5
-        public ActionResult Delete(int id)
+        // GET: User/Delete/5
+        public async Task<IActionResult> Delete(string id)
         {
-            return View();
+            var user = await _userManager.FindByIdAsync(id);
+            if (user == null) return NotFound();
+
+            return View(user);
         }
 
-        // POST: UserController/Delete/5
-        [HttpPost]
+        // POST: User/Delete/5
+        [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
-        public ActionResult Delete(int id, IFormCollection collection)
+        public async Task<IActionResult> DeleteConfirmed(string id)
         {
-            try
-            {
+            var user = await _userManager.FindByIdAsync(id);
+            if (user == null) return NotFound();
+
+            var result = await _userManager.DeleteAsync(user);
+            if (result.Succeeded)
                 return RedirectToAction(nameof(Index));
-            }
-            catch
-            {
-                return View();
-            }
+
+            ModelState.AddModelError("", "Error deleting user.");
+            return View(user);
+        }
+
+        private async Task PopulateDropDowns()
+        {
+            var teams = await _teamRepo.GetAllAsync();
+            var managers = await _userRepo.GetAllManagersAsync();
+            var roles = new List<string> { "Admin", "TeamLead", "Manager", "Director", "Employee" };
+
+            ViewBag.Teams = new SelectList(teams, "Id", "Name");
+            ViewBag.Managers = new SelectList(managers, "Id", "Name");
+            ViewBag.Roles = roles;
         }
     }
 }

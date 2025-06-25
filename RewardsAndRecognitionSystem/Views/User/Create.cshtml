@@ -1,0 +1,64 @@
+﻿@model RewardsAndRecognitionRepository.Models.User
+@{
+    ViewData["Title"] = "Create User";
+}
+
+<h2 class="mb-4">Create New User</h2>
+
+<div class="card shadow-sm border-0 p-4" style="max-width: 600px; margin: auto;">
+    <form asp-action="Create" method="post">
+        <div class="form-group mb-3">
+            <label asp-for="Name" class="form-label fw-semibold">Name</label>
+            <input asp-for="Name" class="form-control border-dark-subtle" />
+            <span asp-validation-for="Name" class="text-danger"></span>
+        </div>
+
+        <div class="form-group mb-3">
+            <label asp-for="Email" class="form-label fw-semibold">Email</label>
+            <input asp-for="Email" class="form-control border-dark-subtle" />
+            <span asp-validation-for="Email" class="text-danger"></span>
+        </div>
+
+        <div class="form-group mb-3">
+            <label class="form-label fw-semibold">Password</label>
+            <input name="password" type="password" class="form-control border-dark-subtle" />
+            <small class="text-muted">Password must meet the system's requirements.</small>
+        </div>
+
+        <div class="form-group mb-3">
+            <label asp-for="TeamId" class="form-label fw-semibold">Team</label>
+            <select asp-for="TeamId" asp-items="ViewBag.Teams" class="form-select border-dark-subtle">
+                <option value="">-- Select Team --</option>
+            </select>
+        </div>
+
+        <div class="form-group mb-4">
+            <label asp-for="ManagerId" class="form-label fw-semibold">Manager</label>
+            <select asp-for="ManagerId" asp-items="ViewBag.Managers" class="form-select border-dark-subtle">
+                <option value="">-- Select Manager --</option>
+            </select>
+        </div>
+
+        <div class="form-group mb-4">
+            <label class="form-label fw-semibold">Role</label>
+            <select name="SelectedRole" class="form-select border-dark-subtle">
+                <option value="">-- Select Role --</option>
+                @foreach (var role in ViewBag.Roles as List<string>)
+                {
+                    <option value="@role">@role</option>
+                }
+            </select>
+        </div>
+
+        <div class="d-flex justify-content-between">
+            <a asp-action="Index" class="btn btn-outline-secondary px-4">Cancel</a>
+            <button type="submit" class="btn btn-dark px-4">Create</button>
+        </div>
+    </form>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

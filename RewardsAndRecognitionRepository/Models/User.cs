@@ -24,9 +24,9 @@ namespace RewardsAndRecognitionRepository.Models
         public Team? Team { get; set; }
         public User? Manager { get; set; }
 
-        public ICollection<Nomination> NominationsGiven { get; set; }
-        public ICollection<Nomination> NominationsReceived { get; set; }
-        public ICollection<Approval> Approvals { get; set; }
+        public ICollection<Nomination>? NominationsGiven { get; set; }
+        public ICollection<Nomination>? NominationsReceived { get; set; }
+        public ICollection<Approval>? Approvals { get; set; }
     }
 
 }
