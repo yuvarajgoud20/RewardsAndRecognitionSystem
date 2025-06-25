@@ -8,7 +8,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace RewardsAndRecognitionRepository.Migrations
 {
     /// <inheritdoc />
-    public partial class TablesCreationAndSeedData : Migration
+    public partial class InitialMigrations : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -25,31 +25,6 @@ namespace RewardsAndRecognitionRepository.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_AspNetRoles", x => x.Id);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "AspNetUsers",
-                columns: table => new
-                {
-                    Id = table.Column<string>(type: "nvarchar(450)", nullable: false),
-                    UserName = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
-                    NormalizedUserName = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
-                    Email = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
-                    NormalizedEmail = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
-                    EmailConfirmed = table.Column<bool>(type: "bit", nullable: false),
-                    PasswordHash = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    SecurityStamp = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    ConcurrencyStamp = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    PhoneNumber = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    PhoneNumberConfirmed = table.Column<bool>(type: "bit", nullable: false),
-                    TwoFactorEnabled = table.Column<bool>(type: "bit", nullable: false),
-                    LockoutEnd = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: true),
-                    LockoutEnabled = table.Column<bool>(type: "bit", nullable: false),
-                    AccessFailedCount = table.Column<int>(type: "int", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_AspNetUsers", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -104,6 +79,23 @@ namespace RewardsAndRecognitionRepository.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "Approvals",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    NominationId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    ApproverId = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    Action = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Level = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    ActionAt = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    Remarks = table.Column<string>(type: "nvarchar(max)", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Approvals", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "AspNetUserClaims",
                 columns: table => new
                 {
@@ -116,32 +108,20 @@ namespace RewardsAndRecognitionRepository.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_AspNetUserClaims", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_AspNetUserClaims_AspNetUsers_UserId",
-                        column: x => x.UserId,
-                        principalTable: "AspNetUsers",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
                 name: "AspNetUserLogins",
                 columns: table => new
                 {
-                    LoginProvider = table.Column<string>(type: "nvarchar(128)", maxLength: 128, nullable: false),
-                    ProviderKey = table.Column<string>(type: "nvarchar(128)", maxLength: 128, nullable: false),
+                    LoginProvider = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    ProviderKey = table.Column<string>(type: "nvarchar(450)", nullable: false),
                     ProviderDisplayName = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     UserId = table.Column<string>(type: "nvarchar(450)", nullable: false)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_AspNetUserLogins", x => new { x.LoginProvider, x.ProviderKey });
-                    table.ForeignKey(
-                        name: "FK_AspNetUserLogins_AspNetUsers_UserId",
-                        column: x => x.UserId,
-                        principalTable: "AspNetUsers",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
@@ -160,12 +140,43 @@ namespace RewardsAndRecognitionRepository.Migrations
                         principalTable: "AspNetRoles",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "AspNetUsers",
+                columns: table => new
+                {
+                    Id = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    TeamId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    ManagerId = table.Column<string>(type: "nvarchar(450)", nullable: true),
+                    IsActive = table.Column<bool>(type: "bit", nullable: true),
+                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    Discriminator = table.Column<string>(type: "nvarchar(5)", maxLength: 5, nullable: false),
+                    UserName = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
+                    NormalizedUserName = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
+                    Email = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
+                    NormalizedEmail = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
+                    EmailConfirmed = table.Column<bool>(type: "bit", nullable: false),
+                    PasswordHash = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    SecurityStamp = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    ConcurrencyStamp = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    PhoneNumber = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    PhoneNumberConfirmed = table.Column<bool>(type: "bit", nullable: false),
+                    TwoFactorEnabled = table.Column<bool>(type: "bit", nullable: false),
+                    LockoutEnd = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: true),
+                    LockoutEnabled = table.Column<bool>(type: "bit", nullable: false),
+                    AccessFailedCount = table.Column<int>(type: "int", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_AspNetUsers", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_AspNetUserRoles_AspNetUsers_UserId",
-                        column: x => x.UserId,
+                        name: "FK_AspNetUsers_AspNetUsers_ManagerId",
+                        column: x => x.ManagerId,
                         principalTable: "AspNetUsers",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        onDelete: ReferentialAction.Restrict);
                 });
 
             migrationBuilder.CreateTable(
@@ -173,8 +184,8 @@ namespace RewardsAndRecognitionRepository.Migrations
                 columns: table => new
                 {
                     UserId = table.Column<string>(type: "nvarchar(450)", nullable: false),
-                    LoginProvider = table.Column<string>(type: "nvarchar(128)", maxLength: 128, nullable: false),
-                    Name = table.Column<string>(type: "nvarchar(128)", maxLength: 128, nullable: false),
+                    LoginProvider = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    Name = table.Column<string>(type: "nvarchar(450)", nullable: false),
                     Value = table.Column<string>(type: "nvarchar(max)", nullable: true)
                 },
                 constraints: table =>
@@ -189,29 +200,12 @@ namespace RewardsAndRecognitionRepository.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "Approvals",
-                columns: table => new
-                {
-                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    NominationId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    ApproverId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    Action = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Level = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    ActionAt = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    Remarks = table.Column<string>(type: "nvarchar(max)", nullable: true)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Approvals", x => x.Id);
-                });
-
-            migrationBuilder.CreateTable(
                 name: "Nominations",
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    NominatorId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    NomineeId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    NominatorId = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    NomineeId = table.Column<string>(type: "nvarchar(450)", nullable: false),
                     CategoryId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     Description = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Achievements = table.Column<string>(type: "nvarchar(max)", nullable: false),
@@ -222,6 +216,18 @@ namespace RewardsAndRecognitionRepository.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Nominations", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Nominations_AspNetUsers_NominatorId",
+                        column: x => x.NominatorId,
+                        principalTable: "AspNetUsers",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_Nominations_AspNetUsers_NomineeId",
+                        column: x => x.NomineeId,
+                        principalTable: "AspNetUsers",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
                         name: "FK_Nominations_Categories_CategoryId",
                         column: x => x.CategoryId,
@@ -242,76 +248,59 @@ namespace RewardsAndRecognitionRepository.Migrations
                 {
                     Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    TeamLeadId = table.Column<Guid>(type: "uniqueidentifier", nullable: false)
+                    TeamLeadId = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    ManagerId = table.Column<string>(type: "nvarchar(450)", nullable: true)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Teams", x => x.Id);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "Users",
-                columns: table => new
-                {
-                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Email = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    PasswordHash = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Role = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    TeamId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
-                    ManagerId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
-                    IsActive = table.Column<bool>(type: "bit", nullable: false),
-                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Users", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_Users_Teams_TeamId",
-                        column: x => x.TeamId,
-                        principalTable: "Teams",
-                        principalColumn: "Id");
-                    table.ForeignKey(
-                        name: "FK_Users_Users_ManagerId",
+                        name: "FK_Teams_AspNetUsers_ManagerId",
                         column: x => x.ManagerId,
-                        principalTable: "Users",
+                        principalTable: "AspNetUsers",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_Teams_AspNetUsers_TeamLeadId",
+                        column: x => x.TeamLeadId,
+                        principalTable: "AspNetUsers",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
                 });
 
             migrationBuilder.InsertData(
-                table: "Categories",
-                columns: new[] { "Id", "CreatedAt", "Description", "Name" },
-                values: new object[] { new Guid("2c587b55-34f2-4280-8555-f099c2a70fdd"), new DateTime(2025, 6, 21, 9, 33, 29, 121, DateTimeKind.Utc).AddTicks(9150), "Awarded to best overall performer", "Best Performer" });
-
-            migrationBuilder.InsertData(
-                table: "Users",
-                columns: new[] { "Id", "CreatedAt", "Email", "IsActive", "ManagerId", "Name", "PasswordHash", "Role", "TeamId" },
+                table: "AspNetUsers",
+                columns: new[] { "Id", "AccessFailedCount", "ConcurrencyStamp", "CreatedAt", "Discriminator", "Email", "EmailConfirmed", "IsActive", "LockoutEnabled", "LockoutEnd", "ManagerId", "Name", "NormalizedEmail", "NormalizedUserName", "PasswordHash", "PhoneNumber", "PhoneNumberConfirmed", "SecurityStamp", "TeamId", "TwoFactorEnabled", "UserName" },
                 values: new object[,]
                 {
-                    { new Guid("846398bf-21c1-4437-b410-28cef56ea3d6"), new DateTime(2025, 6, 21, 9, 33, 29, 121, DateTimeKind.Utc).AddTicks(8909), "manager@company.com", true, null, "Manager User", "hashed_password_here", "Manager", null },
-                    { new Guid("a0b04559-ffcb-44a8-a399-108dbb0e748d"), new DateTime(2025, 6, 21, 9, 33, 29, 121, DateTimeKind.Utc).AddTicks(8907), "admin@company.com", true, null, "Admin User", "hashed_password_here", "Admin", null }
+                    { "3ae57138-7f02-4495-8fe7-f16ea1016b51", 0, "b5fa6410-d7cf-4496-a57d-02067e81fbf2", new DateTime(2025, 6, 25, 6, 9, 15, 833, DateTimeKind.Utc).AddTicks(7707), "User", "manager@company.com", false, true, false, null, null, "Manager User", null, null, "hashed_password_here", null, false, "a5e866b0-1bed-4132-aeb6-4e88f31723af", null, false, null },
+                    { "fbc9e986-0c46-469d-9a91-8e27ce5da80d", 0, "0cbc03d1-f9bd-4b09-94f2-1da7e7957505", new DateTime(2025, 6, 25, 6, 9, 15, 833, DateTimeKind.Utc).AddTicks(7697), "User", "admin@company.com", false, true, false, null, null, "Admin User", null, null, "hashed_password_here", null, false, "888e6d65-2278-45f2-b27d-30525368d853", null, false, null }
                 });
+
+            migrationBuilder.InsertData(
+                table: "Categories",
+                columns: new[] { "Id", "CreatedAt", "Description", "Name" },
+                values: new object[] { new Guid("375f230a-e461-4830-b91e-9941c86b04a0"), new DateTime(2025, 6, 25, 6, 9, 15, 833, DateTimeKind.Utc).AddTicks(8067), "Awarded to best overall performer", "Best Performer" });
 
             migrationBuilder.InsertData(
                 table: "YearQuarters",
                 columns: new[] { "Id", "EndDate", "IsActive", "Quarter", "StartDate", "Year" },
-                values: new object[] { new Guid("9d0d3fab-781c-4144-a90e-f92dfb4ae6cc"), new DateTime(2025, 6, 30, 0, 0, 0, 0, DateTimeKind.Unspecified), true, "Q2", new DateTime(2025, 4, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), 2025 });
+                values: new object[] { new Guid("4ef7fb1d-6203-4438-ad41-c35692e1a811"), new DateTime(2025, 6, 30, 0, 0, 0, 0, DateTimeKind.Unspecified), true, "Q2", new DateTime(2025, 4, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), 2025 });
 
             migrationBuilder.InsertData(
-                table: "Users",
-                columns: new[] { "Id", "CreatedAt", "Email", "IsActive", "ManagerId", "Name", "PasswordHash", "Role", "TeamId" },
-                values: new object[] { new Guid("24141765-5527-4fca-90e2-87355b3a0ea0"), new DateTime(2025, 6, 21, 9, 33, 29, 121, DateTimeKind.Utc).AddTicks(8915), "lead@company.com", true, new Guid("846398bf-21c1-4437-b410-28cef56ea3d6"), "Team Lead User", "hashed_password_here", "TeamLead", null });
+                table: "AspNetUsers",
+                columns: new[] { "Id", "AccessFailedCount", "ConcurrencyStamp", "CreatedAt", "Discriminator", "Email", "EmailConfirmed", "IsActive", "LockoutEnabled", "LockoutEnd", "ManagerId", "Name", "NormalizedEmail", "NormalizedUserName", "PasswordHash", "PhoneNumber", "PhoneNumberConfirmed", "SecurityStamp", "TeamId", "TwoFactorEnabled", "UserName" },
+                values: new object[] { "ceaeee27-e938-4304-be9e-c6c39dd38275", 0, "bd6d4859-3474-4f19-9318-647daacb8d18", new DateTime(2025, 6, 25, 6, 9, 15, 833, DateTimeKind.Utc).AddTicks(7724), "User", "lead@company.com", false, true, false, null, "3ae57138-7f02-4495-8fe7-f16ea1016b51", "Team Lead User", null, null, "hashed_password_here", null, false, "35d34b04-010f-4c9a-991d-4682f03b5624", null, false, null });
 
             migrationBuilder.InsertData(
                 table: "Teams",
-                columns: new[] { "Id", "Name", "TeamLeadId" },
-                values: new object[] { new Guid("28baad43-4001-403b-9795-b64f935cdc09"), "Alpha Team", new Guid("24141765-5527-4fca-90e2-87355b3a0ea0") });
+                columns: new[] { "Id", "ManagerId", "Name", "TeamLeadId" },
+                values: new object[] { new Guid("3dadcde7-1580-4fbd-8246-25ae55559236"), null, "Alpha Team", "ceaeee27-e938-4304-be9e-c6c39dd38275" });
 
             migrationBuilder.InsertData(
-                table: "Users",
-                columns: new[] { "Id", "CreatedAt", "Email", "IsActive", "ManagerId", "Name", "PasswordHash", "Role", "TeamId" },
-                values: new object[] { new Guid("d46aa680-08a1-4cbb-b077-c7d912f45e24"), new DateTime(2025, 6, 21, 9, 33, 29, 121, DateTimeKind.Utc).AddTicks(8918), "employee@company.com", true, new Guid("846398bf-21c1-4437-b410-28cef56ea3d6"), "Employee One", "hashed_password_here", "Employee", new Guid("28baad43-4001-403b-9795-b64f935cdc09") });
+                table: "AspNetUsers",
+                columns: new[] { "Id", "AccessFailedCount", "ConcurrencyStamp", "CreatedAt", "Discriminator", "Email", "EmailConfirmed", "IsActive", "LockoutEnabled", "LockoutEnd", "ManagerId", "Name", "NormalizedEmail", "NormalizedUserName", "PasswordHash", "PhoneNumber", "PhoneNumberConfirmed", "SecurityStamp", "TeamId", "TwoFactorEnabled", "UserName" },
+                values: new object[] { "941e4342-c703-4700-82c9-791bb2217c68", 0, "cae69003-ea18-4662-ac47-ab62166881c8", new DateTime(2025, 6, 25, 6, 9, 15, 833, DateTimeKind.Utc).AddTicks(7736), "User", "employee@company.com", false, true, false, null, "3ae57138-7f02-4495-8fe7-f16ea1016b51", "Employee One", null, null, "hashed_password_here", null, false, "4dad9b49-b63b-464f-bc4d-f97dc8388712", new Guid("3dadcde7-1580-4fbd-8246-25ae55559236"), false, null });
 
             migrationBuilder.CreateIndex(
                 name: "IX_Approvals_ApproverId",
@@ -356,6 +345,16 @@ namespace RewardsAndRecognitionRepository.Migrations
                 column: "NormalizedEmail");
 
             migrationBuilder.CreateIndex(
+                name: "IX_AspNetUsers_ManagerId",
+                table: "AspNetUsers",
+                column: "ManagerId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_AspNetUsers_TeamId",
+                table: "AspNetUsers",
+                column: "TeamId");
+
+            migrationBuilder.CreateIndex(
                 name: "UserNameIndex",
                 table: "AspNetUsers",
                 column: "NormalizedUserName",
@@ -383,19 +382,22 @@ namespace RewardsAndRecognitionRepository.Migrations
                 column: "YearQuarterId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_Teams_ManagerId",
+                table: "Teams",
+                column: "ManagerId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Teams_TeamLeadId",
                 table: "Teams",
                 column: "TeamLeadId");
 
-            migrationBuilder.CreateIndex(
-                name: "IX_Users_ManagerId",
-                table: "Users",
-                column: "ManagerId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Users_TeamId",
-                table: "Users",
-                column: "TeamId");
+            migrationBuilder.AddForeignKey(
+                name: "FK_Approvals_AspNetUsers_ApproverId",
+                table: "Approvals",
+                column: "ApproverId",
+                principalTable: "AspNetUsers",
+                principalColumn: "Id",
+                onDelete: ReferentialAction.Cascade);
 
             migrationBuilder.AddForeignKey(
                 name: "FK_Approvals_Nominations_NominationId",
@@ -406,43 +408,46 @@ namespace RewardsAndRecognitionRepository.Migrations
                 onDelete: ReferentialAction.Cascade);
 
             migrationBuilder.AddForeignKey(
-                name: "FK_Approvals_Users_ApproverId",
-                table: "Approvals",
-                column: "ApproverId",
-                principalTable: "Users",
+                name: "FK_AspNetUserClaims_AspNetUsers_UserId",
+                table: "AspNetUserClaims",
+                column: "UserId",
+                principalTable: "AspNetUsers",
                 principalColumn: "Id",
                 onDelete: ReferentialAction.Cascade);
 
             migrationBuilder.AddForeignKey(
-                name: "FK_Nominations_Users_NominatorId",
-                table: "Nominations",
-                column: "NominatorId",
-                principalTable: "Users",
+                name: "FK_AspNetUserLogins_AspNetUsers_UserId",
+                table: "AspNetUserLogins",
+                column: "UserId",
+                principalTable: "AspNetUsers",
                 principalColumn: "Id",
-                onDelete: ReferentialAction.Restrict);
+                onDelete: ReferentialAction.Cascade);
 
             migrationBuilder.AddForeignKey(
-                name: "FK_Nominations_Users_NomineeId",
-                table: "Nominations",
-                column: "NomineeId",
-                principalTable: "Users",
+                name: "FK_AspNetUserRoles_AspNetUsers_UserId",
+                table: "AspNetUserRoles",
+                column: "UserId",
+                principalTable: "AspNetUsers",
                 principalColumn: "Id",
-                onDelete: ReferentialAction.Restrict);
+                onDelete: ReferentialAction.Cascade);
 
             migrationBuilder.AddForeignKey(
-                name: "FK_Teams_Users_TeamLeadId",
-                table: "Teams",
-                column: "TeamLeadId",
-                principalTable: "Users",
-                principalColumn: "Id",
-                onDelete: ReferentialAction.Restrict);
+                name: "FK_AspNetUsers_Teams_TeamId",
+                table: "AspNetUsers",
+                column: "TeamId",
+                principalTable: "Teams",
+                principalColumn: "Id");
         }
 
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropForeignKey(
-                name: "FK_Teams_Users_TeamLeadId",
+                name: "FK_Teams_AspNetUsers_ManagerId",
+                table: "Teams");
+
+            migrationBuilder.DropForeignKey(
+                name: "FK_Teams_AspNetUsers_TeamLeadId",
                 table: "Teams");
 
             migrationBuilder.DropTable(
@@ -470,16 +475,13 @@ namespace RewardsAndRecognitionRepository.Migrations
                 name: "AspNetRoles");
 
             migrationBuilder.DropTable(
-                name: "AspNetUsers");
-
-            migrationBuilder.DropTable(
                 name: "Categories");
 
             migrationBuilder.DropTable(
                 name: "YearQuarters");
 
             migrationBuilder.DropTable(
-                name: "Users");
+                name: "AspNetUsers");
 
             migrationBuilder.DropTable(
                 name: "Teams");
