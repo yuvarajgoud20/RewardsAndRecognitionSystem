@@ -1,0 +1,16 @@
+﻿@model RewardsAndRecognitionRepository.Models.Team
+
+<h2 class="mb-4">Confirm Delete</h2>
+
+<div class="alert alert-warning">
+    <h5>Are you sure you want to delete the team: <strong>@Model.Name</strong>?</h5>
+    <p>This action cannot be undone.</p>
+</div>
+
+<form asp-action="Delete">
+    <input type="hidden" asp-for="Id" />
+    <div class="d-flex justify-content-between">
+        <a asp-action="Index" class="btn btn-outline-secondary">Cancel</a>
+        <button type="submit" class="btn btn-danger">Confirm Delete</button>
+    </div>
+</form>

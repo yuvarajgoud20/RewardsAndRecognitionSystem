@@ -1,0 +1,35 @@
+﻿@model IEnumerable<RewardsAndRecognitionRepository.Models.YearQuarter>
+
+<h2 class="mb-4">Year Quarters</h2>
+
+<a asp-action="Create" class="btn btn-dark mb-3">➕ Add Year Quarter</a>
+
+<table class="table table-bordered table-striped shadow-sm">
+    <thead class="table-dark">
+        <tr>
+            <th>Year</th>
+            <th>Quarter</th>
+            <th>Start Date</th>
+            <th>End Date</th>
+            <th>Active</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var yq in Model)
+        {
+            <tr>
+                <td>@yq.Year</td>
+                <td>@yq.Quarter</td>
+                <td>@yq.StartDate.ToShortDateString()</td>
+                <td>@yq.EndDate.ToShortDateString()</td>
+                <td>@(yq.IsActive ? "Yes" : "No")</td>
+                <td>
+                    <a asp-action="Details" asp-route-id="@yq.Id" class="btn btn-sm btn-info">👁 View</a>
+                    <a asp-action="Edit" asp-route-id="@yq.Id" class="btn btn-sm btn-primary">✏️ Edit</a>
+                    <a asp-action="Delete" asp-route-id="@yq.Id" class="btn btn-sm btn-danger">🗑 Delete</a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

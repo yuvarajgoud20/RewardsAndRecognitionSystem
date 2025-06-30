@@ -12,8 +12,8 @@ using RewardsAndRecognitionRepository.Models;
 namespace RewardsAndRecognitionRepository.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20250625060917_InitialMigrations")]
-    partial class InitialMigrations
+    [Migration("20250627065511_RemovedManagerIdFromUsers")]
+    partial class RemovedManagerIdFromUsers
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -214,15 +214,6 @@ namespace RewardsAndRecognitionRepository.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Categories");
-
-                    b.HasData(
-                        new
-                        {
-                            Id = new Guid("375f230a-e461-4830-b91e-9941c86b04a0"),
-                            CreatedAt = new DateTime(2025, 6, 25, 6, 9, 15, 833, DateTimeKind.Utc).AddTicks(8067),
-                            Description = "Awarded to best overall performer",
-                            Name = "Best Performer"
-                        });
                 });
 
             modelBuilder.Entity("RewardsAndRecognitionRepository.Models.Nomination", b =>
@@ -297,14 +288,6 @@ namespace RewardsAndRecognitionRepository.Migrations
                     b.HasIndex("TeamLeadId");
 
                     b.ToTable("Teams");
-
-                    b.HasData(
-                        new
-                        {
-                            Id = new Guid("3dadcde7-1580-4fbd-8246-25ae55559236"),
-                            Name = "Alpha Team",
-                            TeamLeadId = "ceaeee27-e938-4304-be9e-c6c39dd38275"
-                        });
                 });
 
             modelBuilder.Entity("RewardsAndRecognitionRepository.Models.User", b =>
@@ -343,9 +326,6 @@ namespace RewardsAndRecognitionRepository.Migrations
                     b.Property<DateTimeOffset?>("LockoutEnd")
                         .HasColumnType("datetimeoffset");
 
-                    b.Property<string>("ManagerId")
-                        .HasColumnType("nvarchar(450)");
-
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -382,8 +362,6 @@ namespace RewardsAndRecognitionRepository.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("ManagerId");
-
                     b.HasIndex("NormalizedEmail")
                         .HasDatabaseName("EmailIndex");
 
@@ -397,75 +375,6 @@ namespace RewardsAndRecognitionRepository.Migrations
                     b.ToTable("AspNetUsers", (string)null);
 
                     b.HasDiscriminator().HasValue("User");
-
-                    b.HasData(
-                        new
-                        {
-                            Id = "fbc9e986-0c46-469d-9a91-8e27ce5da80d",
-                            AccessFailedCount = 0,
-                            ConcurrencyStamp = "0cbc03d1-f9bd-4b09-94f2-1da7e7957505",
-                            CreatedAt = new DateTime(2025, 6, 25, 6, 9, 15, 833, DateTimeKind.Utc).AddTicks(7697),
-                            Email = "admin@company.com",
-                            EmailConfirmed = false,
-                            IsActive = true,
-                            LockoutEnabled = false,
-                            Name = "Admin User",
-                            PasswordHash = "hashed_password_here",
-                            PhoneNumberConfirmed = false,
-                            SecurityStamp = "888e6d65-2278-45f2-b27d-30525368d853",
-                            TwoFactorEnabled = false
-                        },
-                        new
-                        {
-                            Id = "3ae57138-7f02-4495-8fe7-f16ea1016b51",
-                            AccessFailedCount = 0,
-                            ConcurrencyStamp = "b5fa6410-d7cf-4496-a57d-02067e81fbf2",
-                            CreatedAt = new DateTime(2025, 6, 25, 6, 9, 15, 833, DateTimeKind.Utc).AddTicks(7707),
-                            Email = "manager@company.com",
-                            EmailConfirmed = false,
-                            IsActive = true,
-                            LockoutEnabled = false,
-                            Name = "Manager User",
-                            PasswordHash = "hashed_password_here",
-                            PhoneNumberConfirmed = false,
-                            SecurityStamp = "a5e866b0-1bed-4132-aeb6-4e88f31723af",
-                            TwoFactorEnabled = false
-                        },
-                        new
-                        {
-                            Id = "ceaeee27-e938-4304-be9e-c6c39dd38275",
-                            AccessFailedCount = 0,
-                            ConcurrencyStamp = "bd6d4859-3474-4f19-9318-647daacb8d18",
-                            CreatedAt = new DateTime(2025, 6, 25, 6, 9, 15, 833, DateTimeKind.Utc).AddTicks(7724),
-                            Email = "lead@company.com",
-                            EmailConfirmed = false,
-                            IsActive = true,
-                            LockoutEnabled = false,
-                            ManagerId = "3ae57138-7f02-4495-8fe7-f16ea1016b51",
-                            Name = "Team Lead User",
-                            PasswordHash = "hashed_password_here",
-                            PhoneNumberConfirmed = false,
-                            SecurityStamp = "35d34b04-010f-4c9a-991d-4682f03b5624",
-                            TwoFactorEnabled = false
-                        },
-                        new
-                        {
-                            Id = "941e4342-c703-4700-82c9-791bb2217c68",
-                            AccessFailedCount = 0,
-                            ConcurrencyStamp = "cae69003-ea18-4662-ac47-ab62166881c8",
-                            CreatedAt = new DateTime(2025, 6, 25, 6, 9, 15, 833, DateTimeKind.Utc).AddTicks(7736),
-                            Email = "employee@company.com",
-                            EmailConfirmed = false,
-                            IsActive = true,
-                            LockoutEnabled = false,
-                            ManagerId = "3ae57138-7f02-4495-8fe7-f16ea1016b51",
-                            Name = "Employee One",
-                            PasswordHash = "hashed_password_here",
-                            PhoneNumberConfirmed = false,
-                            SecurityStamp = "4dad9b49-b63b-464f-bc4d-f97dc8388712",
-                            TeamId = new Guid("3dadcde7-1580-4fbd-8246-25ae55559236"),
-                            TwoFactorEnabled = false
-                        });
                 });
 
             modelBuilder.Entity("RewardsAndRecognitionRepository.Models.YearQuarter", b =>
@@ -493,17 +402,6 @@ namespace RewardsAndRecognitionRepository.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("YearQuarters");
-
-                    b.HasData(
-                        new
-                        {
-                            Id = new Guid("4ef7fb1d-6203-4438-ad41-c35692e1a811"),
-                            EndDate = new DateTime(2025, 6, 30, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            IsActive = true,
-                            Quarter = "Q2",
-                            StartDate = new DateTime(2025, 4, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            Year = 2025
-                        });
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
@@ -631,16 +529,9 @@ namespace RewardsAndRecognitionRepository.Migrations
 
             modelBuilder.Entity("RewardsAndRecognitionRepository.Models.User", b =>
                 {
-                    b.HasOne("RewardsAndRecognitionRepository.Models.User", "Manager")
-                        .WithMany()
-                        .HasForeignKey("ManagerId")
-                        .OnDelete(DeleteBehavior.Restrict);
-
                     b.HasOne("RewardsAndRecognitionRepository.Models.Team", "Team")
                         .WithMany("Users")
                         .HasForeignKey("TeamId");
-
-                    b.Navigation("Manager");
 
                     b.Navigation("Team");
                 });

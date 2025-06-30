@@ -1,0 +1,37 @@
+﻿@model IEnumerable<RewardsAndRecognitionRepository.Models.Category>
+
+@{
+    ViewData["Title"] = "Categories";
+}
+
+<h2 class="mb-4">Categories</h2>
+
+<div class="mb-3 text-end">
+    <a asp-action="Create" class="btn btn-dark">+ New Category</a>
+</div>
+
+<table class="table table-bordered shadow-sm">
+    <thead>
+        <tr>
+            <th>Name</th>
+            <th>Description</th>
+            <th>Created At</th>
+            <th style="width: 200px">Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var category in Model)
+        {
+            <tr>
+                <td>@category.Name</td>
+                <td>@category.Description</td>
+                <td>@category.CreatedAt.ToShortDateString()</td>
+                <td>
+                    <a asp-action="Edit" asp-route-id="@category.Id" class="btn btn-sm btn-outline-primary">Edit</a>
+                    <a asp-action="Details" asp-route-id="@category.Id" class="btn btn-sm btn-outline-secondary">Details</a>
+                    <a asp-action="Delete" asp-route-id="@category.Id" class="btn btn-sm btn-outline-danger">Delete</a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

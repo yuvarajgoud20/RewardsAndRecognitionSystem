@@ -1,12 +1,14 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using RewardsAndRecognitionRepository.Models;
 
 namespace RewardsAndRecognitionRepository.Interfaces
 {
     public interface IYearQuarterRepo
     {
+        Task<IEnumerable<YearQuarter>> GetAllAsync();
+        Task<YearQuarter?> GetByIdAsync(Guid id);
+        Task AddAsync(YearQuarter yq);
+        Task UpdateAsync(YearQuarter yq);
+        Task DeleteAsync(Guid id);
+        Task<bool> ExistsAsync(Guid id);
     }
 }

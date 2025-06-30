@@ -3,12 +3,10 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
-#pragma warning disable CA1814 // Prefer jagged arrays over multidimensional
-
 namespace RewardsAndRecognitionRepository.Migrations
 {
     /// <inheritdoc />
-    public partial class InitialMigrations : Migration
+    public partial class RemovedManagerIdFromUsers : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -149,7 +147,6 @@ namespace RewardsAndRecognitionRepository.Migrations
                     Id = table.Column<string>(type: "nvarchar(450)", nullable: false),
                     Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     TeamId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
-                    ManagerId = table.Column<string>(type: "nvarchar(450)", nullable: true),
                     IsActive = table.Column<bool>(type: "bit", nullable: true),
                     CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
                     Discriminator = table.Column<string>(type: "nvarchar(5)", maxLength: 5, nullable: false),
@@ -171,12 +168,6 @@ namespace RewardsAndRecognitionRepository.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_AspNetUsers", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_AspNetUsers_AspNetUsers_ManagerId",
-                        column: x => x.ManagerId,
-                        principalTable: "AspNetUsers",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
                 });
 
             migrationBuilder.CreateTable(
@@ -268,40 +259,6 @@ namespace RewardsAndRecognitionRepository.Migrations
                         onDelete: ReferentialAction.Restrict);
                 });
 
-            migrationBuilder.InsertData(
-                table: "AspNetUsers",
-                columns: new[] { "Id", "AccessFailedCount", "ConcurrencyStamp", "CreatedAt", "Discriminator", "Email", "EmailConfirmed", "IsActive", "LockoutEnabled", "LockoutEnd", "ManagerId", "Name", "NormalizedEmail", "NormalizedUserName", "PasswordHash", "PhoneNumber", "PhoneNumberConfirmed", "SecurityStamp", "TeamId", "TwoFactorEnabled", "UserName" },
-                values: new object[,]
-                {
-                    { "3ae57138-7f02-4495-8fe7-f16ea1016b51", 0, "b5fa6410-d7cf-4496-a57d-02067e81fbf2", new DateTime(2025, 6, 25, 6, 9, 15, 833, DateTimeKind.Utc).AddTicks(7707), "User", "manager@company.com", false, true, false, null, null, "Manager User", null, null, "hashed_password_here", null, false, "a5e866b0-1bed-4132-aeb6-4e88f31723af", null, false, null },
-                    { "fbc9e986-0c46-469d-9a91-8e27ce5da80d", 0, "0cbc03d1-f9bd-4b09-94f2-1da7e7957505", new DateTime(2025, 6, 25, 6, 9, 15, 833, DateTimeKind.Utc).AddTicks(7697), "User", "admin@company.com", false, true, false, null, null, "Admin User", null, null, "hashed_password_here", null, false, "888e6d65-2278-45f2-b27d-30525368d853", null, false, null }
-                });
-
-            migrationBuilder.InsertData(
-                table: "Categories",
-                columns: new[] { "Id", "CreatedAt", "Description", "Name" },
-                values: new object[] { new Guid("375f230a-e461-4830-b91e-9941c86b04a0"), new DateTime(2025, 6, 25, 6, 9, 15, 833, DateTimeKind.Utc).AddTicks(8067), "Awarded to best overall performer", "Best Performer" });
-
-            migrationBuilder.InsertData(
-                table: "YearQuarters",
-                columns: new[] { "Id", "EndDate", "IsActive", "Quarter", "StartDate", "Year" },
-                values: new object[] { new Guid("4ef7fb1d-6203-4438-ad41-c35692e1a811"), new DateTime(2025, 6, 30, 0, 0, 0, 0, DateTimeKind.Unspecified), true, "Q2", new DateTime(2025, 4, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), 2025 });
-
-            migrationBuilder.InsertData(
-                table: "AspNetUsers",
-                columns: new[] { "Id", "AccessFailedCount", "ConcurrencyStamp", "CreatedAt", "Discriminator", "Email", "EmailConfirmed", "IsActive", "LockoutEnabled", "LockoutEnd", "ManagerId", "Name", "NormalizedEmail", "NormalizedUserName", "PasswordHash", "PhoneNumber", "PhoneNumberConfirmed", "SecurityStamp", "TeamId", "TwoFactorEnabled", "UserName" },
-                values: new object[] { "ceaeee27-e938-4304-be9e-c6c39dd38275", 0, "bd6d4859-3474-4f19-9318-647daacb8d18", new DateTime(2025, 6, 25, 6, 9, 15, 833, DateTimeKind.Utc).AddTicks(7724), "User", "lead@company.com", false, true, false, null, "3ae57138-7f02-4495-8fe7-f16ea1016b51", "Team Lead User", null, null, "hashed_password_here", null, false, "35d34b04-010f-4c9a-991d-4682f03b5624", null, false, null });
-
-            migrationBuilder.InsertData(
-                table: "Teams",
-                columns: new[] { "Id", "ManagerId", "Name", "TeamLeadId" },
-                values: new object[] { new Guid("3dadcde7-1580-4fbd-8246-25ae55559236"), null, "Alpha Team", "ceaeee27-e938-4304-be9e-c6c39dd38275" });
-
-            migrationBuilder.InsertData(
-                table: "AspNetUsers",
-                columns: new[] { "Id", "AccessFailedCount", "ConcurrencyStamp", "CreatedAt", "Discriminator", "Email", "EmailConfirmed", "IsActive", "LockoutEnabled", "LockoutEnd", "ManagerId", "Name", "NormalizedEmail", "NormalizedUserName", "PasswordHash", "PhoneNumber", "PhoneNumberConfirmed", "SecurityStamp", "TeamId", "TwoFactorEnabled", "UserName" },
-                values: new object[] { "941e4342-c703-4700-82c9-791bb2217c68", 0, "cae69003-ea18-4662-ac47-ab62166881c8", new DateTime(2025, 6, 25, 6, 9, 15, 833, DateTimeKind.Utc).AddTicks(7736), "User", "employee@company.com", false, true, false, null, "3ae57138-7f02-4495-8fe7-f16ea1016b51", "Employee One", null, null, "hashed_password_here", null, false, "4dad9b49-b63b-464f-bc4d-f97dc8388712", new Guid("3dadcde7-1580-4fbd-8246-25ae55559236"), false, null });
-
             migrationBuilder.CreateIndex(
                 name: "IX_Approvals_ApproverId",
                 table: "Approvals",
@@ -343,11 +300,6 @@ namespace RewardsAndRecognitionRepository.Migrations
                 name: "EmailIndex",
                 table: "AspNetUsers",
                 column: "NormalizedEmail");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_AspNetUsers_ManagerId",
-                table: "AspNetUsers",
-                column: "ManagerId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_AspNetUsers_TeamId",

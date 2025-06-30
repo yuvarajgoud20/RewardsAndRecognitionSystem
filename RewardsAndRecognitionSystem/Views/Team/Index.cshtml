@@ -1,0 +1,34 @@
+﻿@model IEnumerable<RewardsAndRecognitionRepository.Models.Team>
+
+@{
+    ViewData["Title"] = "Teams List";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h2 class="mb-4">All Teams</h2>
+<a class="btn btn-dark mb-3" asp-action="Create">+ Create New Team</a>
+
+<table class="table table-bordered table-striped">
+    <thead class="table-dark">
+        <tr>
+            <th>Name</th>
+            <th>Manager</th>
+            <th>Team Lead</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var team in Model)
+        {
+            <tr>
+                <td>@team.Name</td>
+                <td>@team.Manager?.Name</td>
+                <td>@team.TeamLead?.Name</td>
+                <td>
+                    <a asp-action="Edit" asp-route-id="@team.Id" class="btn btn-sm btn-outline-dark me-2">Edit</a>
+                    <a asp-action="Delete" asp-route-id="@team.Id" class="btn btn-sm btn-outline-danger">Delete</a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

@@ -4,6 +4,7 @@ using RewardsAndRecognitionRepository.Data;
 using RewardsAndRecognitionRepository.Interfaces;
 using RewardsAndRecognitionRepository.Models;
 using RewardsAndRecognitionRepository.Repos;
+using RewardsAndRecognitionRepository.Repositories;
 
 
 var builder = WebApplication.CreateBuilder(args);
@@ -26,6 +27,10 @@ builder.Services.AddControllersWithViews();
 
 builder.Services.AddScoped<IUserRepo, UserRepo>();
 builder.Services.AddScoped<ITeamRepo, TeamRepo>();
+builder.Services.AddScoped<INominationRepo, NominationRepo>();
+builder.Services.AddScoped<ICategoryRepo, CategoryRepo>();
+builder.Services.AddScoped<IApprovalRepo, ApprovalRepo>();
+builder.Services.AddScoped<IYearQuarterRepo, YearQuarterRepo>();
 
 
 var app = builder.Build();

@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.EntityFrameworkCore;
 using RewardsAndRecognitionRepository.Interfaces;
 using RewardsAndRecognitionRepository.Models;
 using RewardsAndRecognitionRepository.Repos;
@@ -13,18 +14,24 @@ namespace RewardsAndRecognitionSystem.Controllers
         private readonly IUserRepo _userRepo;
         private readonly UserManager<User> _userManager;
         private readonly ITeamRepo _teamRepo;
+        private readonly ApplicationDbContext _context;
 
-        public UserController(IUserRepo userRepo, UserManager<User> userManager, ITeamRepo teamRepo)
+        public UserController(IUserRepo userRepo, UserManager<User> userManager, ITeamRepo teamRepo, ApplicationDbContext context)
         {
             _userRepo = userRepo;
             _userManager = userManager;
             _teamRepo = teamRepo;
+            _context = context;
         }
 
         // GET: User
         public async Task<IActionResult> Index()
         {
-            var users = await _userRepo.GetAllAsync();
+            var users = await _context.Users
+        .Include(u => u.Team)
+            .ThenInclude(t => t.Manager)
+        .ToListAsync();
+
             var userRoles = new Dictionary<string, string>();
 
             foreach (var user in users)
@@ -33,7 +40,10 @@ namespace RewardsAndRecognitionSystem.Controllers
                 userRoles[user.Id] = roles.FirstOrDefault() ?? "No Role";
             }
 
+            
+
             ViewBag.UserRoles = userRoles;
+
             return View(users);
         }
 
@@ -109,7 +119,6 @@ namespace RewardsAndRecognitionSystem.Controllers
                 user.Email = updatedUser.Email;
                 user.NormalizedEmail = updatedUser.Email.ToUpper();
                 user.TeamId = updatedUser.TeamId;
-                user.ManagerId = updatedUser.ManagerId;
 
                 var result = await _userManager.UpdateAsync(user);
                 if (result.Succeeded)

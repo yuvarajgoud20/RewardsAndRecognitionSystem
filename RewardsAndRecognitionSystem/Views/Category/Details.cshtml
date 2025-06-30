@@ -1,0 +1,25 @@
+﻿@model RewardsAndRecognitionRepository.Models.Category
+
+@{
+    ViewData["Title"] = "Category Details";
+}
+
+<h2 class="mb-4">Category Details</h2>
+
+<div class="card shadow-sm border-0 p-4" style="max-width: 600px; margin: auto;">
+    <dl class="row">
+        <dt class="col-sm-4">Name</dt>
+        <dd class="col-sm-8">@Model.Name</dd>
+
+        <dt class="col-sm-4">Description</dt>
+        <dd class="col-sm-8">@Model.Description</dd>
+
+        <dt class="col-sm-4">Created At</dt>
+        <dd class="col-sm-8">@Model.CreatedAt.ToString("f")</dd>
+    </dl>
+
+    <div class="d-flex justify-content-between mt-3">
+        <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-outline-primary">Edit</a>
+        <a asp-action="Index" class="btn btn-outline-secondary">Back</a>
+    </div>
+</div>

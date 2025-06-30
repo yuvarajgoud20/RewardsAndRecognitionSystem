@@ -15,14 +15,14 @@ namespace RewardsAndRecognitionRepository.Models
         public string Name { get; set; } = string.Empty;
 
         public Guid? TeamId { get; set; }
-        public string? ManagerId { get; set; }
+        
 
         public bool? IsActive { get; set; } = true;
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 
         // Navigation
         public Team? Team { get; set; }
-        public User? Manager { get; set; }
+        
 
         public ICollection<Nomination>? NominationsGiven { get; set; }
         public ICollection<Nomination>? NominationsReceived { get; set; }

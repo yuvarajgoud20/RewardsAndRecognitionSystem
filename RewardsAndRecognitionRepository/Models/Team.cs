@@ -12,7 +12,7 @@ namespace RewardsAndRecognitionRepository.Models
         public string Name { get; set; } = string.Empty;
 
         public string TeamLeadId { get; set; }
-        public User TeamLead { get; set; }
+        public User? TeamLead { get; set; }
 
         public string? ManagerId { get; set; }
         public User? Manager { get; set; }

@@ -1,0 +1,27 @@
+﻿@model RewardsAndRecognitionRepository.Models.YearQuarter
+
+<h2 class="mb-4">Year Quarter Details</h2>
+
+<div class="card p-4 shadow-sm" style="max-width: 600px; margin: auto;">
+    <dl class="row">
+        <dt class="col-sm-4">Year</dt>
+        <dd class="col-sm-8">@Model.Year</dd>
+
+        <dt class="col-sm-4">Quarter</dt>
+        <dd class="col-sm-8">@Model.Quarter</dd>
+
+        <dt class="col-sm-4">Start Date</dt>
+        <dd class="col-sm-8">@Model.StartDate.ToShortDateString()</dd>
+
+        <dt class="col-sm-4">End Date</dt>
+        <dd class="col-sm-8">@Model.EndDate.ToShortDateString()</dd>
+
+        <dt class="col-sm-4">Is Active</dt>
+        <dd class="col-sm-8">@(Model.IsActive ? "Yes" : "No")</dd>
+    </dl>
+
+    <div class="d-flex justify-content-between">
+        <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-primary">Edit</a>
+        <a asp-action="Index" class="btn btn-outline-secondary">Back</a>
+    </div>
+</div>

@@ -1,0 +1,90 @@
+﻿@model IEnumerable<RewardsAndRecognitionRepository.Models.Nomination>
+
+@{
+    ViewData["Title"] = "Nominations List";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<style>
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        margin-top: 20px;
+    }
+
+    th, td {
+        border: 1px solid #ddd;
+        padding: 12px;
+        text-align: left;
+    }
+
+    th {
+        background-color: black;
+        color: white;
+        font-weight: 600;
+    }
+
+    tr:nth-child(even) {
+        background-color: #f9f9f9;
+    }
+
+    tr:hover {
+        background-color: #f1f1f1;
+    }
+
+    .btn {
+        padding: 6px 12px;
+        border: none;
+        cursor: pointer;
+        border-radius: 4px;
+        font-size: 0.9rem;
+    }
+
+    .btn-edit {
+        background-color: black;
+        color: white;
+        margin-right: 5px;
+    }
+
+    .btn-delete {
+        background-color: darkred;
+        color: white;
+    }
+</style>
+
+<h2>Nominations</h2>
+
+<p>
+    <a asp-action="Create" class="btn btn-edit">Create New Nomination</a>
+</p>
+
+<table>
+    <thead>
+        <tr>
+            <th>Nominee</th>
+            <th>Category</th>
+            <th>Description</th>
+            <th>Status</th>
+            <th>Created At</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var nomination in Model)
+        {
+            <tr>
+                <td>@nomination.Nominee?.Name</td>
+                <td>@nomination.Category?.Name</td>
+                <td>@nomination.Description</td>
+                <td>@nomination.Status</td>
+                <td>@nomination.CreatedAt.ToShortDateString()</td>
+                <td>
+                    <a asp-action="Edit" asp-route-id="@nomination.Id" class="btn btn-edit">Edit</a>
+                    <a asp-action="Delete" asp-route-id="@nomination.Id" class="btn btn-delete">Delete</a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+

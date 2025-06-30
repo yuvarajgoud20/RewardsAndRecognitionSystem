@@ -82,5 +82,30 @@ namespace RewardsAndRecognitionRepository.Repos
             var managers = await _userManager.GetUsersInRoleAsync("Manager");
             return managers;
         }
+
+        public async Task<IEnumerable<User>> GetLeadsAsync(string? currentLeadId = null)
+        {
+            var teamLeadRoleId = await _context.Roles
+                .Where(r => r.Name == "TeamLead")
+                .Select(r => r.Id)
+                .FirstOrDefaultAsync();
+
+            var teamLeadUserIds = await _context.UserRoles
+                .Where(ur => ur.RoleId == teamLeadRoleId)
+                .Select(ur => ur.UserId)
+                .ToListAsync();
+
+            var assignedLeadIds = await _context.Teams
+                .Where(t => t.TeamLeadId != null)
+                .Select(t => t.TeamLeadId)
+                .ToListAsync();
+
+            return await _context.Users
+                .Where(u =>
+                    teamLeadUserIds.Contains(u.Id)
+       && (u.Id == currentLeadId || !assignedLeadIds.Contains(u.Id))
+                )
+                .ToListAsync();
+        }
     }
 }

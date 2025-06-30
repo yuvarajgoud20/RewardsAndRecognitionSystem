@@ -21,7 +21,7 @@
         <dd class="col-sm-8">@Model.Team?.Name</dd>
 
         <dt class="col-sm-4 fw-semibold">Manager</dt>
-        <dd class="col-sm-8">@Model.Manager?.Name</dd>
+        <dd class="col-sm-8">@Model.Team?.Manager?.Name</dd>
     </dl>
 
     <form asp-action="Delete" method="post">

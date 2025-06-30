@@ -1,0 +1,120 @@
+﻿@model RewardsAndRecognitionRepository.Models.Nomination
+@{
+    ViewData["Title"] = "Create Nomination";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<style>
+    .scroll-wrapper {
+        max-height: 85vh;
+        overflow-y: auto;
+        padding: 20px;
+    }
+
+    .card-form {
+        max-width: 800px;
+        margin: auto;
+        background-color: #fff;
+        padding: 25px;
+        box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        border-radius: 10px;
+    }
+
+        .card-form h2 {
+            margin-bottom: 20px;
+            font-weight: 600;
+            text-align: center;
+        }
+
+    .form-group {
+        margin-bottom: 16px;
+    }
+
+    label {
+        font-weight: 600;
+        display: block;
+    }
+
+        label span {
+            color: red;
+            margin-left: 3px;
+        }
+
+    .form-control:disabled {
+        background-color: #f1f1f1;
+    }
+
+    .btn-submit {
+        background-color: #000;
+        color: #fff;
+        padding: 10px 20px;
+        border: none;
+        border-radius: 5px;
+        display: block;
+        margin: 0 auto;
+    }
+
+        .btn-submit:hover {
+            background-color: #333;
+        }
+</style>
+
+<div class="scroll-wrapper">
+    <div class="card-form">
+        <h2>Create Nomination</h2>
+
+        <form asp-action="Create">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+            <div class="form-group">
+                <input type="hidden" asp-for="NominatorId" value="@ViewBag.NominatorId" />
+            </div>
+
+            <div class="form-group">
+                <label for="NomineeId">Nominee<span>*</span></label>
+                <select asp-for="NomineeId" class="form-control" asp-items="ViewBag.Nominees">
+                    <option value="">-- Select Nominee --</option>
+                </select>
+                <span asp-validation-for="NomineeId" class="text-danger"></span>
+            </div>
+
+            <div class="form-group">
+                <label for="CategoryId">Category<span>*</span></label>
+                <select asp-for="CategoryId" class="form-control" asp-items="ViewBag.Categories">
+                    <option value="">-- Select Category --</option>
+                </select>
+                <span asp-validation-for="CategoryId" class="text-danger"></span>
+            </div>
+
+            <div class="form-group">
+                <label for="YearQuarterId">Quarter<span>*</span></label>
+                <select asp-for="YearQuarterId" class="form-control" asp-items="ViewBag.YearQuarters">
+                    <option value="">-- Select Quarter --</option>
+                </select>
+                <span asp-validation-for="YearQuarterId" class="text-danger"></span>
+            </div>
+
+            <div class="form-group">
+                <label for="Description">Description<span>*</span></label>
+                <textarea asp-for="Description" class="form-control"></textarea>
+                <span asp-validation-for="Description" class="text-danger"></span>
+            </div>
+
+            <div class="form-group">
+                <label for="Achievements">Achievements<span>*</span></label>
+                <textarea asp-for="Achievements" class="form-control"></textarea>
+                <span asp-validation-for="Achievements" class="text-danger"></span>
+            </div>
+
+            <div class="form-group">
+                <input type="hidden" asp-for="Status" value="@ViewBag.Status" />
+            </div>
+
+            <button type="submit" class="btn btn-submit">Submit Nomination</button>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    @await Html.PartialAsync("_ValidationScriptsPartial")
+}

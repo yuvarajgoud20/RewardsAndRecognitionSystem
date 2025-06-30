@@ -99,7 +99,7 @@
                 <td>@user.Name</td>
                 <td>@user.Email</td>
                 <td>@(user.Team == null ? ("Not in Team") : user.Team.Name)</td>
-                <td>@(user.Manager == null ? ("No Manager") : user.Manager.Name)</td>
+                <td>@(user.Team?.Manager?.Name ?? "No Manager")</td>
                 <td>@userRoles[user.Id]</td>
                 <td>
                     <a asp-action="Edit" asp-route-id="@user.Id" class="btn btn-edit">Edit</a>
