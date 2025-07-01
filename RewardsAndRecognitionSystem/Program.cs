@@ -1,9 +1,12 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using RewardsAndRecognitionRepository.Dapper;
 using RewardsAndRecognitionRepository.Data;
 using RewardsAndRecognitionRepository.Interfaces;
+using RewardsAndRecognitionRepository.Interfaces.Dapper;
 using RewardsAndRecognitionRepository.Models;
 using RewardsAndRecognitionRepository.Repos;
+using RewardsAndRecognitionRepository.Repos.Dapper;
 using RewardsAndRecognitionRepository.Repositories;
 
 
@@ -24,6 +27,8 @@ builder.Services.AddIdentity<User,IdentityRole>()
     .AddEntityFrameworkStores<ApplicationDbContext>()
     .AddDefaultTokenProviders();
 builder.Services.AddControllersWithViews();
+builder.Services.AddScoped<DapperContext>();
+builder.Services.AddScoped<ISample, DapperNotification>();
 
 builder.Services.AddScoped<IUserRepo, UserRepo>();
 builder.Services.AddScoped<ITeamRepo, TeamRepo>();

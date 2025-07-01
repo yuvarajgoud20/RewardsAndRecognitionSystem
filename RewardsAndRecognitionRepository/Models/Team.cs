@@ -14,8 +14,11 @@ namespace RewardsAndRecognitionRepository.Models
         public string TeamLeadId { get; set; }
         public User? TeamLead { get; set; }
 
-        public string? ManagerId { get; set; }
+        public string ManagerId { get; set; }
         public User? Manager { get; set; }
+        public string DirectorId { get; set; }
+        public User? Director { get; set; }
+
 
         public ICollection<User>? Users { get; set; }
     }

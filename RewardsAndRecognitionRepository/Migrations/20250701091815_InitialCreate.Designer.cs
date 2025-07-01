@@ -12,8 +12,8 @@ using RewardsAndRecognitionRepository.Models;
 namespace RewardsAndRecognitionRepository.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20250627065511_RemovedManagerIdFromUsers")]
-    partial class RemovedManagerIdFromUsers
+    [Migration("20250701091815_InitialCreate")]
+    partial class InitialCreate
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -270,7 +270,12 @@ namespace RewardsAndRecognitionRepository.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
+                    b.Property<string>("DirectorId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
                     b.Property<string>("ManagerId")
+                        .IsRequired()
                         .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("Name")
@@ -282,6 +287,8 @@ namespace RewardsAndRecognitionRepository.Migrations
                         .HasColumnType("nvarchar(450)");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("DirectorId");
 
                     b.HasIndex("ManagerId");
 
@@ -511,16 +518,25 @@ namespace RewardsAndRecognitionRepository.Migrations
 
             modelBuilder.Entity("RewardsAndRecognitionRepository.Models.Team", b =>
                 {
+                    b.HasOne("RewardsAndRecognitionRepository.Models.User", "Director")
+                        .WithMany()
+                        .HasForeignKey("DirectorId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
                     b.HasOne("RewardsAndRecognitionRepository.Models.User", "Manager")
                         .WithMany()
                         .HasForeignKey("ManagerId")
-                        .OnDelete(DeleteBehavior.Restrict);
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
 
                     b.HasOne("RewardsAndRecognitionRepository.Models.User", "TeamLead")
                         .WithMany()
                         .HasForeignKey("TeamLeadId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
+
+                    b.Navigation("Director");
 
                     b.Navigation("Manager");
 

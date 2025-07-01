@@ -26,11 +26,13 @@ namespace RewardsAndRecognitionSystem.Controllers
         // GET: TeamController/Create
         public async Task<IActionResult> Create()
         {
-            var managers = await _userRepo.GetAllManagersAsync();
-            var leads = await _userRepo.GetLeadsAsync(); // ⬅️ Only unassigned team leads
+            //var managers = await _userRepo.GetAllManagersAsync();
+            //var leads = await _userRepo.GetLeadsAsync(); // ⬅️ Only unassigned team leads
 
-            ViewBag.Managers = new SelectList(managers, "Id", "Name");
-            ViewBag.TeamLeads = new SelectList(leads, "Id", "Name");
+            //ViewBag.Managers = new SelectList(managers, "Id", "Name");
+            //ViewBag.TeamLeads = new SelectList(leads, "Id", "Name");
+
+            await LoadDropdownsAsync();
 
             return View();
         }
@@ -125,9 +127,11 @@ namespace RewardsAndRecognitionSystem.Controllers
         {
             var managers = await _userRepo.GetAllManagersAsync();
             var leads = await _userRepo.GetLeadsAsync();
+            var directors = await _userRepo.GetAllDirectorsAsync();
 
             ViewBag.Managers = new SelectList(managers, "Id", "Name");
             ViewBag.TeamLeads = new SelectList(leads, "Id", "Name");
+            ViewBag.Directors = new SelectList(directors, "Id", "Name");
         }
     }
 }

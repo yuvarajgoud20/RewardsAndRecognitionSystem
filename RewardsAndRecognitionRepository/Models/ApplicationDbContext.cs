@@ -67,6 +67,12 @@ namespace RewardsAndRecognitionRepository.Models
                       .WithMany()
                       .HasForeignKey(t => t.ManagerId)
                       .OnDelete(DeleteBehavior.Restrict);
+
+                // ✅ Director relationship
+                entity.HasOne(t => t.Director)
+                      .WithMany()
+                      .HasForeignKey(t => t.DirectorId)
+                      .OnDelete(DeleteBehavior.Restrict);
             });
 
             modelBuilder

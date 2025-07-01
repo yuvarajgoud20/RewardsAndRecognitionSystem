@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace RewardsAndRecognitionRepository.Migrations
 {
     /// <inheritdoc />
-    public partial class RemovedManagerIdFromUsers : Migration
+    public partial class InitialCreate : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -240,11 +240,18 @@ namespace RewardsAndRecognitionRepository.Migrations
                     Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     TeamLeadId = table.Column<string>(type: "nvarchar(450)", nullable: false),
-                    ManagerId = table.Column<string>(type: "nvarchar(450)", nullable: true)
+                    ManagerId = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    DirectorId = table.Column<string>(type: "nvarchar(450)", nullable: false)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Teams", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Teams_AspNetUsers_DirectorId",
+                        column: x => x.DirectorId,
+                        principalTable: "AspNetUsers",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
                         name: "FK_Teams_AspNetUsers_ManagerId",
                         column: x => x.ManagerId,
@@ -334,6 +341,11 @@ namespace RewardsAndRecognitionRepository.Migrations
                 column: "YearQuarterId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_Teams_DirectorId",
+                table: "Teams",
+                column: "DirectorId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Teams_ManagerId",
                 table: "Teams",
                 column: "ManagerId");
@@ -394,6 +406,10 @@ namespace RewardsAndRecognitionRepository.Migrations
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
+            migrationBuilder.DropForeignKey(
+                name: "FK_Teams_AspNetUsers_DirectorId",
+                table: "Teams");
+
             migrationBuilder.DropForeignKey(
                 name: "FK_Teams_AspNetUsers_ManagerId",
                 table: "Teams");

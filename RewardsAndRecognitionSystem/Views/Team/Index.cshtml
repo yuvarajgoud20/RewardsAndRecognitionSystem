@@ -12,8 +12,9 @@
     <thead class="table-dark">
         <tr>
             <th>Name</th>
-            <th>Manager</th>
             <th>Team Lead</th>
+            <th>Manager</th>
+            <th>Director</th>
             <th>Actions</th>
         </tr>
     </thead>
@@ -22,8 +23,9 @@
         {
             <tr>
                 <td>@team.Name</td>
-                <td>@team.Manager?.Name</td>
                 <td>@team.TeamLead?.Name</td>
+                <td>@team.Manager?.Name</td>
+                <td>@team.Director?.Name</td>
                 <td>
                     <a asp-action="Edit" asp-route-id="@team.Id" class="btn btn-sm btn-outline-dark me-2">Edit</a>
                     <a asp-action="Delete" asp-route-id="@team.Id" class="btn btn-sm btn-outline-danger">Delete</a>

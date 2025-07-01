@@ -1,0 +1,37 @@
+﻿@model RewardsAndRecognitionRepository.Models.Nomination
+
+@{
+    ViewData["Title"] = "Nomination Details";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h2 class="mb-4"><i class="bi bi-info-circle"></i> Nomination Details</h2>
+
+<div class="card shadow p-4">
+    <dl class="row">
+        <dt class="col-sm-3"><i class="bi bi-person-circle"></i> Nominee</dt>
+        <dd class="col-sm-9">@Model.Nominee?.Name</dd>
+
+        <dt class="col-sm-3"><i class="bi bi-people-fill"></i> Team</dt>
+        <dd class="col-sm-9">@Model.Nominee?.Team?.Name</dd>
+
+        <dt class="col-sm-3"><i class="bi bi-award"></i> Category</dt>
+        <dd class="col-sm-9">@Model.Category?.Name</dd>
+
+        <dt class="col-sm-3"><i class="bi bi-card-text"></i> Description</dt>
+        <dd class="col-sm-9">@Model.Description</dd>
+
+        <dt class="col-sm-3"><i class="bi bi-trophy"></i> Achievements</dt>
+        <dd class="col-sm-9">@Model.Achievements</dd>
+
+        <dt class="col-sm-3"><i class="bi bi-info-circle"></i> Status</dt>
+        <dd class="col-sm-9">@Model.Status</dd>
+
+        <dt class="col-sm-3"><i class="bi bi-calendar3"></i> Created At</dt>
+        <dd class="col-sm-9">@Model.CreatedAt.ToString("dd MMM yyyy")</dd>
+    </dl>
+
+    <div class="mt-4">
+        <a asp-action="Index" class="btn btn-secondary"><i class="bi bi-arrow-left-circle"></i> Back to List</a>
+    </div>
+</div>

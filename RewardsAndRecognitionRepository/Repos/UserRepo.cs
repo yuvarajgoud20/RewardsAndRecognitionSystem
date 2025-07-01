@@ -82,6 +82,11 @@ namespace RewardsAndRecognitionRepository.Repos
             var managers = await _userManager.GetUsersInRoleAsync("Manager");
             return managers;
         }
+        public async Task<IEnumerable<User>> GetAllDirectorsAsync()
+        {
+            var directors = await _userManager.GetUsersInRoleAsync("Director");
+            return directors;
+        }
 
         public async Task<IEnumerable<User>> GetLeadsAsync(string? currentLeadId = null)
         {

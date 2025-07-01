@@ -1,0 +1,48 @@
+﻿@model RewardsAndRecognitionRepository.Models.Nomination
+@{
+    ViewData["Title"] = "Edit Nomination";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h2 class="mb-4"><i class="bi bi-pencil-square"></i> Edit Nomination</h2>
+
+<form asp-action="Edit" method="post" class="card p-4 shadow bg-white text-dark">
+    @Html.AntiForgeryToken()
+    <input type="hidden" asp-for="Id" />
+    <input type="hidden" asp-for="NominatorId" />
+    <input type="hidden" asp-for="NomineeId" />
+    <input type="hidden" asp-for="Status" />
+
+    <div class="mb-3">
+        <label asp-for="CategoryId" class="form-label"><i class="bi bi-award"></i> Category</label>
+        <select asp-for="CategoryId" class="form-select" asp-items="ViewBag.Categories"></select>
+        <span asp-validation-for="CategoryId" class="text-danger"></span>
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="YearQuarterId" class="form-label"><i class="bi bi-calendar-range"></i> Quarter</label>
+        <select asp-for="YearQuarterId" class="form-select" asp-items="ViewBag.YearQuarters"></select>
+        <span asp-validation-for="YearQuarterId" class="text-danger"></span>
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="Description" class="form-label"><i class="bi bi-card-text"></i> Description</label>
+        <textarea asp-for="Description" class="form-control" rows="4"></textarea>
+        <span asp-validation-for="Description" class="text-danger"></span>
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="Achievements" class="form-label"><i class="bi bi-trophy"></i> Achievements</label>
+        <textarea asp-for="Achievements" class="form-control" rows="3"></textarea>
+        <span asp-validation-for="Achievements" class="text-danger"></span>
+    </div>
+
+    <div class="d-flex gap-3">
+        <button type="submit" class="btn btn-primary">
+            <i class="bi bi-save"></i> Save Changes
+        </button>
+        <a asp-action="Index" class="btn btn-secondary">
+            <i class="bi bi-x-circle"></i> Cancel
+        </a>
+    </div>
+</form>

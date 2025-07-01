@@ -16,6 +16,13 @@
             <span asp-validation-for="Name" class="text-danger"></span>
         </div>
 
+        <div class="mb-4">
+            <label asp-for="TeamLeadId" class="form-label">Team Lead</label>
+            <select asp-for="TeamLeadId" asp-items="ViewBag.TeamLeads" class="form-select border-dark-subtle">
+                <option value="">-- Select Team Lead --</option>
+            </select>
+        </div>
+
         <div class="mb-3">
             <label asp-for="ManagerId" class="form-label">Manager</label>
             <select asp-for="ManagerId" asp-items="ViewBag.Managers" class="form-select border-dark-subtle">
@@ -23,10 +30,10 @@
             </select>
         </div>
 
-        <div class="mb-4">
-            <label asp-for="TeamLeadId" class="form-label">Team Lead</label>
-            <select asp-for="TeamLeadId" asp-items="ViewBag.TeamLeads" class="form-select border-dark-subtle">
-                <option value="">-- Select Team Lead --</option>
+        <div class="mb-3">
+            <label asp-for="DirectorId" class="form-label">Director</label>
+            <select asp-for="DirectorId" asp-items="ViewBag.Director" class="form-select border-dark-subtle">
+                <option value="">-- Select Director --</option>
             </select>
         </div>
 

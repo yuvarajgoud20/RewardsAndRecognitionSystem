@@ -25,22 +25,80 @@ namespace RewardsAndRecognitionSystem.Controllers
         }
 
         // GET: Nomination
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(string filter, string search)
         {
             var currentUser = await _userManager.GetUserAsync(User);
-            if (currentUser == null)
-                return Unauthorized();
+            if (currentUser == null) return Unauthorized();
 
-            var nominations = await _nominationRepo
-                .GetAllNominationsAsync();
+            var userRoles = await _userManager.GetRolesAsync(currentUser);
+            List<Nomination> nominationsToShow = new();
 
-            // Filter nominations created by current user
-            var myNominations = nominations
+            if (userRoles.Contains("Manager"))
+            {
+                nominationsToShow = await _context.Nominations
+                    .Include(n => n.Nominee)
+                        .ThenInclude(u => u.Team)
+                    .Include(n => n.Category)
+                    .Include(n => n.Approvals)
+                    .Include(n => n.Nominator)
+                    .Where(n => n.Nominee.Team.ManagerId == currentUser.Id)
+                    .ToListAsync();
+
+                // Track reviewed nominations
+                var alreadyReviewedIds = nominationsToShow
+                    .Where(n => n.Approvals.Any(a => a.ApproverId == currentUser.Id))
+                    .Select(n => n.Id)
+                    .ToList();
+
+                ViewBag.ReviewedNominationIds = alreadyReviewedIds;
+
+                // Filter: Pending or Reviewed
+                if (filter == "Pending")
+                {
+                    nominationsToShow = nominationsToShow
+                        .Where(n => !alreadyReviewedIds.Contains(n.Id))
+                        .ToList();
+                }
+                else if (filter == "Reviewed")
+                {
+                    nominationsToShow = nominationsToShow
+                        .Where(n => alreadyReviewedIds.Contains(n.Id))
+                        .ToList();
+                }
+
+                // Search: filter by nominee name
+                if (!string.IsNullOrEmpty(search))
+                {
+                    nominationsToShow = nominationsToShow
+                        .Where(n => n.Nominee.Name != null && n.Nominee.Name.Contains(search, StringComparison.OrdinalIgnoreCase))
+                        .ToList();
+                }
+
+                ViewBag.CurrentFilter = filter;
+                ViewBag.SearchTerm = search;
+                return View(nominationsToShow);
+            }
+
+            // For TeamLead or others — show their own nominations
+            nominationsToShow = await _context.Nominations
+                .Include(n => n.Nominee)
+                .ThenInclude(u => u.Team)
+                .Include(n => n.Category)
                 .Where(n => n.NominatorId == currentUser.Id)
-                .ToList();
+                .ToListAsync();
 
-            return View(myNominations);
+            // Search within own nominations
+            if (!string.IsNullOrEmpty(search))
+            {
+                nominationsToShow = nominationsToShow
+                    .Where(n => n.Nominee.Name != null && n.Nominee.Name.Contains(search, StringComparison.OrdinalIgnoreCase))
+                    .ToList();
+            }
+
+            ViewBag.SearchTerm = search;
+            return View(nominationsToShow);
         }
+
 
         // GET: Nomination/Details/5
         public async Task<IActionResult> Details(Guid id)
@@ -57,7 +115,7 @@ namespace RewardsAndRecognitionSystem.Controllers
         public async Task<IActionResult> Create()
         {
             if (!User.Identity.IsAuthenticated)
-                return RedirectToAction("Login", "Account");
+                return RedirectToAction("Identity/Account/Login");
 
             var currentUser = await _userManager.GetUserAsync(User);
             if (currentUser == null) return Unauthorized();
@@ -100,47 +158,92 @@ namespace RewardsAndRecognitionSystem.Controllers
         {
             var nomination = await _nominationRepo.GetNominationByIdAsync(id);
             if (nomination == null)
-            {
                 return NotFound();
-            }
+
+            if (nomination.Status != NominationStatus.PendingManager)
+                return Forbid(); // Disallow editing if not pending
+
+            ViewBag.Categories = new SelectList(await _context.Categories.ToListAsync(), "Id", "Name", nomination.CategoryId);
+            ViewBag.YearQuarters = new SelectList(await _context.YearQuarters.ToListAsync(), "Id", "Quarter", nomination.YearQuarterId);
+
             return View(nomination);
         }
+
 
         // POST: Nomination/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(Guid id, Nomination nomination)
         {
-            if (id != nomination.Id)
-            {
-                return NotFound();
-            }
-
-            if (ModelState.IsValid)
-            {
-                await _nominationRepo.UpdateNominationAsync(nomination);
-                return RedirectToAction(nameof(Index));
-            }
-            return View(nomination);
+            await _nominationRepo.UpdateNominationAsync(nomination);
+            return RedirectToAction(nameof(Index));
         }
+
 
         // GET: Nomination/Delete/5
-        public async Task<IActionResult> Delete(Guid id)
-        {
-            var nomination = await _nominationRepo.GetNominationByIdAsync(id);
-            if (nomination == null)
-            {
-                return NotFound();
-            }
-            return View(nomination);
-        }
-
-        // POST: Nomination/Delete/5
-        [HttpPost, ActionName("Delete")]
+        [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(Guid id)
         {
+            var nomination = await _nominationRepo.GetNominationByIdAsync(id);
+            if (nomination == null || nomination.Status != NominationStatus.PendingManager)
+                return Forbid();
+
             await _nominationRepo.DeleteNominationAsync(id);
+            return RedirectToAction(nameof(Index));
+        }
+
+        // GET: Nomination/Review/{id}
+
+
+        public async Task<IActionResult> Review(Guid id)
+        {
+            var nomination = await _nominationRepo.GetNominationByIdAsync(id);
+            if (nomination == null)
+                return NotFound();
+
+            return View(nomination);
+        }
+
+        // POST: Nomination/Review/{id}
+        // POST: Nomination/Review/{id}
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Review(Guid id, string action, string remarks)
+        {
+            var nomination = await _nominationRepo.GetNominationByIdAsync(id);
+            var currentUser = await _userManager.GetUserAsync(User);
+
+            if (nomination == null || currentUser == null)
+                return NotFound();
+
+            // Parse enum safely
+            if (!Enum.TryParse<ApprovalAction>(action, out var parsedAction))
+            {
+                ModelState.AddModelError("", "Invalid approval action.");
+                return View(nomination); // Or redirect back with error
+            }
+
+            nomination.Status = parsedAction == ApprovalAction.Approved
+                ? NominationStatus.Approved
+                : NominationStatus.Rejected;
+
+            await _nominationRepo.UpdateNominationAsync(nomination);
+
+            var approval = new Approval
+            {
+                Id = Guid.NewGuid(),
+                NominationId = id,
+                ApproverId = currentUser.Id,
+                Action = parsedAction,
+                Level = ApprovalLevel.Manager,
+                ActionAt = DateTime.UtcNow,
+                Remarks = remarks
+            };
+
+            _context.Approvals.Add(approval);
+            await _context.SaveChangesAsync();
+
             return RedirectToAction(nameof(Index));
         }
     }

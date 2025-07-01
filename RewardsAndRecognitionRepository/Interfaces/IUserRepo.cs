@@ -22,5 +22,7 @@ namespace RewardsAndRecognitionRepository.Interfaces
         Task<IEnumerable<User>> GetAllManagersAsync();
 
         Task<IEnumerable<User>> GetLeadsAsync(string? currentLeadId = null);
+
+        Task<IEnumerable<User>> GetAllDirectorsAsync();
     }
 }

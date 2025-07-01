@@ -34,6 +34,7 @@ namespace RewardsAndRecognitionRepository.Repos
             return await _context.Nominations
                 .Include(n => n.Nominator)
                 .Include(n => n.Nominee)
+                .ThenInclude(u => u.Team)
                 .Include(n => n.Category)
                 .Include(n => n.YearQuarter)
                 .Include(n => n.Approvals)
