@@ -1,9 +1,11 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using RewardsAndRecognitionRepository.Interfaces;
 using RewardsAndRecognitionRepository.Models;
 
 namespace RewardsAndRecognitionSystem.Controllers
 {
+    [Authorize(Roles = "Admin")]
     public class YearQuarterController : Controller
     {
         private readonly IYearQuarterRepo _yearQuarterRepo;

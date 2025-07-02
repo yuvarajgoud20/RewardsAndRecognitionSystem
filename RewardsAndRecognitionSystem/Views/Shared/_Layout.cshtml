@@ -1,4 +1,7 @@
-﻿<!DOCTYPE html>
+﻿@inject Microsoft.AspNetCore.Identity.UserManager<RewardsAndRecognitionRepository.Models.User> UserManager
+@inject Microsoft.AspNetCore.Identity.SignInManager<RewardsAndRecognitionRepository.Models.User> SignInManager
+
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="utf-8" />
@@ -92,24 +95,52 @@
                 <div class="collapse navbar-collapse" id="mainNavbar">
                     <ul class="navbar-nav me-auto mb-2 mb-lg-0">
                         <li class="nav-item">
-                            <a class="nav-link" asp-controller="Home" asp-action="Index"><i class="bi bi-house-door"></i> Home</a>
+                            <a class="nav-link" asp-controller="Home" asp-action="Index">
+                                <i class="bi bi-house-door"></i> Home
+                            </a>
                         </li>
-                        <li class="nav-item">
-                            <a class="nav-link" asp-controller="User" asp-action="Index"><i class="bi bi-person-lines-fill"></i> Users</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" asp-controller="Nomination" asp-action="Index"><i class="bi bi-award"></i> Nominations</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" asp-controller="Team" asp-action="Index"><i class="bi bi-people-fill"></i> Teams</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" asp-controller="Category" asp-action="Index"><i class="bi bi-tags-fill"></i> Categories</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" asp-controller="YearQuarter" asp-action="Index"><i class="bi bi-calendar4-week"></i> Year Quarters</a>
-                        </li>
+
+                        @if (User.IsInRole("Admin") || User.IsInRole("Manager") || User.IsInRole("TeamLead") || User.IsInRole("Director"))
+                        {
+                            <li class="nav-item">
+                                <a class="nav-link" asp-controller="Nomination" asp-action="Index">
+                                    <i class="bi bi-award"></i> Nominations
+                                </a>
+                            </li>
+                        }
+
+                        @if (User.IsInRole("Admin"))
+                        {
+                            <li class="nav-item dropdown">
+                                <a class="nav-link dropdown-toggle" href="#" id="adminDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                    <i class="bi bi-gear-fill"></i> Admin
+                                </a>
+                                <ul class="dropdown-menu" aria-labelledby="adminDropdown">
+                                    <li>
+                                        <a class="dropdown-item" asp-controller="User" asp-action="Index">
+                                            <i class="bi bi-person-lines-fill"></i> Users
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a class="dropdown-item" asp-controller="Team" asp-action="Index">
+                                            <i class="bi bi-people-fill"></i> Teams
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a class="dropdown-item" asp-controller="Category" asp-action="Index">
+                                            <i class="bi bi-tags-fill"></i> Categories
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a class="dropdown-item" asp-controller="YearQuarter" asp-action="Index">
+                                            <i class="bi bi-calendar4-week"></i> Year Quarters
+                                        </a>
+                                    </li>
+                                </ul>
+                            </li>
+                        }
                     </ul>
+
                     <partial name="_LoginPartial" />
                 </div>
             </div>

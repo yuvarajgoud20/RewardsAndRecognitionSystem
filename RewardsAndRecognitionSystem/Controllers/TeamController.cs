@@ -1,10 +1,12 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using RewardsAndRecognitionRepository.Interfaces;
 using RewardsAndRecognitionRepository.Models;
 
 namespace RewardsAndRecognitionSystem.Controllers
 {
+    [Authorize(Roles = "Admin")]
     public class TeamController : Controller
     {
         private readonly ITeamRepo _teamRepo;

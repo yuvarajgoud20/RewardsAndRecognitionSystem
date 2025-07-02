@@ -10,7 +10,7 @@ using RewardsAndRecognitionRepository.Repos;
 
 namespace RewardsAndRecognitionSystem.Controllers
 {
-    [Authorize]
+    [Authorize(Roles = "Manager,TeamLead,Admin,Director")]
     public class NominationController : Controller
     {
         private readonly INominationRepo _nominationRepo;
@@ -80,14 +80,26 @@ namespace RewardsAndRecognitionSystem.Controllers
                 ViewBag.SearchTerm = search;
                 return View(nominationsToShow);
             }
+            if (userRoles.Contains("TeamLead"))
+            {
+                // For TeamLead or others — show their own nominations
+                nominationsToShow = await _context.Nominations
+                    .Include(n => n.Nominee)
+                    .ThenInclude(u => u.Team)
+                    .Include(n => n.Category)
+                    .Where(n => n.NominatorId == currentUser.Id)
+                    .ToListAsync();
+            }
 
-            // For TeamLead or others — show their own nominations
-            nominationsToShow = await _context.Nominations
-                .Include(n => n.Nominee)
-                .ThenInclude(u => u.Team)
-                .Include(n => n.Category)
-                .Where(n => n.NominatorId == currentUser.Id)
-                .ToListAsync();
+            if (userRoles.Contains("Admin"))
+            {
+                nominationsToShow = await _context.Nominations
+                    .Include(n => n.Nominee)
+                    .Include(n => n.Nominator)
+                    .ThenInclude(u => u.Team)
+                    .Include(n => n.Category)
+                    .ToListAsync();
+            }
 
             // Search within own nominations
             if (!string.IsNullOrEmpty(search))

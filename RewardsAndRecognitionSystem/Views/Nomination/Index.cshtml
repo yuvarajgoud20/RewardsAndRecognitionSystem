@@ -9,6 +9,7 @@
     var nominationsList = Model.ToList();
     var isManager = User.IsInRole("Manager");
     var isTeamLead = User.IsInRole("TeamLead");
+    var isAdmin = User.IsInRole("Admin");
 }
 
 <style>
@@ -178,24 +179,35 @@
 
 <h2><i class="bi bi-star-fill"></i> Nominations</h2>
 
-@if (isTeamLead)
+@if (isTeamLead || isAdmin)
 {
-    <div class="text-end mb-3">
-        <a asp-action="Create" class="btn btn-indigo">
-            <i class="bi bi-plus-circle-fill"></i> Create Nomination
-        </a>
-    </div>
+    @if (isTeamLead)
+    {
+        <div class="text-end mb-3">
+            <a asp-action="Create" class="btn btn-indigo">
+                <i class="bi bi-plus-circle-fill"></i> Create Nomination
+            </a>
+        </div>
+    }
 
     <table class="table-custom">
         <thead>
             <tr>
                 <th>#</th>
                 <th>Nominee</th>
+                @if (isAdmin)
+                {
+                    <th>Nominator</th>
+                }
                 <th>Team</th>
                 <th>Category</th>
                 <th>Status</th>
                 <th>Created</th>
-                <th>Actions</th>
+                @if(isTeamLead)
+                {
+                    <th>Actions</th>
+                }
+                
             </tr>
         </thead>
         <tbody>
@@ -205,32 +217,36 @@
                 <tr>
                     <td>@(i + 1)</td>
                     <td>@n.Nominee?.Name</td>
+                    @if (isAdmin)
+                    {
+                        <td>@n.Nominator?.Name</td>
+                    }
                     <td>@n.Nominee?.Team?.Name</td>
                     <td>@n.Category?.Name</td>
                     <td>@n.Status</td>
                     <td>@n.CreatedAt.ToShortDateString()</td>
-                    <td>
-                        <a asp-action="Details" asp-route-id="@n.Id" class="btn btn-indigo btn-sm">
-                            <i class="bi bi-eye-fill"></i> Details
-                        </a>
+                    @if(isTeamLead)
+                    {
+                        <td>
+                            <a asp-action="Details" asp-route-id="@n.Id" class="btn btn-indigo btn-sm">
+                                <i class="bi bi-eye-fill"></i> Details
+                            </a>
                         
 
-                <a asp-action="Edit"
-                   asp-route-id="@n.Id"
-                   class="btn btn-indigo btn-sm @( (n.Status == NominationStatus.Approved || n.Status == NominationStatus.Rejected) ? "disabled no-click" : "" )">
-                    <i class="bi bi-pencil-fill"></i> Edit
-                </a>
+                            <a asp-action="Edit"
+                               asp-route-id="@n.Id"
+                               class="btn btn-indigo btn-sm @( (n.Status == NominationStatus.Approved || n.Status == NominationStatus.Rejected) ? "disabled no-click" : "" )">
+                                <i class="bi bi-pencil-fill"></i> Edit
+                            </a>
 
-                        <button class="btn btn-danger btn-sm @( (n.Status == NominationStatus.Approved || n.Status == NominationStatus.Rejected) ? "disabled no-click" : "" )"
-                                data-bs-toggle="modal"
-                                data-bs-target="#deleteModal"
-                                data-id="@n.Id">
-                            <i class="bi bi-trash-fill"></i> Delete
-                        </button>
-
-
-
-                    </td>
+                            <button class="btn btn-danger btn-sm @( (n.Status == NominationStatus.Approved || n.Status == NominationStatus.Rejected) ? "disabled no-click" : "" )"
+                                    data-bs-toggle="modal"
+                                    data-bs-target="#deleteModal"
+                                    data-id="@n.Id">
+                                <i class="bi bi-trash-fill"></i> Delete
+                            </button>
+                        </td>
+                    }
                 </tr>
             }
         </tbody>
