@@ -2,21 +2,124 @@
 
 @{
     ViewData["Title"] = "Categories";
+    Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
-<h2 class="mb-4">Categories</h2>
+<style>
+    :root {
+        --indigo-main: #3f51b5;
+        --indigo-light: #5c6bc0;
+        --indigo-dark: #303f9f;
+        --danger: #c62828;
+        --danger-hover: #b71c1c;
+        --gray: #6c757d;
+        --text-light: #fff;
+    }
+
+    .btn {
+        padding: 8px 14px;
+        border-radius: 5px;
+        font-size: 0.875rem;
+        font-weight: 500;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        border: none;
+        transition: transform 0.2s ease;
+        white-space: nowrap;
+    }
+
+    .btn-indigo {
+        background: var(--indigo-main);
+        color:white;
+    }
+
+        .btn-indigo:hover {
+            background: var(--indigo-dark);
+            color: white;
+        }
+
+    .btn-secondary {
+        background: var(--gray);
+        
+    }
+
+        .btn-secondary:hover {
+            background: #5a6268;
+            
+        }
+
+    .btn-danger {
+        background: var(--danger);
+        color: var(--text-light);
+    }
+
+        .btn-danger:hover {
+            background: var(--danger-hover);
+            
+        }
+
+    .table-custom {
+        width: 100%;
+        border-collapse: collapse;
+        background: white;
+        border-radius: 8px;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
+        overflow: hidden;
+    }
+
+        .table-custom th,
+        .table-custom td {
+            padding: 14px 16px;
+            text-align: left;
+            vertical-align: middle;
+        }
+
+        .table-custom th {
+            background: linear-gradient(to right, var(--indigo-main), var(--indigo-light));
+            color: white;
+            font-weight: 600;
+        }
+
+        .table-custom tr:nth-child(even) {
+            background-color: #f5f5f5;
+        }
+
+        .table-custom tr:hover {
+            background-color: #eef1f7;
+        }
+
+    .actions-cell {
+        white-space: nowrap;
+        display: flex;
+        gap: 8px;
+        flex-wrap: wrap;
+    }
+
+    .desc-cell {
+        max-width: 280px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+</style>
+
+<h2 class="mb-4"><i class="bi bi-tags-fill me-2"></i>Categories</h2>
 
 <div class="mb-3 text-end">
-    <a asp-action="Create" class="btn btn-dark">+ New Category</a>
+    <a asp-action="Create" class="btn btn-indigo">
+        <i class="bi bi-plus-circle-fill"></i> New Category
+    </a>
 </div>
 
-<table class="table table-bordered shadow-sm">
+<table class="table-custom">
     <thead>
         <tr>
-            <th>Name</th>
-            <th>Description</th>
-            <th>Created At</th>
-            <th style="width: 200px">Actions</th>
+            <th><i class="bi bi-tag-fill"></i> Name</th>
+            <th class="desc-cell"><i class="bi bi-card-text"></i> Description</th>
+            <th><i class="bi bi-calendar-event"></i> Created Date</th>
+            <th><i class="bi bi-tools"></i> Actions</th>
         </tr>
     </thead>
     <tbody>
@@ -24,12 +127,18 @@
         {
             <tr>
                 <td>@category.Name</td>
-                <td>@category.Description</td>
+                <td class="desc-cell">@category.Description</td>
                 <td>@category.CreatedAt.ToShortDateString()</td>
-                <td>
-                    <a asp-action="Edit" asp-route-id="@category.Id" class="btn btn-sm btn-outline-primary">Edit</a>
-                    <a asp-action="Details" asp-route-id="@category.Id" class="btn btn-sm btn-outline-secondary">Details</a>
-                    <a asp-action="Delete" asp-route-id="@category.Id" class="btn btn-sm btn-outline-danger">Delete</a>
+                <td class="actions-cell">
+                    <a asp-action="Edit" asp-route-id="@category.Id" class="btn btn-indigo btn-sm">
+                        <i class="bi bi-pencil-fill"></i> Edit
+                    </a>
+                    <a asp-action="Details" asp-route-id="@category.Id" class="btn btn-secondary btn-sm">
+                        <i class="bi bi-eye-fill"></i> Details
+                    </a>
+                    <a asp-action="Delete" asp-route-id="@category.Id" class="btn btn-danger btn-sm">
+                        <i class="bi bi-trash-fill"></i> Delete
+                    </a>
                 </td>
             </tr>
         }

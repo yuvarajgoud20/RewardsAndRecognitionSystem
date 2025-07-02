@@ -12,8 +12,8 @@ using RewardsAndRecognitionRepository.Models;
 namespace RewardsAndRecognitionRepository.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20250701091815_InitialCreate")]
-    partial class InitialCreate
+    [Migration("20250701165707_AllCrudCompleted")]
+    partial class AllCrudCompleted
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)

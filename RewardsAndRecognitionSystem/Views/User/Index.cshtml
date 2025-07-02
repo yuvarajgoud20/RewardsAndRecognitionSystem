@@ -1,95 +1,125 @@
 ﻿@model IEnumerable<RewardsAndRecognitionRepository.Models.User>
 @{
     var userRoles = ViewBag.UserRoles as Dictionary<string, string>;
-}
-@{
     ViewData["Title"] = "Users List";
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
 <style>
+    :root {
+        --indigo-main: #3f51b5;
+        --indigo-light: #5c6bc0;
+        --indigo-dark: #303f9f;
+        --danger: #c62828;
+        --danger-hover: #b71c1c;
+        --text-light: #fff;
+    }
+
     .user-header {
         display: flex;
         justify-content: space-between;
         align-items: center;
-        margin-top: 20px;
+        margin: 30px 0 20px;
     }
 
     .create-btn {
-        background-color: black;
-        color: white;
-        padding: 8px 16px;
-        border-radius: 5px;
-        text-decoration: none;
+        background: linear-gradient(to right, var(--indigo-main), var(--indigo-light));
+        color: var(--text-light);
+        padding: 10px 20px;
+        border-radius: 6px;
         font-weight: 500;
+        border: none;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+       
     }
 
         .create-btn:hover {
-            background-color: #333;
-            color: #fff;
+            background: var(--indigo-dark);
+            
+            color: var(--text-light);
         }
 
-    table {
+    .users-table {
         width: 100%;
         border-collapse: collapse;
-        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        margin-top: 20px;
+        background: white;
+        border-radius: 8px;
+        box-shadow: 0 4px 10px rgba(0,0,0,0.08);
+        overflow: hidden;
     }
 
-    th, td {
-        border: 1px solid #ddd;
-        padding: 12px;
-        text-align: left;
-    }
+        .users-table th, .users-table td {
+            padding: 14px 16px;
+            text-align: left;
+        }
 
-    th {
-        background-color: black;
-        color: white;
-        font-weight: 600;
-    }
+        .users-table th {
+            background: linear-gradient(to right, var(--indigo-main), var(--indigo-light));
+            color: white;
+            font-weight: 600;
+        }
 
-    tr:nth-child(even) {
-        background-color: #f9f9f9;
-    }
+        .users-table tr:nth-child(even) {
+            background-color: #f5f5f5;
+        }
 
-    tr:hover {
-        background-color: #f1f1f1;
-    }
+        .users-table tr:hover {
+            background-color: #eef1f7;
+        }
 
     .btn {
-        padding: 6px 12px;
+        padding: 8px 14px;
         border: none;
-        cursor: pointer;
-        border-radius: 4px;
+        border-radius: 5px;
         font-size: 0.9rem;
+        font-weight: 500;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        transition: background-color 0.3s ease;
     }
 
     .btn-edit {
-        background-color: black;
-        color: white;
-        margin-right: 5px;
+        background: var(--indigo-main);
+        color: var(--text-light);
     }
 
+        .btn-edit:hover {
+            background: var(--indigo-dark);
+            color: white;
+        }
+
     .btn-delete {
-        background-color: darkred;
+        background: var(--danger);
         color: white;
     }
+
+        .btn-delete:hover {
+            background: var(--danger-hover);
+            color: white;
+        }
 </style>
 
 <div class="user-header">
-    <h2>Users</h2>
-    <a asp-action="Create" class="create-btn">+ Create User</a>
+    <h2><i class="bi bi-people-fill me-2"></i> Users</h2>
+    <a asp-action="Create" class="create-btn">
+        <i class="bi bi-person-plus-fill"></i> Create User
+    </a>
 </div>
 
-<table>
+<table class="users-table">
     <thead>
         <tr>
-            <th>Name</th>
-            <th>Email</th>
-            <th>Team</th>
-            <th>Manager</th>
-            <th>Role</th>
-            <th>Actions</th>
+            <th><i class="bi bi-person-fill"></i> Name</th>
+            <th><i class="bi bi-envelope-fill"></i> Email</th>
+            <th><i class="bi bi-diagram-3-fill"></i> Team</th>
+            <th><i class="bi bi-person-badge-fill"></i> Manager</th>
+            <th><i class="bi bi-award-fill"></i> Role</th>
+            <th><i class="bi bi-tools"></i> Actions</th>
         </tr>
     </thead>
     <tbody>
@@ -98,12 +128,16 @@
             <tr>
                 <td>@user.Name</td>
                 <td>@user.Email</td>
-                <td>@(user.Team == null ? ("Not in Team") : user.Team.Name)</td>
+                <td>@(user.Team?.Name ?? "Not Assigned")</td>
                 <td>@(user.Team?.Manager?.Name ?? "No Manager")</td>
                 <td>@userRoles[user.Id]</td>
                 <td>
-                    <a asp-action="Edit" asp-route-id="@user.Id" class="btn btn-edit">Edit</a>
-                    <a asp-action="Delete" asp-route-id="@user.Id" class="btn btn-delete">Delete</a>
+                    <a asp-action="Edit" asp-route-id="@user.Id" class="btn btn-edit">
+                        <i class="bi bi-pencil-square"></i> Edit
+                    </a>
+                    <a asp-action="Delete" asp-route-id="@user.Id" class="btn btn-delete">
+                        <i class="bi bi-trash-fill"></i> Delete
+                    </a>
                 </td>
             </tr>
         }

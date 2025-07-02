@@ -36,6 +36,10 @@ builder.Services.AddScoped<INominationRepo, NominationRepo>();
 builder.Services.AddScoped<ICategoryRepo, CategoryRepo>();
 builder.Services.AddScoped<IApprovalRepo, ApprovalRepo>();
 builder.Services.AddScoped<IYearQuarterRepo, YearQuarterRepo>();
+builder.Services.ConfigureApplicationCookie(options =>
+{
+    options.LoginPath = "/Identity/Account/Login";
+});
 
 
 var app = builder.Build();

@@ -12,25 +12,100 @@
 }
 
 <style>
-    body {
-        color: #fff;
+    :root {
+        --indigo-main: #3f51b5;
+        --indigo-light: #5c6bc0;
+        --indigo-dark: #303f9f;
+        --danger: #c62828;
+        --danger-hover: #b71c1c;
+        --text-light: #fff;
+    }
+    .dontdisplay
+    {
+
+    }
+    .btn {
+        padding: 6px 12px;
+        border-radius: 4px;
+        font-size: 0.875rem;
+        font-weight: 500;
+        border: none;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        cursor: pointer;
     }
 
-    table {
+    .btn-indigo {
+        background: linear-gradient(to right, var(--indigo-main), var(--indigo-light));
+        color: var(--text-light);
+        border: none;
+        padding: 8px 16px;
+        border-radius: 6px;
+        font-weight: 500;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        transition: all 0.3s ease;
+    }
+
+        .btn-indigo:hover {
+            filter: brightness(0.95);
+            transform: translateY(-1px);
+            color: var(--text-light);
+        }
+
+
+    .btn-danger {
+        background: var(--danger);
+        color: white;
+    }
+
+        .btn-danger:hover {
+            background: var(--danger-hover);
+        }
+
+    .btn-disabled {
+        background: #ccc;
+        color: #666;
+        cursor: not-allowed;
+    }
+
+    .table-custom {
         width: 100%;
-        background: #fff;
-        border-radius: 10px;
-        color: black;
+        border-collapse: collapse;
+        background: white;
+        border-radius: 8px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
         overflow: hidden;
-        box-shadow: 0 4px 12px rgba(0,0,0,0.15);
     }
 
-    th, td {
-        padding: 12px;
-        text-align: left;
-        border-bottom: 1px solid #ddd;
-        vertical-align: top;
+        .table-custom th, .table-custom td {
+            padding: 14px 16px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+
+        .table-custom th {
+            background: linear-gradient(to right, var(--indigo-main), var(--indigo-light));
+            color: white;
+        }
+
+    .filter-bar {
+        display: flex;
+        justify-content: space-between;
+        gap: 15px;
+        margin-bottom: 20px;
     }
+
+        .filter-bar input, .filter-bar select {
+            padding: 8px 12px;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            min-width: 200px;
+        }
 
     .popup-overlay {
         position: fixed;
@@ -38,7 +113,7 @@
         left: 0;
         width: 100vw;
         height: 100vh;
-        background: rgba(0,0,0,0.7);
+        background: rgba(0, 0, 0, 0.6);
         display: none;
         justify-content: center;
         align-items: center;
@@ -46,14 +121,14 @@
     }
 
     .popup-card {
-        background: #fff;
-        padding: 20px;
+        background: white;
+        padding: 24px;
         border-radius: 10px;
-        width: 500px;
-        color: black;
-        box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+        width: 550px;
         max-height: 90vh;
         overflow-y: auto;
+        color: black;
+        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
     }
 
     .popup-header {
@@ -70,103 +145,56 @@
         cursor: pointer;
     }
 
-    .popup-fields {
-        display: flex;
-        flex-direction: column;
-        gap: 10px;
-        margin-bottom: 20px;
-        font-size: 14.5px;
-    }
-
-    .popup-field {
-        display: flex;
-        flex-direction: column;
-        background: #f1f1f1;
-        padding: 8px;
-        border-radius: 6px;
-    }
-
-        .popup-field strong {
-            font-weight: 600;
-            color: #555;
-        }
-
-    .popup-textarea {
-        background-color: #fff;
-        border: 1px solid #ddd;
-        padding: 8px;
-        border-radius: 4px;
-        width: 100%;
-        color: #333;
-        white-space: pre-wrap;
-        word-wrap: break-word;
-    }
-
-    .btn {
-        padding: 6px 12px;
-        border-radius: 4px;
-        border: none;
-        cursor: pointer;
-    }
-
-    .btn-approve {
-        background: green;
-        color: white;
-    }
-
-    .btn-reject {
-        background: crimson;
-        color: white;
-    }
-
-    .btn-disabled {
-        background: #ccc;
-        color: #666;
+   
+    .no-click {
+        pointer-events: none;
+        opacity: 0.6;
         cursor: not-allowed;
     }
 
-    .filter-bar {
+
+
+    .popup-fields {
         display: flex;
-        justify-content: space-between;
+        flex-direction: column;
+        gap: 12px;
         margin-bottom: 20px;
     }
 
-        .filter-bar input,
-        .filter-bar select {
-            padding: 8px;
-            border-radius: 4px;
-            min-width: 150px;
-        }
+    .popup-field {
+        background: #f5f5f5;
+        padding: 10px;
+        border-radius: 6px;
+    }
 
-    .popup-content {
-        white-space: pre-wrap;
-        word-wrap: break-word;
-        font-size: 15px;
-        line-height: 1.6;
+    .popup-textarea {
+        background-color: #fff;
+        border: 1px solid #ccc;
+        padding: 8px;
+        border-radius: 4px;
         color: #333;
-        margin-top: 10px;
     }
 </style>
 
-<h2>Nominations</h2>
+<h2><i class="bi bi-star-fill"></i> Nominations</h2>
 
 @if (isTeamLead)
 {
-    <div style="text-align: right; margin-bottom: 20px;">
-        <a asp-action="Create" class="btn btn-success">
-            <i class="bi bi-plus-circle"></i> Create Nomination
+    <div class="text-end mb-3">
+        <a asp-action="Create" class="btn btn-indigo">
+            <i class="bi bi-plus-circle-fill"></i> Create Nomination
         </a>
     </div>
 
-    <table class="table table-bordered bg-white text-dark">
+    <table class="table-custom">
         <thead>
             <tr>
-                <th>S.No</th>
+                <th>#</th>
                 <th>Nominee</th>
                 <th>Team</th>
                 <th>Category</th>
                 <th>Status</th>
-                <th>CreatedDate</th>
+                <th>Created</th>
                 <th>Actions</th>
             </tr>
         </thead>
@@ -174,8 +202,6 @@
             @for (int i = 0; i < nominationsList.Count; i++)
             {
                 var n = nominationsList[i];
-                var shortDesc = n.Description?.Length > 50 ? n.Description.Substring(0, 50) + "..." : n.Description;
-
                 <tr>
                     <td>@(i + 1)</td>
                     <td>@n.Nominee?.Name</td>
@@ -184,60 +210,37 @@
                     <td>@n.Status</td>
                     <td>@n.CreatedAt.ToShortDateString()</td>
                     <td>
-                        <a asp-action="Details" asp-route-id="@n.Id" class="btn btn-sm btn-info">
-                            Details
+                        <a asp-action="Details" asp-route-id="@n.Id" class="btn btn-indigo btn-sm">
+                            <i class="bi bi-eye-fill"></i> Details
                         </a>
-                        <a asp-action="Edit" asp-route-id="@n.Id" class="btn btn-sm btn-primary">
-                            Edit
-                        </a>
-                        <button type="button"
-                                class="btn btn-danger btn-sm"
+                        
+
+                <a asp-action="Edit"
+                   asp-route-id="@n.Id"
+                   class="btn btn-indigo btn-sm @( (n.Status == NominationStatus.Approved || n.Status == NominationStatus.Rejected) ? "disabled no-click" : "" )">
+                    <i class="bi bi-pencil-fill"></i> Edit
+                </a>
+
+                        <button class="btn btn-danger btn-sm @( (n.Status == NominationStatus.Approved || n.Status == NominationStatus.Rejected) ? "disabled no-click" : "" )"
                                 data-bs-toggle="modal"
                                 data-bs-target="#deleteModal"
                                 data-id="@n.Id">
-                            Delete
+                            <i class="bi bi-trash-fill"></i> Delete
                         </button>
+
+
 
                     </td>
                 </tr>
             }
         </tbody>
     </table>
-    <!-- Delete Confirmation Modal -->
-    <!-- Delete Confirmation Modal -->
-    <div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content bg-white text-dark">
-                <div class="modal-header">
-                    <h5 class="modal-title"><i class="bi bi-exclamation-triangle text-danger"></i> Confirm Deletion</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                </div>
-                <div class="modal-body">
-                    Are you sure you want to delete this nomination?
-                </div>
-                <div class="modal-footer">
-                    <form id="deleteForm" asp-action="DeleteConfirmed" asp-controller="Nomination" method="post">
-                        <input type="hidden" name="id" id="deleteNominationId" />
-                        @Html.AntiForgeryToken()
-                        <button type="submit" class="btn btn-danger">
-                            <i class="bi bi-trash-fill"></i> Delete
-                        </button>
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
-                            <i class="bi bi-x-circle"></i> Cancel
-                        </button>
-                    </form>
-                </div>
-            </div>
-        </div>
-    </div>
-
-
 }
 
 @if (isManager)
 {
     <div class="filter-bar">
-        <input type="text" id="liveSearch" placeholder="Search Nominee Name" />
+        <input type="text" id="liveSearch" placeholder="🔍 Search by Nominee" />
         <select id="filterSelect">
             <option value="all">All</option>
             <option value="pending">Pending</option>
@@ -245,7 +248,7 @@
         </select>
     </div>
 
-    <table class="table table-bordered bg-white text-dark" id="nominationsTable">
+    <table class="table-custom" id="nominationsTable">
         <thead>
             <tr>
                 <th>#</th>
@@ -263,9 +266,8 @@
             {
                 var n = nominationsList[i];
                 var isReviewed = reviewedIds.Contains(n.Id);
-                var statusClass = isReviewed ? "reviewed" : "pending";
 
-                <tr class="@statusClass"
+                <tr class="@(isReviewed ? "reviewed" : "pending")"
                     data-index="@i"
                     data-id="@n.Id"
                     data-name="@n.Nominee?.Name?.ToLower()"
@@ -287,11 +289,15 @@
                     <td>
                         @if (isReviewed)
                         {
-                            <span class="btn btn-disabled">Reviewed</span>
+                            <span class="btn btn-disabled btn-sm">
+                                <i class="bi bi-check2-circle"></i> Reviewed
+                            </span>
                         }
                         else
                         {
-                            <button class="btn btn-light btn-sm open-popup" data-index="@i">Review</button>
+                            <button class="btn btn-indigo btn-sm open-popup" data-index="@i">
+                                <i class="bi bi-eye-fill"></i> Review
+                            </button>
                         }
                     </td>
                 </tr>
@@ -299,111 +305,118 @@
         </tbody>
     </table>
 
-    <!-- Manager Review Popup -->
+    <!-- Popup for Review -->
     <div class="popup-overlay" id="popupOverlay">
         <div class="popup-card">
             <div class="popup-header">
-                <h4>Nomination Details</h4>
+                <h5>Nomination Review</h5>
                 <button class="popup-close" onclick="closePopup()">×</button>
             </div>
             <div id="popupContent"></div>
         </div>
     </div>
 
-    <!-- Hidden Form -->
+    <!-- Hidden Review Form -->
     <form id="reviewForm" method="post" asp-action="Review" asp-controller="Nomination">
+        @Html.AntiForgeryToken()
         <input type="hidden" name="id" id="reviewId" />
         <input type="hidden" name="action" id="reviewAction" />
         <input type="hidden" name="remarks" id="reviewRemarks" />
-        @Html.AntiForgeryToken()
     </form>
 }
 
+<!-- Delete Modal -->
+<div class="modal fade" id="deleteModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content bg-white text-dark">
+            <div class="modal-header">
+                <h5 class="modal-title"><i class="bi bi-exclamation-triangle text-danger"></i> Confirm Deletion</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">Are you sure you want to delete this nomination?</div>
+            <div class="modal-footer">
+                <form id="deleteForm" asp-action="DeleteConfirmed" method="post">
+                    @Html.AntiForgeryToken()
+                    <input type="hidden" name="id" id="deleteNominationId" />
+                    <button type="submit" class="btn btn-danger"><i class="bi bi-trash-fill"></i> Delete</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
 @section Scripts {
     <script>
+        document.querySelectorAll("button.open-popup").forEach(btn => {
+            btn.addEventListener("click", e => {
+                const index = btn.dataset.index;
+                const row = document.querySelector(`tr[data-index="${index}"]`);
+                const data = row.dataset;
+
+                const html = `
+                    <div class="popup-fields">
+                        <div class="popup-field"><strong>Nominee:</strong> ${data.name}</div>
+                        <div class="popup-field"><strong>Team:</strong> ${data.team}</div>
+                        <div class="popup-field"><strong>Category:</strong> ${data.category}</div>
+                        <div class="popup-field"><strong>Nominated By:</strong> ${data.nominatedby}</div>
+                        <div class="popup-field"><strong>Description:</strong><div class="popup-textarea">${data.description}</div></div>
+                        <div class="popup-field"><strong>Achievements:</strong><div class="popup-textarea">${data.achievements}</div></div>
+                        <div class="popup-field"><strong>Status:</strong> ${data.status}</div>
+                        <div class="popup-field"><strong>Created:</strong> ${data.created}</div>
+                        <div class="mt-3">
+                            <label><strong>Remarks</strong></label>
+                            <textarea class="form-control" rows="3" id="popupRemarks"></textarea>
+                        </div>
+                        <div class="d-flex justify-content-end gap-3 mt-3">
+                            <button class="btn btn-success" onclick="submitReview('${data.id}', 'Approved')">
+                                <i class="bi bi-check-circle-fill"></i> Approve
+                            </button>
+                            <button class="btn btn-danger" onclick="submitReview('${data.id}', 'Rejected')">
+                                <i class="bi bi-x-circle-fill"></i> Reject
+                            </button>
+                        </div>
+                    </div>
+                `;
+                document.getElementById("popupContent").innerHTML = html;
+                document.getElementById("popupOverlay").style.display = "flex";
+            });
+        });
+
         function closePopup() {
             document.getElementById("popupOverlay").style.display = "none";
-            document.getElementById("popupContent").innerHTML = "";
         }
 
-        function openPopup(index) {
-            const row = document.querySelector(`button[data-index='${index}']`).closest("tr");
-            const data = row.dataset;
-
-            const html = `
-                <div class="popup-fields">
-                    <div class="popup-field"><strong>Nominee:</strong> ${data.name}</div>
-                    <div class="popup-field"><strong>Team:</strong> ${data.team}</div>
-                    <div class="popup-field"><strong>Category:</strong> ${data.category}</div>
-                    <div class="popup-field"><strong>Nominated By:</strong> ${data.nominatedby}</div>
-                    <div class="popup-field"><strong>Description:</strong><div class="popup-textarea">${data.description}</div></div>
-                    <div class="popup-field"><strong>Achievements:</strong><div class="popup-textarea">${data.achievements}</div></div>
-                    <div class="popup-field"><strong>Status:</strong> ${data.status}</div>
-                    <div class="popup-field"><strong>Created:</strong> ${data.created}</div>
-                </div>
-
-                <form method="post" asp-action="Review" asp-controller="Nomination">
-                    <input type="hidden" name="id" value="${data.id}" />
-                    <input type="hidden" name="action" id="actionField" />
-                    <div class="mb-3">
-                        <label for="remarks"><strong>Remarks</strong></label>
-                        <textarea name="remarks" required class="form-control" rows="3"></textarea>
-                    </div>
-                    <div class="d-flex justify-content-end gap-3 mt-3">
-                        <button type="button" class="btn btn-success" onclick="submitAction('Approved')">
-                            <i class="bi bi-check-circle"></i> Approve
-                        </button>
-                        <button type="button" class="btn btn-danger" onclick="submitAction('Rejected')">
-                            <i class="bi bi-x-circle"></i> Reject
-                        </button>
-                    </div>
-                </form>
-            `;
-
-            document.getElementById("popupContent").innerHTML = html;
-            document.getElementById("popupOverlay").style.display = "flex";
-        }
-
-        function submitAction(action) {
-            const remarks = document.querySelector("#popupContent textarea[name='remarks']").value;
-            const id = document.querySelector("#popupContent input[name='id']").value;
-
+        function submitReview(id, action) {
+            const remarks = document.getElementById("popupRemarks").value;
             document.getElementById("reviewId").value = id;
             document.getElementById("reviewAction").value = action;
             document.getElementById("reviewRemarks").value = remarks;
-
             document.getElementById("reviewForm").submit();
         }
-        document.querySelectorAll("button.open-popup").forEach(btn => {
-            btn.addEventListener("click", e => {
-                e.stopPropagation();
-                openPopup(btn.dataset.index);
-            });
+
+        document.getElementById('deleteModal').addEventListener('show.bs.modal', function (e) {
+            const button = e.relatedTarget;
+            document.getElementById('deleteNominationId').value = button.getAttribute('data-id');
         });
 
         function filterTable() {
-            const filter = document.getElementById("filterSelect")?.value ?? "all";
-            const search = document.getElementById("liveSearch")?.value.toLowerCase();
+            const search = document.getElementById("liveSearch").value.toLowerCase();
+            const filter = document.getElementById("filterSelect").value;
 
-            document.querySelectorAll("tbody tr").forEach(row => {
-                const name = row.getAttribute("data-name") ?? "";
-                const isReviewed = row.classList.contains("reviewed");
-                const isPending = row.classList.contains("pending");
+            document.querySelectorAll("#nominationsTable tbody tr").forEach(row => {
+                const name = row.getAttribute("data-name");
+                const reviewed = row.classList.contains("reviewed");
+                const pending = row.classList.contains("pending");
 
-                let visible = true;
-                if (filter === "pending" && !isPending) visible = false;
-                if (filter === "reviewed" && !isReviewed) visible = false;
-                if (search && !name.includes(search)) visible = false;
+                let show = true;
+                if (search && !name.includes(search)) show = false;
+                if (filter === "pending" && !pending) show = false;
+                if (filter === "reviewed" && !reviewed) show = false;
 
-                row.style.display = visible ? "" : "none";
+                row.style.display = show ? "" : "none";
             });
         }
-        var deleteModal = document.getElementById('deleteModal');
-        deleteModal.addEventListener('show.bs.modal', function (event) {
-            var button = event.relatedTarget;
-            var nominationId = button.getAttribute('data-id');
-            document.getElementById('deleteNominationId').value = nominationId;
-        });
 
         document.getElementById("filterSelect")?.addEventListener("change", filterTable);
         document.getElementById("liveSearch")?.addEventListener("input", filterTable);
