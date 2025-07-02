@@ -245,6 +245,8 @@
             <option value="all">All</option>
             <option value="pending">Pending</option>
             <option value="reviewed">Reviewed</option>
+            <option value="approved">Approved</option>
+            <option value="rejected">Rejected</option>
         </select>
     </div>
 
@@ -408,11 +410,13 @@
                 const name = row.getAttribute("data-name");
                 const reviewed = row.classList.contains("reviewed");
                 const pending = row.classList.contains("pending");
-
+                const status = (row.getAttribute("data-status") || "").toLowerCase();
                 let show = true;
                 if (search && !name.includes(search)) show = false;
                 if (filter === "pending" && !pending) show = false;
                 if (filter === "reviewed" && !reviewed) show = false;
+                if(filter==="approved" && status!="approved") show=false;
+                if(filter==="rejected" && status!="rejected") show=false;
 
                 row.style.display = show ? "" : "none";
             });
