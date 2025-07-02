@@ -1,18 +1,130 @@
 ﻿@model IEnumerable<RewardsAndRecognitionRepository.Models.YearQuarter>
+@{
+    ViewData["Title"] = "Year Quarters";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
 
-<h2 class="mb-4">Year Quarters</h2>
+<style>
+    :root {
+        --indigo-main: #3f51b5;
+        --indigo-light: #5c6bc0;
+        --indigo-dark: #303f9f;
+        --danger: #c62828;
+        --danger-hover: #b71c1c;
+        --text-light: #fff;
+        --info: #0288d1;
+    }
 
-<a asp-action="Create" class="btn btn-dark mb-3">➕ Add Year Quarter</a>
+    .page-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin: 30px 0 20px;
+    }
 
-<table class="table table-bordered table-striped shadow-sm">
-    <thead class="table-dark">
+    .add-btn {
+        background: linear-gradient(to right, var(--indigo-main), var(--indigo-light));
+        color: var(--text-light);
+        padding: 10px 20px;
+        border-radius: 6px;
+        font-weight: 500;
+        border: none;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+       
+    }
+
+        .add-btn:hover {
+            background: var(--indigo-dark);
+            color: var(--text-light);
+        }
+
+    .yearquarter-table {
+        width: 100%;
+        border-collapse: collapse;
+        background: white;
+        border-radius: 8px;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
+        overflow: hidden;
+    }
+
+        .yearquarter-table th, .yearquarter-table td {
+            padding: 14px 16px;
+            text-align: left;
+        }
+
+        .yearquarter-table th {
+            background: linear-gradient(to right, var(--indigo-main), var(--indigo-light));
+            color: white;
+            font-weight: 600;
+        }
+
+        .yearquarter-table tr:nth-child(even) {
+            background-color: #f5f5f5;
+        }
+
+        .yearquarter-table tr:hover {
+            background-color: #eef1f7;
+        }
+
+    .btn {
+        padding: 8px 12px;
+        border: none;
+        border-radius: 5px;
+        font-size: 0.85rem;
+        font-weight: 500;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+       
+    }
+
+    .btn-secondary {
+        background: #6c757d;
+    }
+
+        .btn-secondary:hover {
+            background: #5a6268;
+        }
+
+    .btn-primary {
+        background-color: var(--indigo-main);
+        color: white;
+    }
+
+        .btn-primary:hover {
+            background-color: var(--indigo-dark);
+        }
+
+    .btn-danger {
+        background-color: var(--danger);
+        color: white;
+    }
+
+        .btn-danger:hover {
+            background-color: var(--danger-hover);
+        }
+</style>
+
+<div class="page-header">
+    <h2><i class="bi bi-calendar2-week-fill me-2"></i> Year Quarters</h2>
+    <a asp-action="Create" class="add-btn">
+        <i class="bi bi-plus-circle-fill"></i> Add Year Quarter
+    </a>
+</div>
+
+<table class="yearquarter-table">
+    <thead>
         <tr>
-            <th>Year</th>
-            <th>Quarter</th>
-            <th>Start Date</th>
-            <th>End Date</th>
-            <th>Active</th>
-            <th>Actions</th>
+            <th><i class="bi bi-calendar2"></i> Year</th>
+            <th><i class="bi bi-calendar3"></i> Quarter</th>
+            <th><i class="bi bi-calendar-event"></i> Start Date</th>
+            <th><i class="bi bi-calendar-check"></i> End Date</th>
+            <th><i class="bi bi-check2-circle"></i> Active</th>
+            <th><i class="bi bi-gear-fill"></i> Actions</th>
         </tr>
     </thead>
     <tbody>
@@ -23,11 +135,17 @@
                 <td>@yq.Quarter</td>
                 <td>@yq.StartDate.ToShortDateString()</td>
                 <td>@yq.EndDate.ToShortDateString()</td>
-                <td>@(yq.IsActive ? "Yes" : "No")</td>
+                <td>@(yq.IsActive ? "✅ Yes" : "❌ No")</td>
                 <td>
-                    <a asp-action="Details" asp-route-id="@yq.Id" class="btn btn-sm btn-info">👁 View</a>
-                    <a asp-action="Edit" asp-route-id="@yq.Id" class="btn btn-sm btn-primary">✏️ Edit</a>
-                    <a asp-action="Delete" asp-route-id="@yq.Id" class="btn btn-sm btn-danger">🗑 Delete</a>
+                    <a asp-action="Details" asp-route-id="@yq.Id" class="btn btn-secondary">
+                        <i class="bi bi-eye-fill"></i> View
+                    </a>
+                    <a asp-action="Edit" asp-route-id="@yq.Id" class="btn btn-primary">
+                        <i class="bi bi-pencil-square"></i> Edit
+                    </a>
+                    <a asp-action="Delete" asp-route-id="@yq.Id" class="btn btn-danger">
+                        <i class="bi bi-trash-fill"></i> Delete
+                    </a>
                 </td>
             </tr>
         }

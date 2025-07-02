@@ -23,6 +23,7 @@ namespace RewardsAndRecognitionRepository.Repos
             return await _context.Teams
                 .Include(t => t.TeamLead)
                 .Include(t => t.Manager)
+                .Include(t=>t.Director)
                 .ToListAsync();
         }
 

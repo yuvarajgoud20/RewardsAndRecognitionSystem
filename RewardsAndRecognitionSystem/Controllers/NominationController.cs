@@ -28,7 +28,9 @@ namespace RewardsAndRecognitionSystem.Controllers
         public async Task<IActionResult> Index(string filter, string search)
         {
             var currentUser = await _userManager.GetUserAsync(User);
-            if (currentUser == null) return Unauthorized();
+            if (currentUser == null)
+                return RedirectToAction("Login", "Account", new { area = "Identity" });
+
 
             var userRoles = await _userManager.GetRolesAsync(currentUser);
             List<Nomination> nominationsToShow = new();

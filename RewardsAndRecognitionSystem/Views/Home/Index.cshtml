@@ -4,67 +4,63 @@
 }
 
 <style>
-    .hero-section {
-        text-align: center;
-        padding: 80px 20px;
-        background-color: #fff;
-        color: #111;
+    body {
         font-family: 'Segoe UI', sans-serif;
     }
 
+    .hero-section {
+        text-align: center;
+        padding: 100px 20px 60px;
+        background: linear-gradient(to right, #6a11cb, #2575fc);
+        color: white;
+    }
+
     .hero-title {
-        font-size: 3.2rem;
+        font-size: 3rem;
         font-weight: bold;
         margin-bottom: 20px;
     }
 
     .hero-subtitle {
         font-size: 1.2rem;
-        max-width: 600px;
-        margin: 0 auto 30px;
-        color: #555;
+        max-width: 650px;
+        margin: 0 auto;
+        color: #e0e0e0;
     }
-
-    .cta-button {
-        display: inline-block;
-        padding: 12px 28px;
-        font-size: 1rem;
-        background-color: black;
-        color: white;
-        border-radius: 5px;
-        text-decoration: none;
-        transition: background-color 0.3s ease;
-    }
-
-        .cta-button:hover {
-            background-color: #333;
-        }
 
     .features {
         display: flex;
         flex-wrap: wrap;
         justify-content: center;
-        margin-top: 20px;
-        margin-bottom : 50px;
+        gap: 30px;
+        padding: 60px 20px 40px;
+        background: linear-gradient(to bottom, #f9f9f9, #f0f4ff);
     }
 
     .feature-box {
-        width: 280px;
-        border: 1px solid #ddd;
-        padding: 24px;
-        margin: 15px;
-        border-radius: 10px;
-        background-color: #fafafa;
-        transition: box-shadow 0.3s ease;
+        width: 300px;
+        padding: 30px 25px;
+        border-radius: 15px;
+        background: white;
+        box-shadow: 0 6px 15px rgba(0, 0, 0, 0.08);
+        text-align: center;
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
     }
 
         .feature-box:hover {
-            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+            transform: scale(1.05);
+            box-shadow: 0 10px 24px rgba(0, 0, 0, 0.12);
         }
 
+    .feature-icon {
+        font-size: 2.8rem;
+        margin-bottom: 12px;
+    }
+
     .feature-title {
+        font-size: 1.3rem;
         font-weight: 600;
-        font-size: 1.2rem;
+        color: #333;
         margin-bottom: 10px;
     }
 
@@ -72,35 +68,62 @@
         font-size: 0.95rem;
         color: #555;
     }
+
 </style>
 
 <div class="hero-section">
     <h1 class="hero-title">Welcome to the Rewards & Recognition System</h1>
     <p class="hero-subtitle">
-        Empower your teams. Celebrate excellence. This platform enables seamless employee nominations, structured approvals, and lasting recognition.
+        Empower your teams. Celebrate excellence. Seamless nominations, transparent approvals, and lasting recognition.
     </p>
 </div>
 
 <div class="features">
-    <div class="feature-box">
-        <div class="feature-title">🌟 Nominate Talents</div>
+    <div class="feature-box" style="border-top: 5px solid #6f42c1;">
+        <div class="feature-icon">🌟</div>
+        <div class="feature-title">Nominate Talents</div>
         <div class="feature-desc">
-            Team leads can nominate outstanding performers every quarter with ease.
+            Team Leads can effortlessly nominate top performers every quarter.
         </div>
     </div>
 
-    <div class="feature-box">
-        <div class="feature-title">✅ Multi-Level Approvals</div>
+    <div class="feature-box" style="border-top: 5px solid #20c997;">
+        <div class="feature-icon">✅</div>
+        <div class="feature-title">Multi-Level Approvals</div>
         <div class="feature-desc">
-            Built-in approval flow ensures transparency with manager and director validations.
+            Transparent workflows via Manager & Director approvals.
         </div>
     </div>
 
-    <div class="feature-box">
-        <div class="feature-title">📈 Recognition Dashboard</div>
+    <div class="feature-box" style="border-top: 5px solid #fd7e14;">
+        <div class="feature-icon">📈</div>
+        <div class="feature-title">Recognition Dashboard</div>
         <div class="feature-desc">
-            Approved recognitions are showcased in an organized, historical dashboard.
+            Approved recognitions are displayed in a dynamic visual timeline.
+        </div>
+    </div>
+
+    <div class="feature-box" style="border-top: 5px solid #dc3545;">
+        <div class="feature-icon">🏆</div>
+        <div class="feature-title">Award Categories</div>
+        <div class="feature-desc">
+            Celebrate achievements across categories like Innovation & Leadership.
+        </div>
+    </div>
+
+    <div class="feature-box" style="border-top: 5px solid #17a2b8;">
+        <div class="feature-icon">📅</div>
+        <div class="feature-title">Quarter-Based System</div>
+        <div class="feature-desc">
+            Track and manage nominations per quarter effortlessly.
+        </div>
+    </div>
+
+    <div class="feature-box" style="border-top: 5px solid #ffc107;">
+        <div class="feature-icon">🔔</div>
+        <div class="feature-title">Live Notifications</div>
+        <div class="feature-desc">
+            Get notified on nomination status changes and approvals.
         </div>
     </div>
 </div>
-
