@@ -109,12 +109,17 @@
             </div>
 
             <div class="form-group">
-                <label for="YearQuarterId">Quarter<span>*</span></label>
-                <select asp-for="YearQuarterId" class="form-control" asp-items="ViewBag.YearQuarters">
-                    <option value="">-- Select Quarter --</option>
-                </select>
+                <label>Quarter <span class="text-danger">*</span></label>
+
+                <!-- Display the active quarter -->
+                <input type="text" class="form-control" value="@ViewData["ActiveQuarterDisplay"]" disabled />
+
+                <!-- Hidden field to submit the ID -->
+                <input type="hidden" asp-for="YearQuarterId" />
+
                 <span asp-validation-for="YearQuarterId" class="text-danger"></span>
             </div>
+
 
             <div class="form-group">
                 <label for="Description">Description<span>*</span></label>

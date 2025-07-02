@@ -25,7 +25,7 @@ namespace RewardsAndRecognitionSystem.Controllers
         }
 
         // GET: Nomination
-        public async Task<IActionResult> Index(string filter, string search)
+        public async Task<IActionResult> Index()
         {
             var currentUser = await _userManager.GetUserAsync(User);
             if (currentUser == null)
@@ -55,29 +55,29 @@ namespace RewardsAndRecognitionSystem.Controllers
                 ViewBag.ReviewedNominationIds = alreadyReviewedIds;
 
                 // Filter: Pending or Reviewed
-                if (filter == "Pending")
-                {
-                    nominationsToShow = nominationsToShow
-                        .Where(n => !alreadyReviewedIds.Contains(n.Id))
-                        .ToList();
-                }
-                else if (filter == "Reviewed")
-                {
-                    nominationsToShow = nominationsToShow
-                        .Where(n => alreadyReviewedIds.Contains(n.Id))
-                        .ToList();
-                }
+                //if (filter == "Pending")
+                //{
+                //    nominationsToShow = nominationsToShow
+                //        .Where(n => !alreadyReviewedIds.Contains(n.Id))
+                //        .ToList();
+                //}
+                //else if (filter == "Reviewed")
+                //{
+                //    nominationsToShow = nominationsToShow
+                //        .Where(n => alreadyReviewedIds.Contains(n.Id))
+                //        .ToList();
+                //}
 
-                // Search: filter by nominee name
-                if (!string.IsNullOrEmpty(search))
-                {
-                    nominationsToShow = nominationsToShow
-                        .Where(n => n.Nominee.Name != null && n.Nominee.Name.Contains(search, StringComparison.OrdinalIgnoreCase))
-                        .ToList();
-                }
+                //// Search: filter by nominee name
+                //if (!string.IsNullOrEmpty(search))
+                //{
+                //    nominationsToShow = nominationsToShow
+                //        .Where(n => n.Nominee.Name != null && n.Nominee.Name.Contains(search, StringComparison.OrdinalIgnoreCase))
+                //        .ToList();
+                //}
 
-                ViewBag.CurrentFilter = filter;
-                ViewBag.SearchTerm = search;
+                //ViewBag.CurrentFilter = filter;
+                //ViewBag.SearchTerm = search;
                 return View(nominationsToShow);
             }
             if (userRoles.Contains("TeamLead"))
@@ -101,15 +101,15 @@ namespace RewardsAndRecognitionSystem.Controllers
                     .ToListAsync();
             }
 
-            // Search within own nominations
-            if (!string.IsNullOrEmpty(search))
-            {
-                nominationsToShow = nominationsToShow
-                    .Where(n => n.Nominee.Name != null && n.Nominee.Name.Contains(search, StringComparison.OrdinalIgnoreCase))
-                    .ToList();
-            }
+            //// Search within own nominations
+            //if (!string.IsNullOrEmpty(search))
+            //{
+            //    nominationsToShow = nominationsToShow
+            //        .Where(n => n.Nominee.Name != null && n.Nominee.Name.Contains(search, StringComparison.OrdinalIgnoreCase))
+            //        .ToList();
+            //}
 
-            ViewBag.SearchTerm = search;
+            //ViewBag.SearchTerm = search;
             return View(nominationsToShow);
         }
 
@@ -140,12 +140,16 @@ namespace RewardsAndRecognitionSystem.Controllers
 
             ViewBag.Nominees = new SelectList(nominees, "Id", "Name");
 
-
             ViewBag.Categories = new SelectList(await _context.Categories.ToListAsync(), "Id", "Name");
-            ViewBag.YearQuarters = new SelectList(await _context.YearQuarters.ToListAsync(), "Id", "Quarter");
+            var activeQuarter = _context.YearQuarters.FirstOrDefault(yq => yq.IsActive);
             //ViewBag.NominatorId = currentUser.Id;
             //ViewBag.NominatorName = currentUser.Name;
             Nomination nomination = new Nomination();
+            if (activeQuarter != null)
+            {
+                nomination.YearQuarterId= activeQuarter.Id;
+            }
+            ViewData["ActiveQuarterDisplay"] = activeQuarter.Quarter + " - " + activeQuarter.Year;
             ViewBag.NominatorId = currentUser.Id;
             ViewBag.Status = NominationStatus.PendingManager;
             return View(nomination);
