@@ -66,9 +66,11 @@ namespace RewardsAndRecognitionSystem.Controllers
 
             var managers = await _userRepo.GetAllManagersAsync(); // ✅ Required
             var leads = await _userRepo.GetLeadsAsync(team.TeamLeadId);          // ✅ Required
+            var directors = await _userRepo.GetAllDirectorsAsync();
 
             ViewBag.Managers = new SelectList(managers, "Id", "Name", team.ManagerId);
             ViewBag.TeamLeads = new SelectList(leads, "Id", "Name", team.TeamLeadId);
+            ViewBag.Directors = new SelectList(directors, "Id", "Name", team.DirectorId);
 
             return View(team);
         }
