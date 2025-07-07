@@ -1,4 +1,5 @@
-﻿@using RewardsAndRecognitionRepository.Enums
+﻿@using Microsoft.AspNetCore.Identity
+@using RewardsAndRecognitionRepository.Enums
 @model IEnumerable<RewardsAndRecognitionRepository.Models.Nomination>
 
 @{
@@ -8,8 +9,8 @@
     var reviewedIds = ViewBag.ReviewedNominationIds as List<Guid> ?? new List<Guid>();
     var nominationsList = Model.ToList();
     var isManager = User.IsInRole("Manager");
+    var isDirector = User.IsInRole("Director");
     var isTeamLead = User.IsInRole("TeamLead");
-    var isAdmin = User.IsInRole("Admin");
 }
 
 <style>
@@ -21,10 +22,10 @@
         --danger-hover: #b71c1c;
         --text-light: #fff;
     }
-    .dontdisplay
-    {
 
+    .dontdisplay {
     }
+
     .btn {
         padding: 6px 12px;
         border-radius: 4px;
@@ -122,10 +123,10 @@
     }
 
     .popup-card {
-        background: white;
-        padding: 24px;
+        background: #5c6bc0;
+        padding: 10px;
         border-radius: 10px;
-        width: 550px;
+        width: 1000px;
         max-height: 90vh;
         overflow-y: auto;
         color: black;
@@ -142,11 +143,28 @@
         background: none;
         border: none;
         font-size: 1.5rem;
+        font-weight: bold;
+        width: 32px;
+        height: 32px;
+        margin: 8px;
+        padding-bottom: 8px;
+        padding-right: 8px;
         color: #999;
         cursor: pointer;
+        transition: all 0.3s ease;
+        display: flex;
+        align-items: center;
+        justify-content: center;
     }
 
-   
+        .popup-close:hover {
+            background-color: red;
+            color: white;
+            border-radius: 50%;
+        }
+
+
+
     .no-click {
         pointer-events: none;
         opacity: 0.6;
@@ -175,39 +193,60 @@
         border-radius: 4px;
         color: #333;
     }
+
+    .popup-review-card {
+        background: white;
+        border-radius: 12px;
+        max-width: 1100px;
+        width: 100%;
+        color: #333;
+        box-shadow: 0 10px 24px rgba(0, 0, 0, 0.25);
+    }
+
+    .text-indigo {
+        color: #3f51b5;
+    }
+
+    .popup-label {
+        font-weight: 600;
+        color: #303f9f;
+        margin-bottom: 5px;
+        display: block;
+    }
+
+    .popup-block {
+        background-color: #f3f5fa;
+        border: 1px solid #ddd;
+        padding: 12px 16px;
+        border-radius: 6px;
+        font-size: 15px;
+        white-space: pre-wrap;
+        word-wrap: break-word;
+        color: #333;
+    }
+
 </style>
 
 <h2><i class="bi bi-star-fill"></i> Nominations</h2>
 
-@if (isTeamLead || isAdmin)
+@if (isTeamLead)
 {
-    @if (isTeamLead)
-    {
-        <div class="text-end mb-3">
-            <a asp-action="Create" class="btn btn-indigo">
-                <i class="bi bi-plus-circle-fill"></i> Create Nomination
-            </a>
-        </div>
-    }
+    <div class="text-end mb-3">
+        <a asp-action="Create" class="btn btn-indigo">
+            <i class="bi bi-plus-circle-fill"></i> Create Nomination
+        </a>
+    </div>
 
     <table class="table-custom">
         <thead>
             <tr>
                 <th>#</th>
                 <th>Nominee</th>
-                @if (isAdmin)
-                {
-                    <th>Nominator</th>
-                }
                 <th>Team</th>
                 <th>Category</th>
                 <th>Status</th>
                 <th>Created</th>
-                @if(isTeamLead)
-                {
-                    <th>Actions</th>
-                }
-                
+                <th>Actions</th>
             </tr>
         </thead>
         <tbody>
@@ -217,43 +256,36 @@
                 <tr>
                     <td>@(i + 1)</td>
                     <td>@n.Nominee?.Name</td>
-                    @if (isAdmin)
-                    {
-                        <td>@n.Nominator?.Name</td>
-                    }
                     <td>@n.Nominee?.Team?.Name</td>
                     <td>@n.Category?.Name</td>
                     <td>@n.Status</td>
                     <td>@n.CreatedAt.ToShortDateString()</td>
-                    @if(isTeamLead)
-                    {
-                        <td>
-                            <a asp-action="Details" asp-route-id="@n.Id" class="btn btn-indigo btn-sm">
-                                <i class="bi bi-eye-fill"></i> Details
-                            </a>
-                        
+                    <td>
+                        <a asp-action="Details" asp-route-id="@n.Id" class="btn btn-indigo btn-sm">
+                            <i class="bi bi-eye-fill"></i> Details
+                        </a>
 
-                            <a asp-action="Edit"
-                               asp-route-id="@n.Id"
-                               class="btn btn-indigo btn-sm @( (n.Status == NominationStatus.Approved || n.Status == NominationStatus.Rejected) ? "disabled no-click" : "" )">
-                                <i class="bi bi-pencil-fill"></i> Edit
-                            </a>
 
-                            <button class="btn btn-danger btn-sm @( (n.Status == NominationStatus.Approved || n.Status == NominationStatus.Rejected) ? "disabled no-click" : "" )"
-                                    data-bs-toggle="modal"
-                                    data-bs-target="#deleteModal"
-                                    data-id="@n.Id">
-                                <i class="bi bi-trash-fill"></i> Delete
-                            </button>
-                        </td>
-                    }
+                        <a asp-action="Edit"
+                           asp-route-id="@n.Id"
+                           class="btn btn-indigo btn-sm @( (n.Status == NominationStatus.PendingManager) ? "" : "disabled no-click" )">
+                            <i class="bi bi-pencil-fill"></i> Edit
+                        </a>
+
+                        <button class="btn btn-danger btn-sm @( (n.Status == NominationStatus.PendingManager) ? "" : "disabled no-click" )"
+                                data-bs-toggle="modal"
+                                data-bs-target="#deleteModal"
+                                data-id="@n.Id">
+                            <i class="bi bi-trash-fill"></i> Delete
+                        </button>
+                    </td>
                 </tr>
             }
         </tbody>
     </table>
 }
 
-@if (isManager)
+@if (isManager || isDirector)
 {
     <div class="filter-bar">
         <input type="text" id="liveSearch" placeholder="🔍 Search by Nominee" />
@@ -269,7 +301,7 @@
     <table class="table-custom" id="nominationsTable">
         <thead>
             <tr>
-                <th>#</th>
+                <th>S.No</th>
                 <th>Nominee</th>
                 <th>Team</th>
                 <th>Category</th>
@@ -284,6 +316,20 @@
             {
                 var n = nominationsList[i];
                 var isReviewed = reviewedIds.Contains(n.Id);
+                var managerRemarks = "";
+                var directorRemarks = "";
+                var managerApprovalStatus = "";
+                if (isDirector)
+                {
+                    managerRemarks = n.Approvals?.FirstOrDefault(a => a.ApproverId != ViewBag.currentUser.Id)?.Remarks ?? "No Remarks";
+                    directorRemarks = n.Approvals?.FirstOrDefault(a => a.ApproverId == ViewBag.currentUser.Id)?.Remarks ?? "No Remarks";
+                    managerApprovalStatus = n.Approvals?.FirstOrDefault(a => a.ApproverId != ViewBag.currentUser.Id)?.Action.ToString() ?? "No Action Taken";
+                } else
+                {
+                    managerRemarks = n.Approvals?.FirstOrDefault()?.Remarks ?? "No Remarks";
+                }
+
+                
 
                 <tr class="@(isReviewed ? "reviewed" : "pending")"
                     data-index="@i"
@@ -296,7 +342,11 @@
                     data-achievements="@n.Achievements"
                     data-status="@n.Status"
                     data-created="@n.CreatedAt.ToShortDateString()"
-                    data-reviewed="@isReviewed.ToString().ToLower()">
+                    data-reviewed="@isReviewed.ToString().ToLower()"
+                    data-director="@isDirector.ToString().ToLower()"
+                    data-approval_status="@managerApprovalStatus"
+                    data-director_remarks ="@directorRemarks"
+                    data-manager_remarks ="@managerRemarks">
                     <td>@(i + 1)</td>
                     <td>@n.Nominee?.Name</td>
                     <td>@n.Nominee?.Team?.Name</td>
@@ -305,30 +355,20 @@
                     <td>@n.Status</td>
                     <td>@n.CreatedAt.ToShortDateString()</td>
                     <td>
-                        @if (isReviewed)
-                        {
-                            <span class="btn btn-disabled btn-sm">
-                                <i class="bi bi-check2-circle"></i> Reviewed
-                            </span>
-                        }
-                        else
-                        {
-                            <button class="btn btn-indigo btn-sm open-popup" data-index="@i">
-                                <i class="bi bi-eye-fill"></i> Review
-                            </button>
-                        }
+                        <button class="btn btn-indigo btn-sm open-popup" data-index="@i">
+                            <i class="bi bi-eye-fill"></i> @(isReviewed ? "View" : "Review")
+                        </button>
                     </td>
                 </tr>
             }
         </tbody>
     </table>
 
-    <!-- Popup for Review -->
+    <!-- Popup for Review/View -->
     <div class="popup-overlay" id="popupOverlay">
         <div class="popup-card">
-            <div class="popup-header">
-                <h5>Nomination Review</h5>
-                <button class="popup-close" onclick="closePopup()">×</button>
+            <div class="popup-header justify-content-end">
+                <button class="popup-close" onclick="closePopup()"><b>×</b></button>
             </div>
             <div id="popupContent"></div>
         </div>
@@ -342,6 +382,7 @@
         <input type="hidden" name="remarks" id="reviewRemarks" />
     </form>
 }
+
 
 <!-- Delete Modal -->
 <div class="modal fade" id="deleteModal" tabindex="-1">
@@ -365,80 +406,7 @@
 </div>
 
 @section Scripts {
-    <script>
-        document.querySelectorAll("button.open-popup").forEach(btn => {
-            btn.addEventListener("click", e => {
-                const index = btn.dataset.index;
-                const row = document.querySelector(`tr[data-index="${index}"]`);
-                const data = row.dataset;
+    <script src="~/js/Nomination.js">
 
-                const html = `
-                    <div class="popup-fields">
-                        <div class="popup-field"><strong>Nominee:</strong> ${data.name}</div>
-                        <div class="popup-field"><strong>Team:</strong> ${data.team}</div>
-                        <div class="popup-field"><strong>Category:</strong> ${data.category}</div>
-                        <div class="popup-field"><strong>Nominated By:</strong> ${data.nominatedby}</div>
-                        <div class="popup-field"><strong>Description:</strong><div class="popup-textarea">${data.description}</div></div>
-                        <div class="popup-field"><strong>Achievements:</strong><div class="popup-textarea">${data.achievements}</div></div>
-                        <div class="popup-field"><strong>Status:</strong> ${data.status}</div>
-                        <div class="popup-field"><strong>Created:</strong> ${data.created}</div>
-                        <div class="mt-3">
-                            <label><strong>Remarks</strong></label>
-                            <textarea class="form-control" rows="3" id="popupRemarks"></textarea>
-                        </div>
-                        <div class="d-flex justify-content-end gap-3 mt-3">
-                            <button class="btn btn-success" onclick="submitReview('${data.id}', 'Approved')">
-                                <i class="bi bi-check-circle-fill"></i> Approve
-                            </button>
-                            <button class="btn btn-danger" onclick="submitReview('${data.id}', 'Rejected')">
-                                <i class="bi bi-x-circle-fill"></i> Reject
-                            </button>
-                        </div>
-                    </div>
-                `;
-                document.getElementById("popupContent").innerHTML = html;
-                document.getElementById("popupOverlay").style.display = "flex";
-            });
-        });
-
-        function closePopup() {
-            document.getElementById("popupOverlay").style.display = "none";
-        }
-
-        function submitReview(id, action) {
-            const remarks = document.getElementById("popupRemarks").value;
-            document.getElementById("reviewId").value = id;
-            document.getElementById("reviewAction").value = action;
-            document.getElementById("reviewRemarks").value = remarks;
-            document.getElementById("reviewForm").submit();
-        }
-
-        document.getElementById('deleteModal').addEventListener('show.bs.modal', function (e) {
-            const button = e.relatedTarget;
-            document.getElementById('deleteNominationId').value = button.getAttribute('data-id');
-        });
-
-        function filterTable() {
-            const search = document.getElementById("liveSearch").value.toLowerCase();
-            const filter = document.getElementById("filterSelect").value;
-
-            document.querySelectorAll("#nominationsTable tbody tr").forEach(row => {
-                const name = row.getAttribute("data-name");
-                const reviewed = row.classList.contains("reviewed");
-                const pending = row.classList.contains("pending");
-                const status = (row.getAttribute("data-status") || "").toLowerCase();
-                let show = true;
-                if (search && !name.includes(search)) show = false;
-                if (filter === "pending" && !pending) show = false;
-                if (filter === "reviewed" && !reviewed) show = false;
-                if(filter==="approved" && status!="approved") show=false;
-                if(filter==="rejected" && status!="rejected") show=false;
-
-                row.style.display = show ? "" : "none";
-            });
-        }
-
-        document.getElementById("filterSelect")?.addEventListener("change", filterTable);
-        document.getElementById("liveSearch")?.addEventListener("input", filterTable);
     </script>
 }
