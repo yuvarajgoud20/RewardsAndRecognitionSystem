@@ -10,8 +10,9 @@ namespace RewardsAndRecognitionRepository.Enums
     {
         PendingManager,
         PendingDirector,
-        Approved,
-        Rejected
+        ManagerApproved,
+        ManagerRejected,
+        DirectorApproved,
+        DirectorRejected
     }
-
 }
