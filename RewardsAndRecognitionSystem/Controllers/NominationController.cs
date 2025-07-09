@@ -32,6 +32,8 @@ namespace RewardsAndRecognitionSystem.Controllers
                 return RedirectToAction("Login", "Account", new { area = "Identity" });
 
 
+           
+
             var userRoles = await _userManager.GetRolesAsync(currentUser);
             List<Nomination> nominationsToShow = new();
 
@@ -264,5 +266,7 @@ namespace RewardsAndRecognitionSystem.Controllers
 
             return RedirectToAction(nameof(Index));
         }
+       
+
     }
 }

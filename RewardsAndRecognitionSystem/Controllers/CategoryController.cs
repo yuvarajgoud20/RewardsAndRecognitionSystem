@@ -1,7 +1,9 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Newtonsoft.Json;
 using RewardsAndRecognitionRepository.Interfaces;
 using RewardsAndRecognitionRepository.Models;
+using RewardsAndRecognitionRepository.Service;
 
 namespace RewardsAndRecognitionSystem.Controllers
 {
@@ -9,16 +11,21 @@ namespace RewardsAndRecognitionSystem.Controllers
     public class CategoryController : Controller
     {
         private readonly ICategoryRepo _categoryRepo;
+        private readonly INominationRepo _nominationRepo;
+        private readonly ICategoryService _categoryService;
 
-        public CategoryController(ICategoryRepo categoryRepo)
+        public CategoryController(ICategoryRepo categoryRepo, INominationRepo nominationRepo,ICategoryService service)
         {
             _categoryRepo = categoryRepo;
+            _nominationRepo = nominationRepo;
+            _categoryService = service;
         }
 
         // GET: Category
         public async Task<IActionResult> Index()
         {
-            var categories = await _categoryRepo.GetAllAsync();
+           // var categories = await _categoryRepo.GetAllAsync();
+           var categories=await _categoryService.GetAllAsync();
             return View(categories);
         }
 
@@ -79,6 +86,10 @@ namespace RewardsAndRecognitionSystem.Controllers
         public async Task<IActionResult> Delete(Guid id)
         {
             var category = await _categoryRepo.GetByIdAsync(id);
+            var categoriesInNominations = await _nominationRepo.GetUniqueCategoriesAsync();
+            ViewBag.CategoryIdsJson = JsonConvert.SerializeObject(
+            categoriesInNominations.Select(c => c.Id).ToList());
+
             if (category == null) return NotFound();
             return View(category);
         }

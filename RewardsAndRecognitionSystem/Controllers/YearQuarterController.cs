@@ -71,6 +71,7 @@ namespace RewardsAndRecognitionSystem.Controllers
             if (id != yq.Id)
                 return BadRequest();
 
+
             if (ModelState.IsValid)
             {
                 await _yearQuarterRepo.UpdateAsync(yq);

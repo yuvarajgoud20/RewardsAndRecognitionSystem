@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using RewardsAndRecognitionRepository.Interfaces;
@@ -11,11 +12,13 @@ namespace RewardsAndRecognitionSystem.Controllers
     {
         private readonly ITeamRepo _teamRepo;
         private readonly IUserRepo _userRepo;
+        private readonly UserManager<User> _userManager;
 
-        public TeamController(ITeamRepo teamRepo, IUserRepo userRepo)
+        public TeamController(ITeamRepo teamRepo, IUserRepo userRepo,UserManager<User> userManager)
         {
             _teamRepo = teamRepo;
             _userRepo = userRepo;
+            _userManager = userManager;
         }
 
         // GET: TeamController
@@ -48,6 +51,10 @@ namespace RewardsAndRecognitionSystem.Controllers
             if (ModelState.IsValid)
             {
                 await _teamRepo.AddAsync(team);
+                User user = await _userRepo.GetByIdAsync(team.TeamLeadId);
+                user.TeamId = team.Id;
+                user.Team=team;
+                await _userManager.UpdateAsync(user);
                 return RedirectToAction(nameof(Index));
             }
 
@@ -65,10 +72,13 @@ namespace RewardsAndRecognitionSystem.Controllers
             }
 
             var managers = await _userRepo.GetAllManagersAsync(); // ✅ Required
-            var leads = await _userRepo.GetLeadsAsync(team.TeamLeadId);          // ✅ Required
-
+            var leads = await _userRepo.GetLeadsAsync(team.TeamLeadId);   // ✅ Required
+            var directors = await _userRepo.GetAllDirectorsAsync();
             ViewBag.Managers = new SelectList(managers, "Id", "Name", team.ManagerId);
             ViewBag.TeamLeads = new SelectList(leads, "Id", "Name", team.TeamLeadId);
+            ViewBag.Director = new SelectList(directors, "Id", "Name", team.DirectorId);
+
+
 
             return View(team);
         }

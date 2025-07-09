@@ -15,6 +15,11 @@ namespace RewardsAndRecognitionSystem.Controllers
 
         public IActionResult Index()
         {
+           //throw new Exception("Custom Exceptioon : I am testing");
+            //_logger.LogInformation("Info log from Index");
+            //_logger.LogWarning("Warning log from Index");
+            //_logger.LogError("Error log from Index");
+
             return View();
         }
 
@@ -26,7 +31,7 @@ namespace RewardsAndRecognitionSystem.Controllers
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
         public IActionResult Error()
         {
-            return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
+            return View(new ErrorViewModel { ErrorMessage= Activity.Current?.Id ?? HttpContext.TraceIdentifier });
         }
     }
 }
