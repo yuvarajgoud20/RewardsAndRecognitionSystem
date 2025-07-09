@@ -26,7 +26,7 @@
 <h2 class="mb-4">Create New User</h2>
 
 <div class="card shadow-sm border-0 p-4" style="max-width: 600px; margin: auto;">
-    <form asp-action="Create" method="post">
+    <form asp-action="Create" id= "myForm" method="post">
         <div class="form-group mb-3">
             <label asp-for="Name" class="form-label fw-semibold">Name</label>
             <input asp-for="Name" class="form-control border-dark-subtle" />
@@ -45,16 +45,9 @@
             <small class="text-muted">Password must meet the system's requirements.</small>
         </div>
 
-        <div class="form-group mb-3">
-            <label asp-for="TeamId" class="form-label fw-semibold">Team</label>
-            <select asp-for="TeamId" asp-items="ViewBag.Teams" class="form-select border-dark-subtle">
-                <option value="">-- Select Team --</option>
-            </select>
-        </div>
-
         <div class="form-group mb-4">
             <label class="form-label fw-semibold">Role</label>
-            <select name="SelectedRole" class="form-select border-dark-subtle">
+            <select name="SelectedRole" id ="SelectedRole"class="form-select border-dark-subtle">
                 <option value="">-- Select Role --</option>
                 @foreach (var role in ViewBag.Roles as List<string>)
                 {
@@ -62,6 +55,15 @@
                 }
             </select>
         </div>
+
+        <div class="form-group mb-3">
+            <label asp-for="TeamId" class="form-label fw-semibold">Team</label>
+            <select asp-for="TeamId" asp-items="ViewBag.Teams" class="form-select border-dark-subtle">
+                <option value="">-- Select Team --</option>
+            </select>
+        </div>
+
+
 
         <div class="d-flex justify-content-between">
             <a asp-action="Index" class="btn btn-danger px-4">Cancel</a>
@@ -75,3 +77,42 @@
         await Html.RenderPartialAsync("_ValidationScriptsPartial");
     }
 }
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+    $(function() {
+      function toggleTeam() {
+        const role = $("select[name='SelectedRole']").val();
+        const disable = (role != "Employee");
+        const $team = $("select[name='TeamId']");
+
+        if (disable) {
+          $team.val("");       // Clear the value
+          $team.prop("disabled", true);
+        } else {
+          $team.prop("disabled", false);
+        }
+      }
+
+      $("select[name='SelectedRole']").change(toggleTeam);
+
+      // Initialize on page load
+      toggleTeam();
+    });
+</script>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+    $("#myForm").on("submit", function(e) {
+      const role = $("select[name='SelectedRole']").val();
+      const team = $("select[name='TeamId']").val();
+
+      if (role === "Employee" && !team) {
+        e.preventDefault();       // Cancel the submit
+        alert("You must select a Team for Employee.");
+        $("select[name='TeamId']").focus();
+        return false;
+      }
+      // Otherwise, form submits normally
+    });
+</script>

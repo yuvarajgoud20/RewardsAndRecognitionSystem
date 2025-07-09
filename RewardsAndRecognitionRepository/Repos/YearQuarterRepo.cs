@@ -23,28 +23,43 @@ namespace RewardsAndRecognitionRepository.Repositories
 
         public async Task<YearQuarter?> GetByIdAsync(Guid id)
         {
-            return await _context.YearQuarters.FindAsync(id);
+            try
+            {
+                return await _context.YearQuarters.FindAsync(id);
+            }
+            catch
+            {
+                throw new RnRException("Cannot find the Year Quarter");
+            }
+           
         }
 
         public async Task AddAsync(YearQuarter yq)
         {
-            _context.YearQuarters.Add(yq);
-            await _context.SaveChangesAsync();
+                _context.YearQuarters.Add(yq);
+                await _context.SaveChangesAsync();
+           
         }
 
         public async Task UpdateAsync(YearQuarter yq)
         {
             _context.YearQuarters.Update(yq);
+            if ((DateTime.UtcNow < yq.EndDate) && (!yq.IsActive))
+                throw new RnRException("Sorry We cannot Deactivate the Quarter before its End Date..");
             await _context.SaveChangesAsync();
         }
 
         public async Task DeleteAsync(Guid id)
         {
             var yq = await _context.YearQuarters.FindAsync(id);
-            if (yq != null)
+            if(yq != null && !yq.IsActive )
             {
                 _context.YearQuarters.Remove(yq);
                 await _context.SaveChangesAsync();
+            }
+            else
+            {
+                throw new RnRException("⚠️ Cannot delete: This quarter is currently active and cannot be deleted. Please deactivate it");
             }
         }
 

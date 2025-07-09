@@ -409,4 +409,43 @@
     <script src="~/js/Nomination.js">
 
     </script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script>
+        function confirmDelete(nominationId) {
+          Swal.fire({
+            title: 'Are you sure?',
+            text: "This action cannot be undone.",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonText: 'Yes, delete it!',
+            cancelButtonText: 'No, cancel!',
+            reverseButtons: true
+          }).then((result) => {
+            if (result.isConfirmed) {
+              // Create form dynamically
+              const form = document.createElement('form');
+              form.method = 'POST';
+              form.action = '/Nomination/DeleteConfirmed'; // Change to your controller/action
+
+              // Add Nomination ID
+              const idInput = document.createElement('input');
+              idInput.type = 'hidden';
+              idInput.name = 'id';
+              idInput.value = nominationId;
+              form.appendChild(idInput);
+
+              // Grab the anti-forgery token from hidden form
+              const tokenInput = document.querySelector('#antiForgeryForm input[name="__RequestVerificationToken"]');
+              if (tokenInput) {
+                const clone = tokenInput.cloneNode();
+                form.appendChild(clone);
+              }
+
+              document.body.appendChild(form);
+              form.submit();
+            }
+          });
+          return false;
+        }
+    </script>
 }

@@ -14,5 +14,6 @@ namespace RewardsAndRecognitionRepository.Interfaces
         Task AddNominationAsync(Nomination nomination);
         Task UpdateNominationAsync(Nomination nomination);
         Task DeleteNominationAsync(Guid id);
+        Task<List<Category>> GetUniqueCategoriesAsync();
     }
 }

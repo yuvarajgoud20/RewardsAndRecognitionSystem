@@ -1,0 +1,711 @@
+2025-07-09 11:57:06 [Information] User profile is available. Using '"C:\Users\SN017548\AppData\Local\ASP.NET\DataProtection-Keys"' as key repository and Windows DPAPI to encrypt keys at rest.
+2025-07-09 11:57:09 [Information] Executed DbCommand ("79"ms) [Parameters=["@__normalizedName_0='?' (Size = 256)"], CommandType='Text', CommandTimeout='30']"
+""SELECT TOP(1) [a].[Id], [a].[ConcurrencyStamp], [a].[Name], [a].[NormalizedName]
+FROM [AspNetRoles] AS [a]
+WHERE [a].[NormalizedName] = @__normalizedName_0"
+2025-07-09 11:57:09 [Information] Executed DbCommand ("2"ms) [Parameters=["@__normalizedName_0='?' (Size = 256)"], CommandType='Text', CommandTimeout='30']"
+""SELECT TOP(1) [a].[Id], [a].[ConcurrencyStamp], [a].[Name], [a].[NormalizedName]
+FROM [AspNetRoles] AS [a]
+WHERE [a].[NormalizedName] = @__normalizedName_0"
+2025-07-09 11:57:09 [Information] Executed DbCommand ("3"ms) [Parameters=["@__normalizedName_0='?' (Size = 256)"], CommandType='Text', CommandTimeout='30']"
+""SELECT TOP(1) [a].[Id], [a].[ConcurrencyStamp], [a].[Name], [a].[NormalizedName]
+FROM [AspNetRoles] AS [a]
+WHERE [a].[NormalizedName] = @__normalizedName_0"
+2025-07-09 11:57:09 [Information] Executed DbCommand ("3"ms) [Parameters=["@__normalizedName_0='?' (Size = 256)"], CommandType='Text', CommandTimeout='30']"
+""SELECT TOP(1) [a].[Id], [a].[ConcurrencyStamp], [a].[Name], [a].[NormalizedName]
+FROM [AspNetRoles] AS [a]
+WHERE [a].[NormalizedName] = @__normalizedName_0"
+2025-07-09 11:57:09 [Information] Executed DbCommand ("2"ms) [Parameters=["@__normalizedName_0='?' (Size = 256)"], CommandType='Text', CommandTimeout='30']"
+""SELECT TOP(1) [a].[Id], [a].[ConcurrencyStamp], [a].[Name], [a].[NormalizedName]
+FROM [AspNetRoles] AS [a]
+WHERE [a].[NormalizedName] = @__normalizedName_0"
+2025-07-09 11:57:09 [Information] Now listening on: "https://localhost:7156"
+2025-07-09 11:57:09 [Information] Now listening on: "http://localhost:5212"
+2025-07-09 11:57:09 [Information] Application started. Press Ctrl+C to shut down.
+2025-07-09 11:57:09 [Information] Hosting environment: "Development"
+2025-07-09 11:57:09 [Information] Content root path: "C:\.Net Training\RewardsAndRecognitionSystem\RewardsAndRecognitionSystem\RewardsAndRecognitionSystem"
+2025-07-09 11:57:10 [Information] Request starting "HTTP/2" "GET" "https"://"localhost:7156""""/""" - null null
+2025-07-09 11:57:10 [Information] Executed DbCommand ("2"ms) [Parameters=["@__p_0='?' (Size = 450)"], CommandType='Text', CommandTimeout='30']"
+""SELECT TOP(1) [a].[Id], [a].[AccessFailedCount], [a].[ConcurrencyStamp], [a].[CreatedAt], [a].[Discriminator], [a].[Email], [a].[EmailConfirmed], [a].[IsActive], [a].[LockoutEnabled], [a].[LockoutEnd], [a].[Name], [a].[NormalizedEmail], [a].[NormalizedUserName], [a].[PasswordHash], [a].[PhoneNumber], [a].[PhoneNumberConfirmed], [a].[SecurityStamp], [a].[TeamId], [a].[TwoFactorEnabled], [a].[UserName]
+FROM [AspNetUsers] AS [a]
+WHERE [a].[Id] = @__p_0"
+2025-07-09 11:57:10 [Information] Executed DbCommand ("2"ms) [Parameters=["@__user_Id_0='?' (Size = 450)"], CommandType='Text', CommandTimeout='30']"
+""SELECT [a].[Id], [a].[ClaimType], [a].[ClaimValue], [a].[UserId]
+FROM [AspNetUserClaims] AS [a]
+WHERE [a].[UserId] = @__user_Id_0"
+2025-07-09 11:57:10 [Information] Executed DbCommand ("3"ms) [Parameters=["@__userId_0='?' (Size = 450)"], CommandType='Text', CommandTimeout='30']"
+""SELECT [a0].[Name]
+FROM [AspNetUserRoles] AS [a]
+INNER JOIN [AspNetRoles] AS [a0] ON [a].[RoleId] = [a0].[Id]
+WHERE [a].[UserId] = @__userId_0"
+2025-07-09 11:57:10 [Information] Executed DbCommand ("1"ms) [Parameters=["@__normalizedName_0='?' (Size = 256)"], CommandType='Text', CommandTimeout='30']"
+""SELECT TOP(1) [a].[Id], [a].[ConcurrencyStamp], [a].[Name], [a].[NormalizedName]
+FROM [AspNetRoles] AS [a]
+WHERE [a].[NormalizedName] = @__normalizedName_0"
+2025-07-09 11:57:10 [Information] Executed DbCommand ("1"ms) [Parameters=["@__role_Id_0='?' (Size = 450)"], CommandType='Text', CommandTimeout='30']"
+""SELECT [a].[ClaimType], [a].[ClaimValue]
+FROM [AspNetRoleClaims] AS [a]
+WHERE [a].[RoleId] = @__role_Id_0"
+2025-07-09 11:57:10 [Information] Executing endpoint '"RewardsAndRecognitionSystem.Controllers.HomeController.Index (RewardsAndRecognitionSystem)"'
+2025-07-09 11:57:10 [Information] Route matched with "{action = \"Index\", controller = \"Home\", page = \"\", area = \"\"}". Executing controller action with signature "Microsoft.AspNetCore.Mvc.IActionResult Index()" on controller "RewardsAndRecognitionSystem.Controllers.HomeController" ("RewardsAndRecognitionSystem").
+2025-07-09 11:57:10 [Information] Executing action method "RewardsAndRecognitionSystem.Controllers.HomeController.Index (RewardsAndRecognitionSystem)" - Validation state: Valid
+2025-07-09 11:57:10 [Information] Executed action method "RewardsAndRecognitionSystem.Controllers.HomeController.Index (RewardsAndRecognitionSystem)", returned result "Microsoft.AspNetCore.Mvc.ViewResult" in 1.3546ms.
+2025-07-09 11:57:10 [Information] Executing ViewResult, running view "Index".
+2025-07-09 11:57:10 [Information] Executed ViewResult - view "Index" executed in 114.5285ms.
+2025-07-09 11:57:10 [Information] Request starting "HTTP/2" "GET" "https"://"localhost:7156""""/RewardsAndRecognitionSystem.styles.css""?v=OU0B8YxDhnxB1Wnt6mCdxthfnpoUEgjKSbcb-0qokSw" - null null
+2025-07-09 11:57:10 [Information] Request starting "HTTP/2" "GET" "https"://"localhost:7156""""/css/site.css""?v=pAGv4ietcJNk_EwsQZ5BN9-K4MuNYS2a9wl4Jw-q9D0" - null null
+2025-07-09 11:57:10 [Information] Request starting "HTTP/2" "GET" "https"://"localhost:7156""""/_framework/aspnetcore-browser-refresh.js""" - null null
+2025-07-09 11:57:10 [Information] Request starting "HTTP/2" "GET" "https"://"localhost:7156""""/lib/jquery/dist/jquery.min.js""" - null null
+2025-07-09 11:57:10 [Information] Request starting "HTTP/2" "GET" "https"://"localhost:7156""""/js/site.js""?v=hRQyftXiu1lLX2P9Ly9xa4gHJgLeR1uGN5qegUobtGo" - null null
+2025-07-09 11:57:10 [Information] Executed action "RewardsAndRecognitionSystem.Controllers.HomeController.Index (RewardsAndRecognitionSystem)" in 144.7899ms
+2025-07-09 11:57:10 [Information] Executed endpoint '"RewardsAndRecognitionSystem.Controllers.HomeController.Index (RewardsAndRecognitionSystem)"'
+2025-07-09 11:57:10 [Information] Request finished "HTTP/2" "GET" "https"://"localhost:7156""""/_framework/aspnetcore-browser-refresh.js""" - 200 16539 "application/javascript; charset=utf-8" 48.0792ms
+2025-07-09 11:57:10 [Information] Sending file. Request path: '"/css/site.css"'. Physical path: '"C:\.Net Training\RewardsAndRecognitionSystem\RewardsAndRecognitionSystem\RewardsAndRecognitionSystem\wwwroot\css\site.css"'
+2025-07-09 11:57:10 [Information] Sending file. Request path: '"/js/site.js"'. Physical path: '"C:\.Net Training\RewardsAndRecognitionSystem\RewardsAndRecognitionSystem\RewardsAndRecognitionSystem\wwwroot\js\site.js"'
+2025-07-09 11:57:10 [Information] Sending file. Request path: '"/RewardsAndRecognitionSystem.styles.css"'. Physical path: '"C:\.Net Training\RewardsAndRecognitionSystem\RewardsAndRecognitionSystem\RewardsAndRecognitionSystem\obj\Debug\net8.0\scopedcss\bundle\RewardsAndRecognitionSystem.styles.css"'
+2025-07-09 11:57:10 [Information] Request finished "HTTP/2" "GET" "https"://"localhost:7156""""/css/site.css""?v=pAGv4ietcJNk_EwsQZ5BN9-K4MuNYS2a9wl4Jw-q9D0" - 200 362 "text/css" 51.4122ms
+2025-07-09 11:57:10 [Information] Request finished "HTTP/2" "GET" "https"://"localhost:7156""""/js/site.js""?v=hRQyftXiu1lLX2P9Ly9xa4gHJgLeR1uGN5qegUobtGo" - 200 231 "text/javascript" 51.4517ms
+2025-07-09 11:57:10 [Information] Request finished "HTTP/2" "GET" "https"://"localhost:7156""""/RewardsAndRecognitionSystem.styles.css""?v=OU0B8YxDhnxB1Wnt6mCdxthfnpoUEgjKSbcb-0qokSw" - 200 1145 "text/css" 51.4918ms
+2025-07-09 11:57:10 [Information] Request finished "HTTP/2" "GET" "https"://"localhost:7156""""/""" - 200 null "text/html; charset=utf-8" 560.3497ms
+2025-07-09 11:57:10 [Information] Sending file. Request path: '"/lib/jquery/dist/jquery.min.js"'. Physical path: '"C:\.Net Training\RewardsAndRecognitionSystem\RewardsAndRecognitionSystem\RewardsAndRecognitionSystem\wwwroot\lib\jquery\dist\jquery.min.js"'
+2025-07-09 11:57:10 [Information] Request finished "HTTP/2" "GET" "https"://"localhost:7156""""/lib/jquery/dist/jquery.min.js""" - 200 89503 "text/javascript" 69.0397ms
+2025-07-09 11:57:11 [Information] Request starting "HTTP/2" "GET" "https"://"localhost:7156""""/_vs/browserLink""" - null null
+2025-07-09 11:57:11 [Information] Request finished "HTTP/2" "GET" "https"://"localhost:7156""""/_vs/browserLink""" - 200 null "text/javascript; charset=UTF-8" 64.179ms
+2025-07-09 11:57:11 [Information] Request starting "HTTP/2" "GET" "https"://"localhost:7156""""/favicon.ico""" - null null
+2025-07-09 11:57:11 [Information] Sending file. Request path: '"/favicon.ico"'. Physical path: '"C:\.Net Training\RewardsAndRecognitionSystem\RewardsAndRecognitionSystem\RewardsAndRecognitionSystem\wwwroot\favicon.ico"'
+2025-07-09 11:57:11 [Information] Request finished "HTTP/2" "GET" "https"://"localhost:7156""""/favicon.ico""" - 200 5430 "image/x-icon" 12.7405ms
+2025-07-09 11:57:15 [Information] Request starting "HTTP/2" "GET" "https"://"localhost:7156""""/Category""" - null null
+2025-07-09 11:57:15 [Information] Executing endpoint '"RewardsAndRecognitionSystem.Controllers.CategoryController.Index (RewardsAndRecognitionSystem)"'
+2025-07-09 11:57:15 [Information] Route matched with "{action = \"Index\", controller = \"Category\", page = \"\", area = \"\"}". Executing controller action with signature "System.Threading.Tasks.Task`1[Microsoft.AspNetCore.Mvc.IActionResult] Index()" on controller "RewardsAndRecognitionSystem.Controllers.CategoryController" ("RewardsAndRecognitionSystem").
+2025-07-09 11:57:15 [Information] Executing action method "RewardsAndRecognitionSystem.Controllers.CategoryController.Index (RewardsAndRecognitionSystem)" - Validation state: Valid
+2025-07-09 11:57:25 [Information] Executed action "RewardsAndRecognitionSystem.Controllers.CategoryController.Index (RewardsAndRecognitionSystem)" in 10580.0745ms
+2025-07-09 11:57:26 [Information] Executed endpoint '"RewardsAndRecognitionSystem.Controllers.CategoryController.Index (RewardsAndRecognitionSystem)"'
+2025-07-09 11:57:32 [Information] Executing ViewResult, running view "Error".
+2025-07-09 11:57:32 [Information] Executed ViewResult - view "Error" executed in 1662.9228ms.
+2025-07-09 11:57:32 [Information] Request finished "HTTP/2" "GET" "https"://"localhost:7156""""/Category""" - 500 null "text/html" 17196.6577ms
+2025-07-09 11:57:32 [Information] Request starting "HTTP/2" "GET" "https"://"localhost:7156""""/_vs/browserLink""" - null null
+2025-07-09 11:57:32 [Information] Request starting "HTTP/2" "GET" "https"://"localhost:7156""""/_framework/aspnetcore-browser-refresh.js""" - null null
+2025-07-09 11:57:32 [Information] Request finished "HTTP/2" "GET" "https"://"localhost:7156""""/_framework/aspnetcore-browser-refresh.js""" - 200 16539 "application/javascript; charset=utf-8" 3.6149ms
+2025-07-09 11:57:32 [Information] Request finished "HTTP/2" "GET" "https"://"localhost:7156""""/_vs/browserLink""" - 200 null "text/javascript; charset=UTF-8" 25.0516ms
+2025-07-09 11:58:21 [Information] User profile is available. Using '"C:\Users\SN017548\AppData\Local\ASP.NET\DataProtection-Keys"' as key repository and Windows DPAPI to encrypt keys at rest.
+2025-07-09 11:58:22 [Information] Executed DbCommand ("42"ms) [Parameters=["@__normalizedName_0='?' (Size = 256)"], CommandType='Text', CommandTimeout='30']"
+""SELECT TOP(1) [a].[Id], [a].[ConcurrencyStamp], [a].[Name], [a].[NormalizedName]
+FROM [AspNetRoles] AS [a]
+WHERE [a].[NormalizedName] = @__normalizedName_0"
+2025-07-09 11:58:22 [Information] Executed DbCommand ("2"ms) [Parameters=["@__normalizedName_0='?' (Size = 256)"], CommandType='Text', CommandTimeout='30']"
+""SELECT TOP(1) [a].[Id], [a].[ConcurrencyStamp], [a].[Name], [a].[NormalizedName]
+FROM [AspNetRoles] AS [a]
+WHERE [a].[NormalizedName] = @__normalizedName_0"
+2025-07-09 11:58:22 [Information] Executed DbCommand ("1"ms) [Parameters=["@__normalizedName_0='?' (Size = 256)"], CommandType='Text', CommandTimeout='30']"
+""SELECT TOP(1) [a].[Id], [a].[ConcurrencyStamp], [a].[Name], [a].[NormalizedName]
+FROM [AspNetRoles] AS [a]
+WHERE [a].[NormalizedName] = @__normalizedName_0"
+2025-07-09 11:58:22 [Information] Executed DbCommand ("1"ms) [Parameters=["@__normalizedName_0='?' (Size = 256)"], CommandType='Text', CommandTimeout='30']"
+""SELECT TOP(1) [a].[Id], [a].[ConcurrencyStamp], [a].[Name], [a].[NormalizedName]
+FROM [AspNetRoles] AS [a]
+WHERE [a].[NormalizedName] = @__normalizedName_0"
+2025-07-09 11:58:22 [Information] Executed DbCommand ("1"ms) [Parameters=["@__normalizedName_0='?' (Size = 256)"], CommandType='Text', CommandTimeout='30']"
+""SELECT TOP(1) [a].[Id], [a].[ConcurrencyStamp], [a].[Name], [a].[NormalizedName]
+FROM [AspNetRoles] AS [a]
+WHERE [a].[NormalizedName] = @__normalizedName_0"
+2025-07-09 11:58:22 [Information] Now listening on: "https://localhost:7156"
+2025-07-09 11:58:22 [Information] Now listening on: "http://localhost:5212"
+2025-07-09 11:58:22 [Information] Application started. Press Ctrl+C to shut down.
+2025-07-09 11:58:22 [Information] Hosting environment: "Development"
+2025-07-09 11:58:22 [Information] Content root path: "C:\.Net Training\RewardsAndRecognitionSystem\RewardsAndRecognitionSystem\RewardsAndRecognitionSystem"
+2025-07-09 11:58:23 [Information] Request starting "HTTP/2" "GET" "https"://"localhost:7156""""/""" - null null
+2025-07-09 11:58:23 [Information] Executing endpoint '"RewardsAndRecognitionSystem.Controllers.HomeController.Index (RewardsAndRecognitionSystem)"'
+2025-07-09 11:58:23 [Information] Route matched with "{action = \"Index\", controller = \"Home\", page = \"\", area = \"\"}". Executing controller action with signature "Microsoft.AspNetCore.Mvc.IActionResult Index()" on controller "RewardsAndRecognitionSystem.Controllers.HomeController" ("RewardsAndRecognitionSystem").
+2025-07-09 11:58:23 [Information] Executing action method "RewardsAndRecognitionSystem.Controllers.HomeController.Index (RewardsAndRecognitionSystem)" - Validation state: Valid
+2025-07-09 11:58:23 [Information] Executed action method "RewardsAndRecognitionSystem.Controllers.HomeController.Index (RewardsAndRecognitionSystem)", returned result "Microsoft.AspNetCore.Mvc.ViewResult" in 0.2977ms.
+2025-07-09 11:58:23 [Information] Executing ViewResult, running view "Index".
+2025-07-09 11:58:23 [Information] Executed ViewResult - view "Index" executed in 82.4804ms.
+2025-07-09 11:58:23 [Information] Executed action "RewardsAndRecognitionSystem.Controllers.HomeController.Index (RewardsAndRecognitionSystem)" in 94.9376ms
+2025-07-09 11:58:23 [Information] Executed endpoint '"RewardsAndRecognitionSystem.Controllers.HomeController.Index (RewardsAndRecognitionSystem)"'
+2025-07-09 11:58:23 [Information] Request starting "HTTP/2" "GET" "https"://"localhost:7156""""/_framework/aspnetcore-browser-refresh.js""" - null null
+2025-07-09 11:58:23 [Information] Request finished "HTTP/2" "GET" "https"://"localhost:7156""""/_framework/aspnetcore-browser-refresh.js""" - 200 16539 "application/javascript; charset=utf-8" 9.9305ms
+2025-07-09 11:58:23 [Information] Request finished "HTTP/2" "GET" "https"://"localhost:7156""""/""" - 200 null "text/html; charset=utf-8" 300.1834ms
+2025-07-09 11:58:23 [Information] Request starting "HTTP/2" "GET" "https"://"localhost:7156""""/_vs/browserLink""" - null null
+2025-07-09 11:58:23 [Information] Request finished "HTTP/2" "GET" "https"://"localhost:7156""""/_vs/browserLink""" - 200 null "text/javascript; charset=UTF-8" 41.2215ms
+2025-07-09 11:58:26 [Information] Request starting "HTTP/2" "GET" "https"://"localhost:7156""""/User""" - null null
+2025-07-09 11:58:26 [Information] Executing endpoint '"RewardsAndRecognitionSystem.Controllers.UserController.Index (RewardsAndRecognitionSystem)"'
+2025-07-09 11:58:26 [Information] Route matched with "{action = \"Index\", controller = \"User\", page = \"\", area = \"\"}". Executing controller action with signature "System.Threading.Tasks.Task`1[Microsoft.AspNetCore.Mvc.IActionResult] Index()" on controller "RewardsAndRecognitionSystem.Controllers.UserController" ("RewardsAndRecognitionSystem").
+2025-07-09 11:58:26 [Information] Executing action method "RewardsAndRecognitionSystem.Controllers.UserController.Index (RewardsAndRecognitionSystem)" - Validation state: Valid
+2025-07-09 11:58:26 [Information] Executed DbCommand ("6"ms) [Parameters=[""], CommandType='Text', CommandTimeout='30']"
+""SELECT [a].[Id], [a].[AccessFailedCount], [a].[ConcurrencyStamp], [a].[CreatedAt], [a].[Discriminator], [a].[Email], [a].[EmailConfirmed], [a].[IsActive], [a].[LockoutEnabled], [a].[LockoutEnd], [a].[Name], [a].[NormalizedEmail], [a].[NormalizedUserName], [a].[PasswordHash], [a].[PhoneNumber], [a].[PhoneNumberConfirmed], [a].[SecurityStamp], [a].[TeamId], [a].[TwoFactorEnabled], [a].[UserName], [t].[Id], [t].[DirectorId], [t].[ManagerId], [t].[Name], [t].[TeamLeadId], [a0].[Id], [a0].[AccessFailedCount], [a0].[ConcurrencyStamp], [a0].[CreatedAt], [a0].[Discriminator], [a0].[Email], [a0].[EmailConfirmed], [a0].[IsActive], [a0].[LockoutEnabled], [a0].[LockoutEnd], [a0].[Name], [a0].[NormalizedEmail], [a0].[NormalizedUserName], [a0].[PasswordHash], [a0].[PhoneNumber], [a0].[PhoneNumberConfirmed], [a0].[SecurityStamp], [a0].[TeamId], [a0].[TwoFactorEnabled], [a0].[UserName]
+FROM [AspNetUsers] AS [a]
+LEFT JOIN [Teams] AS [t] ON [a].[TeamId] = [t].[Id]
+LEFT JOIN [AspNetUsers] AS [a0] ON [t].[ManagerId] = [a0].[Id]"
+2025-07-09 11:58:26 [Information] Executed DbCommand ("2"ms) [Parameters=["@__userId_0='?' (Size = 450)"], CommandType='Text', CommandTimeout='30']"
+""SELECT [a0].[Name]
+FROM [AspNetUserRoles] AS [a]
+INNER JOIN [AspNetRoles] AS [a0] ON [a].[RoleId] = [a0].[Id]
+WHERE [a].[UserId] = @__userId_0"
+2025-07-09 11:58:26 [Information] Executed DbCommand ("1"ms) [Parameters=["@__userId_0='?' (Size = 450)"], CommandType='Text', CommandTimeout='30']"
+""SELECT [a0].[Name]
+FROM [AspNetUserRoles] AS [a]
+INNER JOIN [AspNetRoles] AS [a0] ON [a].[RoleId] = [a0].[Id]
+WHERE [a].[UserId] = @__userId_0"
+2025-07-09 11:58:26 [Information] Executed DbCommand ("2"ms) [Parameters=["@__userId_0='?' (Size = 450)"], CommandType='Text', CommandTimeout='30']"
+""SELECT [a0].[Name]
+FROM [AspNetUserRoles] AS [a]
+INNER JOIN [AspNetRoles] AS [a0] ON [a].[RoleId] = [a0].[Id]
+WHERE [a].[UserId] = @__userId_0"
+2025-07-09 11:58:26 [Information] Executed DbCommand ("1"ms) [Parameters=["@__userId_0='?' (Size = 450)"], CommandType='Text', CommandTimeout='30']"
+""SELECT [a0].[Name]
+FROM [AspNetUserRoles] AS [a]
+INNER JOIN [AspNetRoles] AS [a0] ON [a].[RoleId] = [a0].[Id]
+WHERE [a].[UserId] = @__userId_0"
+2025-07-09 11:58:26 [Information] Executed DbCommand ("1"ms) [Parameters=["@__userId_0='?' (Size = 450)"], CommandType='Text', CommandTimeout='30']"
+""SELECT [a0].[Name]
+FROM [AspNetUserRoles] AS [a]
+INNER JOIN [AspNetRoles] AS [a0] ON [a].[RoleId] = [a0].[Id]
+WHERE [a].[UserId] = @__userId_0"
+2025-07-09 11:58:26 [Information] Executed DbCommand ("1"ms) [Parameters=["@__userId_0='?' (Size = 450)"], CommandType='Text', CommandTimeout='30']"
+""SELECT [a0].[Name]
+FROM [AspNetUserRoles] AS [a]
+INNER JOIN [AspNetRoles] AS [a0] ON [a].[RoleId] = [a0].[Id]
+WHERE [a].[UserId] = @__userId_0"
+2025-07-09 11:58:26 [Information] Executed DbCommand ("1"ms) [Parameters=["@__userId_0='?' (Size = 450)"], CommandType='Text', CommandTimeout='30']"
+""SELECT [a0].[Name]
+FROM [AspNetUserRoles] AS [a]
+INNER JOIN [AspNetRoles] AS [a0] ON [a].[RoleId] = [a0].[Id]
+WHERE [a].[UserId] = @__userId_0"
+2025-07-09 11:58:26 [Information] Executed DbCommand ("1"ms) [Parameters=["@__userId_0='?' (Size = 450)"], CommandType='Text', CommandTimeout='30']"
+""SELECT [a0].[Name]
+FROM [AspNetUserRoles] AS [a]
+INNER JOIN [AspNetRoles] AS [a0] ON [a].[RoleId] = [a0].[Id]
+WHERE [a].[UserId] = @__userId_0"
+2025-07-09 11:58:26 [Information] Executed DbCommand ("1"ms) [Parameters=["@__userId_0='?' (Size = 450)"], CommandType='Text', CommandTimeout='30']"
+""SELECT [a0].[Name]
+FROM [AspNetUserRoles] AS [a]
+INNER JOIN [AspNetRoles] AS [a0] ON [a].[RoleId] = [a0].[Id]
+WHERE [a].[UserId] = @__userId_0"
+2025-07-09 11:58:27 [Information] Executed action method "RewardsAndRecognitionSystem.Controllers.UserController.Index (RewardsAndRecognitionSystem)", returned result "Microsoft.AspNetCore.Mvc.ViewResult" in 224.5425ms.
+2025-07-09 11:58:27 [Information] Executing ViewResult, running view "Index".
+2025-07-09 11:58:27 [Information] Executed ViewResult - view "Index" executed in 20.4122ms.
+2025-07-09 11:58:27 [Information] Executed action "RewardsAndRecognitionSystem.Controllers.UserController.Index (RewardsAndRecognitionSystem)" in 247.5041ms
+2025-07-09 11:58:27 [Information] Executed endpoint '"RewardsAndRecognitionSystem.Controllers.UserController.Index (RewardsAndRecognitionSystem)"'
+2025-07-09 11:58:27 [Information] Request finished "HTTP/2" "GET" "https"://"localhost:7156""""/User""" - 200 null "text/html; charset=utf-8" 268.7082ms
+2025-07-09 11:58:27 [Information] Request starting "HTTP/2" "GET" "https"://"localhost:7156""""/_framework/aspnetcore-browser-refresh.js""" - null null
+2025-07-09 11:58:27 [Information] Request starting "HTTP/2" "GET" "https"://"localhost:7156""""/_vs/browserLink""" - null null
+2025-07-09 11:58:27 [Information] Request finished "HTTP/2" "GET" "https"://"localhost:7156""""/_framework/aspnetcore-browser-refresh.js""" - 200 16539 "application/javascript; charset=utf-8" 1.3283ms
+2025-07-09 11:58:27 [Information] Request finished "HTTP/2" "GET" "https"://"localhost:7156""""/_vs/browserLink""" - 200 null "text/javascript; charset=UTF-8" 22.93ms
+2025-07-09 11:58:37 [Information] Request starting "HTTP/2" "GET" "https"://"localhost:7156""""/Nomination""" - null null
+2025-07-09 11:58:37 [Information] Executing endpoint '"RewardsAndRecognitionSystem.Controllers.NominationController.Index (RewardsAndRecognitionSystem)"'
+2025-07-09 11:58:37 [Information] Route matched with "{action = \"Index\", controller = \"Nomination\", page = \"\", area = \"\"}". Executing controller action with signature "System.Threading.Tasks.Task`1[Microsoft.AspNetCore.Mvc.IActionResult] Index()" on controller "RewardsAndRecognitionSystem.Controllers.NominationController" ("RewardsAndRecognitionSystem").
+2025-07-09 11:58:37 [Information] Executing action method "RewardsAndRecognitionSystem.Controllers.NominationController.Index (RewardsAndRecognitionSystem)" - Validation state: Valid
+2025-07-09 11:58:37 [Information] Executed DbCommand ("2"ms) [Parameters=["@__p_0='?' (Size = 450)"], CommandType='Text', CommandTimeout='30']"
+""SELECT TOP(1) [a].[Id], [a].[AccessFailedCount], [a].[ConcurrencyStamp], [a].[CreatedAt], [a].[Discriminator], [a].[Email], [a].[EmailConfirmed], [a].[IsActive], [a].[LockoutEnabled], [a].[LockoutEnd], [a].[Name], [a].[NormalizedEmail], [a].[NormalizedUserName], [a].[PasswordHash], [a].[PhoneNumber], [a].[PhoneNumberConfirmed], [a].[SecurityStamp], [a].[TeamId], [a].[TwoFactorEnabled], [a].[UserName]
+FROM [AspNetUsers] AS [a]
+WHERE [a].[Id] = @__p_0"
+2025-07-09 11:58:37 [Information] Executed DbCommand ("2"ms) [Parameters=["@__userId_0='?' (Size = 450)"], CommandType='Text', CommandTimeout='30']"
+""SELECT [a0].[Name]
+FROM [AspNetUserRoles] AS [a]
+INNER JOIN [AspNetRoles] AS [a0] ON [a].[RoleId] = [a0].[Id]
+WHERE [a].[UserId] = @__userId_0"
+2025-07-09 11:58:37 [Information] Executed DbCommand ("5"ms) [Parameters=[""], CommandType='Text', CommandTimeout='30']"
+""SELECT [n].[Id], [n].[Achievements], [n].[CategoryId], [n].[CreatedAt], [n].[Description], [n].[NominatorId], [n].[NomineeId], [n].[Status], [n].[YearQuarterId], [a].[Id], [a].[AccessFailedCount], [a].[ConcurrencyStamp], [a].[CreatedAt], [a].[Discriminator], [a].[Email], [a].[EmailConfirmed], [a].[IsActive], [a].[LockoutEnabled], [a].[LockoutEnd], [a].[Name], [a].[NormalizedEmail], [a].[NormalizedUserName], [a].[PasswordHash], [a].[PhoneNumber], [a].[PhoneNumberConfirmed], [a].[SecurityStamp], [a].[TeamId], [a].[TwoFactorEnabled], [a].[UserName], [a0].[Id], [a0].[AccessFailedCount], [a0].[ConcurrencyStamp], [a0].[CreatedAt], [a0].[Discriminator], [a0].[Email], [a0].[EmailConfirmed], [a0].[IsActive], [a0].[LockoutEnabled], [a0].[LockoutEnd], [a0].[Name], [a0].[NormalizedEmail], [a0].[NormalizedUserName], [a0].[PasswordHash], [a0].[PhoneNumber], [a0].[PhoneNumberConfirmed], [a0].[SecurityStamp], [a0].[TeamId], [a0].[TwoFactorEnabled], [a0].[UserName], [t].[Id], [t].[DirectorId], [t].[ManagerId], [t].[Name], [t].[TeamLeadId], [c].[Id], [c].[CreatedAt], [c].[Description], [c].[Name]
+FROM [Nominations] AS [n]
+INNER JOIN [AspNetUsers] AS [a] ON [n].[NomineeId] = [a].[Id]
+INNER JOIN [AspNetUsers] AS [a0] ON [n].[NominatorId] = [a0].[Id]
+LEFT JOIN [Teams] AS [t] ON [a0].[TeamId] = [t].[Id]
+INNER JOIN [Categories] AS [c] ON [n].[CategoryId] = [c].[Id]"
+2025-07-09 11:58:37 [Information] Executed action method "RewardsAndRecognitionSystem.Controllers.NominationController.Index (RewardsAndRecognitionSystem)", returned result "Microsoft.AspNetCore.Mvc.ViewResult" in 114.8434ms.
+2025-07-09 11:58:37 [Information] Executing ViewResult, running view "Index".
+2025-07-09 11:58:37 [Information] Executed ViewResult - view "Index" executed in 22.1792ms.
+2025-07-09 11:58:37 [Information] Executed action "RewardsAndRecognitionSystem.Controllers.NominationController.Index (RewardsAndRecognitionSystem)" in 138.9144ms
+2025-07-09 11:58:37 [Information] Executed endpoint '"RewardsAndRecognitionSystem.Controllers.NominationController.Index (RewardsAndRecognitionSystem)"'
+2025-07-09 11:58:37 [Information] Request finished "HTTP/2" "GET" "https"://"localhost:7156""""/Nomination""" - 200 null "text/html; charset=utf-8" 164.0887ms
+2025-07-09 11:58:37 [Information] Request starting "HTTP/2" "GET" "https"://"localhost:7156""""/_framework/aspnetcore-browser-refresh.js""" - null null
+2025-07-09 11:58:37 [Information] Request starting "HTTP/2" "GET" "https"://"localhost:7156""""/_vs/browserLink""" - null null
+2025-07-09 11:58:37 [Information] Request finished "HTTP/2" "GET" "https"://"localhost:7156""""/_framework/aspnetcore-browser-refresh.js""" - 200 16539 "application/javascript; charset=utf-8" 2.2626ms
+2025-07-09 11:58:37 [Information] Request finished "HTTP/2" "GET" "https"://"localhost:7156""""/_vs/browserLink""" - 200 null "text/javascript; charset=UTF-8" 18.548ms
+2025-07-09 11:58:43 [Information] Request starting "HTTP/2" "GET" "https"://"localhost:7156""""/User""" - null null
+2025-07-09 11:58:43 [Information] Executing endpoint '"RewardsAndRecognitionSystem.Controllers.UserController.Index (RewardsAndRecognitionSystem)"'
+2025-07-09 11:58:43 [Information] Route matched with "{action = \"Index\", controller = \"User\", page = \"\", area = \"\"}". Executing controller action with signature "System.Threading.Tasks.Task`1[Microsoft.AspNetCore.Mvc.IActionResult] Index()" on controller "RewardsAndRecognitionSystem.Controllers.UserController" ("RewardsAndRecognitionSystem").
+2025-07-09 11:58:43 [Information] Executing action method "RewardsAndRecognitionSystem.Controllers.UserController.Index (RewardsAndRecognitionSystem)" - Validation state: Valid
+2025-07-09 11:58:43 [Information] Executed DbCommand ("3"ms) [Parameters=[""], CommandType='Text', CommandTimeout='30']"
+""SELECT [a].[Id], [a].[AccessFailedCount], [a].[ConcurrencyStamp], [a].[CreatedAt], [a].[Discriminator], [a].[Email], [a].[EmailConfirmed], [a].[IsActive], [a].[LockoutEnabled], [a].[LockoutEnd], [a].[Name], [a].[NormalizedEmail], [a].[NormalizedUserName], [a].[PasswordHash], [a].[PhoneNumber], [a].[PhoneNumberConfirmed], [a].[SecurityStamp], [a].[TeamId], [a].[TwoFactorEnabled], [a].[UserName], [t].[Id], [t].[DirectorId], [t].[ManagerId], [t].[Name], [t].[TeamLeadId], [a0].[Id], [a0].[AccessFailedCount], [a0].[ConcurrencyStamp], [a0].[CreatedAt], [a0].[Discriminator], [a0].[Email], [a0].[EmailConfirmed], [a0].[IsActive], [a0].[LockoutEnabled], [a0].[LockoutEnd], [a0].[Name], [a0].[NormalizedEmail], [a0].[NormalizedUserName], [a0].[PasswordHash], [a0].[PhoneNumber], [a0].[PhoneNumberConfirmed], [a0].[SecurityStamp], [a0].[TeamId], [a0].[TwoFactorEnabled], [a0].[UserName]
+FROM [AspNetUsers] AS [a]
+LEFT JOIN [Teams] AS [t] ON [a].[TeamId] = [t].[Id]
+LEFT JOIN [AspNetUsers] AS [a0] ON [t].[ManagerId] = [a0].[Id]"
+2025-07-09 11:58:43 [Information] Executed DbCommand ("2"ms) [Parameters=["@__userId_0='?' (Size = 450)"], CommandType='Text', CommandTimeout='30']"
+""SELECT [a0].[Name]
+FROM [AspNetUserRoles] AS [a]
+INNER JOIN [AspNetRoles] AS [a0] ON [a].[RoleId] = [a0].[Id]
+WHERE [a].[UserId] = @__userId_0"
+2025-07-09 11:58:43 [Information] Executed DbCommand ("1"ms) [Parameters=["@__userId_0='?' (Size = 450)"], CommandType='Text', CommandTimeout='30']"
+""SELECT [a0].[Name]
+FROM [AspNetUserRoles] AS [a]
+INNER JOIN [AspNetRoles] AS [a0] ON [a].[RoleId] = [a0].[Id]
+WHERE [a].[UserId] = @__userId_0"
+2025-07-09 11:58:43 [Information] Executed DbCommand ("1"ms) [Parameters=["@__userId_0='?' (Size = 450)"], CommandType='Text', CommandTimeout='30']"
+""SELECT [a0].[Name]
+FROM [AspNetUserRoles] AS [a]
+INNER JOIN [AspNetRoles] AS [a0] ON [a].[RoleId] = [a0].[Id]
+WHERE [a].[UserId] = @__userId_0"
+2025-07-09 11:58:43 [Information] Executed DbCommand ("1"ms) [Parameters=["@__userId_0='?' (Size = 450)"], CommandType='Text', CommandTimeout='30']"
+""SELECT [a0].[Name]
+FROM [AspNetUserRoles] AS [a]
+INNER JOIN [AspNetRoles] AS [a0] ON [a].[RoleId] = [a0].[Id]
+WHERE [a].[UserId] = @__userId_0"
+2025-07-09 11:58:43 [Information] Executed DbCommand ("1"ms) [Parameters=["@__userId_0='?' (Size = 450)"], CommandType='Text', CommandTimeout='30']"
+""SELECT [a0].[Name]
+FROM [AspNetUserRoles] AS [a]
+INNER JOIN [AspNetRoles] AS [a0] ON [a].[RoleId] = [a0].[Id]
+WHERE [a].[UserId] = @__userId_0"
+2025-07-09 11:58:43 [Information] Executed DbCommand ("1"ms) [Parameters=["@__userId_0='?' (Size = 450)"], CommandType='Text', CommandTimeout='30']"
+""SELECT [a0].[Name]
+FROM [AspNetUserRoles] AS [a]
+INNER JOIN [AspNetRoles] AS [a0] ON [a].[RoleId] = [a0].[Id]
+WHERE [a].[UserId] = @__userId_0"
+2025-07-09 11:58:43 [Information] Executed DbCommand ("1"ms) [Parameters=["@__userId_0='?' (Size = 450)"], CommandType='Text', CommandTimeout='30']"
+""SELECT [a0].[Name]
+FROM [AspNetUserRoles] AS [a]
+INNER JOIN [AspNetRoles] AS [a0] ON [a].[RoleId] = [a0].[Id]
+WHERE [a].[UserId] = @__userId_0"
+2025-07-09 11:58:43 [Information] Executed DbCommand ("1"ms) [Parameters=["@__userId_0='?' (Size = 450)"], CommandType='Text', CommandTimeout='30']"
+""SELECT [a0].[Name]
+FROM [AspNetUserRoles] AS [a]
+INNER JOIN [AspNetRoles] AS [a0] ON [a].[RoleId] = [a0].[Id]
+WHERE [a].[UserId] = @__userId_0"
+2025-07-09 11:58:43 [Information] Executed DbCommand ("1"ms) [Parameters=["@__userId_0='?' (Size = 450)"], CommandType='Text', CommandTimeout='30']"
+""SELECT [a0].[Name]
+FROM [AspNetUserRoles] AS [a]
+INNER JOIN [AspNetRoles] AS [a0] ON [a].[RoleId] = [a0].[Id]
+WHERE [a].[UserId] = @__userId_0"
+2025-07-09 11:58:43 [Information] Executed action method "RewardsAndRecognitionSystem.Controllers.UserController.Index (RewardsAndRecognitionSystem)", returned result "Microsoft.AspNetCore.Mvc.ViewResult" in 19.6389ms.
+2025-07-09 11:58:43 [Information] Executing ViewResult, running view "Index".
+2025-07-09 11:58:43 [Information] Executed ViewResult - view "Index" executed in 3.897ms.
+2025-07-09 11:58:43 [Information] Executed action "RewardsAndRecognitionSystem.Controllers.UserController.Index (RewardsAndRecognitionSystem)" in 24.8223ms
+2025-07-09 11:58:43 [Information] Executed endpoint '"RewardsAndRecognitionSystem.Controllers.UserController.Index (RewardsAndRecognitionSystem)"'
+2025-07-09 11:58:43 [Information] Request finished "HTTP/2" "GET" "https"://"localhost:7156""""/User""" - 200 null "text/html; charset=utf-8" 29.3367ms
+2025-07-09 11:58:43 [Information] Request starting "HTTP/2" "GET" "https"://"localhost:7156""""/_framework/aspnetcore-browser-refresh.js""" - null null
+2025-07-09 11:58:43 [Information] Request starting "HTTP/2" "GET" "https"://"localhost:7156""""/_vs/browserLink""" - null null
+2025-07-09 11:58:43 [Information] Request finished "HTTP/2" "GET" "https"://"localhost:7156""""/_framework/aspnetcore-browser-refresh.js""" - 200 16539 "application/javascript; charset=utf-8" 2.1106ms
+2025-07-09 11:58:43 [Information] Request finished "HTTP/2" "GET" "https"://"localhost:7156""""/_vs/browserLink""" - 200 null "text/javascript; charset=UTF-8" 16.3975ms
+2025-07-09 11:58:47 [Information] Request starting "HTTP/2" "POST" "https"://"localhost:7156""""/User/Delete/6b27bdbc-bd72-41bb-b56d-95453b08b7ed""" - "application/x-www-form-urlencoded" 225
+2025-07-09 11:58:47 [Information] Executing endpoint '"RewardsAndRecognitionSystem.Controllers.UserController.DeleteConfirmed (RewardsAndRecognitionSystem)"'
+2025-07-09 11:58:47 [Information] Route matched with "{action = \"Delete\", controller = \"User\", page = \"\", area = \"\"}". Executing controller action with signature "System.Threading.Tasks.Task`1[Microsoft.AspNetCore.Mvc.IActionResult] DeleteConfirmed(System.String)" on controller "RewardsAndRecognitionSystem.Controllers.UserController" ("RewardsAndRecognitionSystem").
+2025-07-09 11:58:47 [Information] Executing action method "RewardsAndRecognitionSystem.Controllers.UserController.DeleteConfirmed (RewardsAndRecognitionSystem)" - Validation state: Valid
+2025-07-09 11:58:47 [Information] Executed DbCommand ("3"ms) [Parameters=["@__p_0='?' (Size = 450)"], CommandType='Text', CommandTimeout='30']"
+""SELECT TOP(1) [a].[Id], [a].[AccessFailedCount], [a].[ConcurrencyStamp], [a].[CreatedAt], [a].[Discriminator], [a].[Email], [a].[EmailConfirmed], [a].[IsActive], [a].[LockoutEnabled], [a].[LockoutEnd], [a].[Name], [a].[NormalizedEmail], [a].[NormalizedUserName], [a].[PasswordHash], [a].[PhoneNumber], [a].[PhoneNumberConfirmed], [a].[SecurityStamp], [a].[TeamId], [a].[TwoFactorEnabled], [a].[UserName]
+FROM [AspNetUsers] AS [a]
+WHERE [a].[Id] = @__p_0"
+2025-07-09 11:58:47 [Information] Executed DbCommand ("9"ms) [Parameters=["@p0='?' (Size = 450), @p1='?' (Size = 4000)"], CommandType='Text', CommandTimeout='30']"
+""SET IMPLICIT_TRANSACTIONS OFF;
+SET NOCOUNT ON;
+DELETE FROM [AspNetUsers]
+OUTPUT 1
+WHERE [Id] = @p0 AND [ConcurrencyStamp] = @p1;"
+2025-07-09 11:58:47 [Information] Executed action "RewardsAndRecognitionSystem.Controllers.UserController.DeleteConfirmed (RewardsAndRecognitionSystem)" in 373.0851ms
+2025-07-09 11:58:47 [Information] Executed endpoint '"RewardsAndRecognitionSystem.Controllers.UserController.DeleteConfirmed (RewardsAndRecognitionSystem)"'
+2025-07-09 11:58:47 [Information] Executing ViewResult, running view "Error".
+2025-07-09 11:58:47 [Information] Executed ViewResult - view "Error" executed in 5.8107ms.
+2025-07-09 11:58:47 [Information] Request finished "HTTP/2" "POST" "https"://"localhost:7156""""/User/Delete/6b27bdbc-bd72-41bb-b56d-95453b08b7ed""" - 500 null "text/html" 582.6725ms
+2025-07-09 11:58:47 [Information] Request starting "HTTP/2" "GET" "https"://"localhost:7156""""/_framework/aspnetcore-browser-refresh.js""" - null null
+2025-07-09 11:58:47 [Information] Request starting "HTTP/2" "GET" "https"://"localhost:7156""""/_vs/browserLink""" - null null
+2025-07-09 11:58:47 [Information] Request finished "HTTP/2" "GET" "https"://"localhost:7156""""/_framework/aspnetcore-browser-refresh.js""" - 200 16539 "application/javascript; charset=utf-8" 1.6202ms
+2025-07-09 11:58:48 [Information] Request finished "HTTP/2" "GET" "https"://"localhost:7156""""/_vs/browserLink""" - 200 null "text/javascript; charset=UTF-8" 21.7808ms
+2025-07-09 11:58:49 [Information] Request starting "HTTP/2" "GET" "https"://"localhost:7156""""/User""" - null null
+2025-07-09 11:58:49 [Information] Executing endpoint '"RewardsAndRecognitionSystem.Controllers.UserController.Index (RewardsAndRecognitionSystem)"'
+2025-07-09 11:58:49 [Information] Route matched with "{action = \"Index\", controller = \"User\", page = \"\", area = \"\"}". Executing controller action with signature "System.Threading.Tasks.Task`1[Microsoft.AspNetCore.Mvc.IActionResult] Index()" on controller "RewardsAndRecognitionSystem.Controllers.UserController" ("RewardsAndRecognitionSystem").
+2025-07-09 11:58:49 [Information] Executing action method "RewardsAndRecognitionSystem.Controllers.UserController.Index (RewardsAndRecognitionSystem)" - Validation state: Valid
+2025-07-09 11:58:49 [Information] Executed DbCommand ("3"ms) [Parameters=[""], CommandType='Text', CommandTimeout='30']"
+""SELECT [a].[Id], [a].[AccessFailedCount], [a].[ConcurrencyStamp], [a].[CreatedAt], [a].[Discriminator], [a].[Email], [a].[EmailConfirmed], [a].[IsActive], [a].[LockoutEnabled], [a].[LockoutEnd], [a].[Name], [a].[NormalizedEmail], [a].[NormalizedUserName], [a].[PasswordHash], [a].[PhoneNumber], [a].[PhoneNumberConfirmed], [a].[SecurityStamp], [a].[TeamId], [a].[TwoFactorEnabled], [a].[UserName], [t].[Id], [t].[DirectorId], [t].[ManagerId], [t].[Name], [t].[TeamLeadId], [a0].[Id], [a0].[AccessFailedCount], [a0].[ConcurrencyStamp], [a0].[CreatedAt], [a0].[Discriminator], [a0].[Email], [a0].[EmailConfirmed], [a0].[IsActive], [a0].[LockoutEnabled], [a0].[LockoutEnd], [a0].[Name], [a0].[NormalizedEmail], [a0].[NormalizedUserName], [a0].[PasswordHash], [a0].[PhoneNumber], [a0].[PhoneNumberConfirmed], [a0].[SecurityStamp], [a0].[TeamId], [a0].[TwoFactorEnabled], [a0].[UserName]
+FROM [AspNetUsers] AS [a]
+LEFT JOIN [Teams] AS [t] ON [a].[TeamId] = [t].[Id]
+LEFT JOIN [AspNetUsers] AS [a0] ON [t].[ManagerId] = [a0].[Id]"
+2025-07-09 11:58:49 [Information] Executed DbCommand ("2"ms) [Parameters=["@__userId_0='?' (Size = 450)"], CommandType='Text', CommandTimeout='30']"
+""SELECT [a0].[Name]
+FROM [AspNetUserRoles] AS [a]
+INNER JOIN [AspNetRoles] AS [a0] ON [a].[RoleId] = [a0].[Id]
+WHERE [a].[UserId] = @__userId_0"
+2025-07-09 11:58:49 [Information] Executed DbCommand ("1"ms) [Parameters=["@__userId_0='?' (Size = 450)"], CommandType='Text', CommandTimeout='30']"
+""SELECT [a0].[Name]
+FROM [AspNetUserRoles] AS [a]
+INNER JOIN [AspNetRoles] AS [a0] ON [a].[RoleId] = [a0].[Id]
+WHERE [a].[UserId] = @__userId_0"
+2025-07-09 11:58:49 [Information] Executed DbCommand ("1"ms) [Parameters=["@__userId_0='?' (Size = 450)"], CommandType='Text', CommandTimeout='30']"
+""SELECT [a0].[Name]
+FROM [AspNetUserRoles] AS [a]
+INNER JOIN [AspNetRoles] AS [a0] ON [a].[RoleId] = [a0].[Id]
+WHERE [a].[UserId] = @__userId_0"
+2025-07-09 11:58:49 [Information] Executed DbCommand ("1"ms) [Parameters=["@__userId_0='?' (Size = 450)"], CommandType='Text', CommandTimeout='30']"
+""SELECT [a0].[Name]
+FROM [AspNetUserRoles] AS [a]
+INNER JOIN [AspNetRoles] AS [a0] ON [a].[RoleId] = [a0].[Id]
+WHERE [a].[UserId] = @__userId_0"
+2025-07-09 11:58:49 [Information] Executed DbCommand ("1"ms) [Parameters=["@__userId_0='?' (Size = 450)"], CommandType='Text', CommandTimeout='30']"
+""SELECT [a0].[Name]
+FROM [AspNetUserRoles] AS [a]
+INNER JOIN [AspNetRoles] AS [a0] ON [a].[RoleId] = [a0].[Id]
+WHERE [a].[UserId] = @__userId_0"
+2025-07-09 11:58:49 [Information] Executed DbCommand ("1"ms) [Parameters=["@__userId_0='?' (Size = 450)"], CommandType='Text', CommandTimeout='30']"
+""SELECT [a0].[Name]
+FROM [AspNetUserRoles] AS [a]
+INNER JOIN [AspNetRoles] AS [a0] ON [a].[RoleId] = [a0].[Id]
+WHERE [a].[UserId] = @__userId_0"
+2025-07-09 11:58:49 [Information] Executed DbCommand ("1"ms) [Parameters=["@__userId_0='?' (Size = 450)"], CommandType='Text', CommandTimeout='30']"
+""SELECT [a0].[Name]
+FROM [AspNetUserRoles] AS [a]
+INNER JOIN [AspNetRoles] AS [a0] ON [a].[RoleId] = [a0].[Id]
+WHERE [a].[UserId] = @__userId_0"
+2025-07-09 11:58:49 [Information] Executed DbCommand ("1"ms) [Parameters=["@__userId_0='?' (Size = 450)"], CommandType='Text', CommandTimeout='30']"
+""SELECT [a0].[Name]
+FROM [AspNetUserRoles] AS [a]
+INNER JOIN [AspNetRoles] AS [a0] ON [a].[RoleId] = [a0].[Id]
+WHERE [a].[UserId] = @__userId_0"
+2025-07-09 11:58:49 [Information] Executed DbCommand ("1"ms) [Parameters=["@__userId_0='?' (Size = 450)"], CommandType='Text', CommandTimeout='30']"
+""SELECT [a0].[Name]
+FROM [AspNetUserRoles] AS [a]
+INNER JOIN [AspNetRoles] AS [a0] ON [a].[RoleId] = [a0].[Id]
+WHERE [a].[UserId] = @__userId_0"
+2025-07-09 11:58:49 [Information] Executed action method "RewardsAndRecognitionSystem.Controllers.UserController.Index (RewardsAndRecognitionSystem)", returned result "Microsoft.AspNetCore.Mvc.ViewResult" in 23.1484ms.
+2025-07-09 11:58:49 [Information] Executing ViewResult, running view "Index".
+2025-07-09 11:58:49 [Information] Executed ViewResult - view "Index" executed in 4.6846ms.
+2025-07-09 11:58:49 [Information] Executed action "RewardsAndRecognitionSystem.Controllers.UserController.Index (RewardsAndRecognitionSystem)" in 28.9016ms
+2025-07-09 11:58:49 [Information] Executed endpoint '"RewardsAndRecognitionSystem.Controllers.UserController.Index (RewardsAndRecognitionSystem)"'
+2025-07-09 11:58:49 [Information] Request finished "HTTP/2" "GET" "https"://"localhost:7156""""/User""" - 200 null "text/html; charset=utf-8" 33.408ms
+2025-07-09 11:58:49 [Information] Request starting "HTTP/2" "GET" "https"://"localhost:7156""""/_framework/aspnetcore-browser-refresh.js""" - null null
+2025-07-09 11:58:49 [Information] Request starting "HTTP/2" "GET" "https"://"localhost:7156""""/_vs/browserLink""" - null null
+2025-07-09 11:58:49 [Information] Request finished "HTTP/2" "GET" "https"://"localhost:7156""""/_framework/aspnetcore-browser-refresh.js""" - 200 16539 "application/javascript; charset=utf-8" 3.6396ms
+2025-07-09 11:58:49 [Information] Request finished "HTTP/2" "GET" "https"://"localhost:7156""""/_vs/browserLink""" - 200 null "text/javascript; charset=UTF-8" 32.9694ms
+2025-07-09 11:58:51 [Information] Request starting "HTTP/2" "GET" "https"://"localhost:7156""""/User/Create""" - null null
+2025-07-09 11:58:51 [Information] Executing endpoint '"RewardsAndRecognitionSystem.Controllers.UserController.Create (RewardsAndRecognitionSystem)"'
+2025-07-09 11:58:51 [Information] Route matched with "{action = \"Create\", controller = \"User\", page = \"\", area = \"\"}". Executing controller action with signature "System.Threading.Tasks.Task`1[Microsoft.AspNetCore.Mvc.IActionResult] Create()" on controller "RewardsAndRecognitionSystem.Controllers.UserController" ("RewardsAndRecognitionSystem").
+2025-07-09 11:58:51 [Information] Executing action method "RewardsAndRecognitionSystem.Controllers.UserController.Create (RewardsAndRecognitionSystem)" - Validation state: Valid
+2025-07-09 11:58:52 [Information] Executed action "RewardsAndRecognitionSystem.Controllers.UserController.Create (RewardsAndRecognitionSystem)" in 327.0478ms
+2025-07-09 11:58:52 [Information] Executed endpoint '"RewardsAndRecognitionSystem.Controllers.UserController.Create (RewardsAndRecognitionSystem)"'
+2025-07-09 11:58:52 [Information] Executing ViewResult, running view "Error".
+2025-07-09 11:58:52 [Information] Executed ViewResult - view "Error" executed in 2.8803ms.
+2025-07-09 11:58:52 [Information] Request finished "HTTP/2" "GET" "https"://"localhost:7156""""/User/Create""" - 500 null "text/html" 382.7252ms
+2025-07-09 11:58:52 [Information] Request starting "HTTP/2" "GET" "https"://"localhost:7156""""/_framework/aspnetcore-browser-refresh.js""" - null null
+2025-07-09 11:58:52 [Information] Request starting "HTTP/2" "GET" "https"://"localhost:7156""""/_vs/browserLink""" - null null
+2025-07-09 11:58:52 [Information] Request finished "HTTP/2" "GET" "https"://"localhost:7156""""/_framework/aspnetcore-browser-refresh.js""" - 200 16539 "application/javascript; charset=utf-8" 1.5515ms
+2025-07-09 11:58:52 [Information] Request finished "HTTP/2" "GET" "https"://"localhost:7156""""/_vs/browserLink""" - 200 null "text/javascript; charset=UTF-8" 15.7336ms
+2025-07-09 11:58:56 [Information] Request starting "HTTP/2" "GET" "https"://"localhost:7156""""/User""" - null null
+2025-07-09 11:58:56 [Information] Executing endpoint '"RewardsAndRecognitionSystem.Controllers.UserController.Index (RewardsAndRecognitionSystem)"'
+2025-07-09 11:58:56 [Information] Route matched with "{action = \"Index\", controller = \"User\", page = \"\", area = \"\"}". Executing controller action with signature "System.Threading.Tasks.Task`1[Microsoft.AspNetCore.Mvc.IActionResult] Index()" on controller "RewardsAndRecognitionSystem.Controllers.UserController" ("RewardsAndRecognitionSystem").
+2025-07-09 11:58:56 [Information] Executing action method "RewardsAndRecognitionSystem.Controllers.UserController.Index (RewardsAndRecognitionSystem)" - Validation state: Valid
+2025-07-09 11:58:56 [Information] Executed DbCommand ("5"ms) [Parameters=[""], CommandType='Text', CommandTimeout='30']"
+""SELECT [a].[Id], [a].[AccessFailedCount], [a].[ConcurrencyStamp], [a].[CreatedAt], [a].[Discriminator], [a].[Email], [a].[EmailConfirmed], [a].[IsActive], [a].[LockoutEnabled], [a].[LockoutEnd], [a].[Name], [a].[NormalizedEmail], [a].[NormalizedUserName], [a].[PasswordHash], [a].[PhoneNumber], [a].[PhoneNumberConfirmed], [a].[SecurityStamp], [a].[TeamId], [a].[TwoFactorEnabled], [a].[UserName], [t].[Id], [t].[DirectorId], [t].[ManagerId], [t].[Name], [t].[TeamLeadId], [a0].[Id], [a0].[AccessFailedCount], [a0].[ConcurrencyStamp], [a0].[CreatedAt], [a0].[Discriminator], [a0].[Email], [a0].[EmailConfirmed], [a0].[IsActive], [a0].[LockoutEnabled], [a0].[LockoutEnd], [a0].[Name], [a0].[NormalizedEmail], [a0].[NormalizedUserName], [a0].[PasswordHash], [a0].[PhoneNumber], [a0].[PhoneNumberConfirmed], [a0].[SecurityStamp], [a0].[TeamId], [a0].[TwoFactorEnabled], [a0].[UserName]
+FROM [AspNetUsers] AS [a]
+LEFT JOIN [Teams] AS [t] ON [a].[TeamId] = [t].[Id]
+LEFT JOIN [AspNetUsers] AS [a0] ON [t].[ManagerId] = [a0].[Id]"
+2025-07-09 11:58:56 [Information] Executed DbCommand ("2"ms) [Parameters=["@__userId_0='?' (Size = 450)"], CommandType='Text', CommandTimeout='30']"
+""SELECT [a0].[Name]
+FROM [AspNetUserRoles] AS [a]
+INNER JOIN [AspNetRoles] AS [a0] ON [a].[RoleId] = [a0].[Id]
+WHERE [a].[UserId] = @__userId_0"
+2025-07-09 11:58:56 [Information] Executed DbCommand ("1"ms) [Parameters=["@__userId_0='?' (Size = 450)"], CommandType='Text', CommandTimeout='30']"
+""SELECT [a0].[Name]
+FROM [AspNetUserRoles] AS [a]
+INNER JOIN [AspNetRoles] AS [a0] ON [a].[RoleId] = [a0].[Id]
+WHERE [a].[UserId] = @__userId_0"
+2025-07-09 11:58:56 [Information] Executed DbCommand ("1"ms) [Parameters=["@__userId_0='?' (Size = 450)"], CommandType='Text', CommandTimeout='30']"
+""SELECT [a0].[Name]
+FROM [AspNetUserRoles] AS [a]
+INNER JOIN [AspNetRoles] AS [a0] ON [a].[RoleId] = [a0].[Id]
+WHERE [a].[UserId] = @__userId_0"
+2025-07-09 11:58:56 [Information] Executed DbCommand ("1"ms) [Parameters=["@__userId_0='?' (Size = 450)"], CommandType='Text', CommandTimeout='30']"
+""SELECT [a0].[Name]
+FROM [AspNetUserRoles] AS [a]
+INNER JOIN [AspNetRoles] AS [a0] ON [a].[RoleId] = [a0].[Id]
+WHERE [a].[UserId] = @__userId_0"
+2025-07-09 11:58:56 [Information] Executed DbCommand ("1"ms) [Parameters=["@__userId_0='?' (Size = 450)"], CommandType='Text', CommandTimeout='30']"
+""SELECT [a0].[Name]
+FROM [AspNetUserRoles] AS [a]
+INNER JOIN [AspNetRoles] AS [a0] ON [a].[RoleId] = [a0].[Id]
+WHERE [a].[UserId] = @__userId_0"
+2025-07-09 11:58:56 [Information] Executed DbCommand ("2"ms) [Parameters=["@__userId_0='?' (Size = 450)"], CommandType='Text', CommandTimeout='30']"
+""SELECT [a0].[Name]
+FROM [AspNetUserRoles] AS [a]
+INNER JOIN [AspNetRoles] AS [a0] ON [a].[RoleId] = [a0].[Id]
+WHERE [a].[UserId] = @__userId_0"
+2025-07-09 11:58:56 [Information] Executed DbCommand ("1"ms) [Parameters=["@__userId_0='?' (Size = 450)"], CommandType='Text', CommandTimeout='30']"
+""SELECT [a0].[Name]
+FROM [AspNetUserRoles] AS [a]
+INNER JOIN [AspNetRoles] AS [a0] ON [a].[RoleId] = [a0].[Id]
+WHERE [a].[UserId] = @__userId_0"
+2025-07-09 11:58:56 [Information] Executed DbCommand ("1"ms) [Parameters=["@__userId_0='?' (Size = 450)"], CommandType='Text', CommandTimeout='30']"
+""SELECT [a0].[Name]
+FROM [AspNetUserRoles] AS [a]
+INNER JOIN [AspNetRoles] AS [a0] ON [a].[RoleId] = [a0].[Id]
+WHERE [a].[UserId] = @__userId_0"
+2025-07-09 11:58:56 [Information] Executed DbCommand ("1"ms) [Parameters=["@__userId_0='?' (Size = 450)"], CommandType='Text', CommandTimeout='30']"
+""SELECT [a0].[Name]
+FROM [AspNetUserRoles] AS [a]
+INNER JOIN [AspNetRoles] AS [a0] ON [a].[RoleId] = [a0].[Id]
+WHERE [a].[UserId] = @__userId_0"
+2025-07-09 11:58:56 [Information] Executed action method "RewardsAndRecognitionSystem.Controllers.UserController.Index (RewardsAndRecognitionSystem)", returned result "Microsoft.AspNetCore.Mvc.ViewResult" in 30.7547ms.
+2025-07-09 11:58:56 [Information] Executing ViewResult, running view "Index".
+2025-07-09 11:58:56 [Information] Executed ViewResult - view "Index" executed in 4.1277ms.
+2025-07-09 11:58:56 [Information] Executed action "RewardsAndRecognitionSystem.Controllers.UserController.Index (RewardsAndRecognitionSystem)" in 36.3102ms
+2025-07-09 11:58:56 [Information] Executed endpoint '"RewardsAndRecognitionSystem.Controllers.UserController.Index (RewardsAndRecognitionSystem)"'
+2025-07-09 11:58:56 [Information] Request finished "HTTP/2" "GET" "https"://"localhost:7156""""/User""" - 200 null "text/html; charset=utf-8" 42.6757ms
+2025-07-09 11:58:56 [Information] Request starting "HTTP/2" "GET" "https"://"localhost:7156""""/_framework/aspnetcore-browser-refresh.js""" - null null
+2025-07-09 11:58:56 [Information] Request finished "HTTP/2" "GET" "https"://"localhost:7156""""/_framework/aspnetcore-browser-refresh.js""" - 200 16539 "application/javascript; charset=utf-8" 2.7192ms
+2025-07-09 11:58:57 [Information] Request starting "HTTP/2" "GET" "https"://"localhost:7156""""/User/Create""" - null null
+2025-07-09 11:58:57 [Information] Executing endpoint '"RewardsAndRecognitionSystem.Controllers.UserController.Create (RewardsAndRecognitionSystem)"'
+2025-07-09 11:58:57 [Information] Route matched with "{action = \"Create\", controller = \"User\", page = \"\", area = \"\"}". Executing controller action with signature "System.Threading.Tasks.Task`1[Microsoft.AspNetCore.Mvc.IActionResult] Create()" on controller "RewardsAndRecognitionSystem.Controllers.UserController" ("RewardsAndRecognitionSystem").
+2025-07-09 11:58:57 [Information] Executing action method "RewardsAndRecognitionSystem.Controllers.UserController.Create (RewardsAndRecognitionSystem)" - Validation state: Valid
+2025-07-09 11:58:58 [Information] Executed action "RewardsAndRecognitionSystem.Controllers.UserController.Create (RewardsAndRecognitionSystem)" in 228.8391ms
+2025-07-09 11:58:58 [Information] Executed endpoint '"RewardsAndRecognitionSystem.Controllers.UserController.Create (RewardsAndRecognitionSystem)"'
+2025-07-09 11:58:58 [Information] Executing ViewResult, running view "Error".
+2025-07-09 11:58:58 [Information] Executed ViewResult - view "Error" executed in 4.7209ms.
+2025-07-09 11:58:58 [Information] Request finished "HTTP/2" "GET" "https"://"localhost:7156""""/User/Create""" - 500 null "text/html" 283.6244ms
+2025-07-09 11:58:58 [Information] Request starting "HTTP/2" "GET" "https"://"localhost:7156""""/_framework/aspnetcore-browser-refresh.js""" - null null
+2025-07-09 11:58:58 [Information] Request finished "HTTP/2" "GET" "https"://"localhost:7156""""/_framework/aspnetcore-browser-refresh.js""" - 200 16539 "application/javascript; charset=utf-8" 5.0602ms
+2025-07-09 11:58:58 [Information] Request starting "HTTP/2" "GET" "https"://"localhost:7156""""/_vs/browserLink""" - null null
+2025-07-09 11:58:58 [Information] Request finished "HTTP/2" "GET" "https"://"localhost:7156""""/_vs/browserLink""" - 200 null "text/javascript; charset=UTF-8" 44.2501ms
+2025-07-09 12:00:04 [Information] User profile is available. Using '"C:\Users\SN017548\AppData\Local\ASP.NET\DataProtection-Keys"' as key repository and Windows DPAPI to encrypt keys at rest.
+2025-07-09 12:00:05 [Information] Executed DbCommand ("89"ms) [Parameters=["@__normalizedName_0='?' (Size = 256)"], CommandType='Text', CommandTimeout='30']"
+""SELECT TOP(1) [a].[Id], [a].[ConcurrencyStamp], [a].[Name], [a].[NormalizedName]
+FROM [AspNetRoles] AS [a]
+WHERE [a].[NormalizedName] = @__normalizedName_0"
+2025-07-09 12:00:05 [Information] Executed DbCommand ("8"ms) [Parameters=["@__normalizedName_0='?' (Size = 256)"], CommandType='Text', CommandTimeout='30']"
+""SELECT TOP(1) [a].[Id], [a].[ConcurrencyStamp], [a].[Name], [a].[NormalizedName]
+FROM [AspNetRoles] AS [a]
+WHERE [a].[NormalizedName] = @__normalizedName_0"
+2025-07-09 12:00:05 [Information] Executed DbCommand ("1"ms) [Parameters=["@__normalizedName_0='?' (Size = 256)"], CommandType='Text', CommandTimeout='30']"
+""SELECT TOP(1) [a].[Id], [a].[ConcurrencyStamp], [a].[Name], [a].[NormalizedName]
+FROM [AspNetRoles] AS [a]
+WHERE [a].[NormalizedName] = @__normalizedName_0"
+2025-07-09 12:00:05 [Information] Executed DbCommand ("1"ms) [Parameters=["@__normalizedName_0='?' (Size = 256)"], CommandType='Text', CommandTimeout='30']"
+""SELECT TOP(1) [a].[Id], [a].[ConcurrencyStamp], [a].[Name], [a].[NormalizedName]
+FROM [AspNetRoles] AS [a]
+WHERE [a].[NormalizedName] = @__normalizedName_0"
+2025-07-09 12:00:05 [Information] Executed DbCommand ("1"ms) [Parameters=["@__normalizedName_0='?' (Size = 256)"], CommandType='Text', CommandTimeout='30']"
+""SELECT TOP(1) [a].[Id], [a].[ConcurrencyStamp], [a].[Name], [a].[NormalizedName]
+FROM [AspNetRoles] AS [a]
+WHERE [a].[NormalizedName] = @__normalizedName_0"
+2025-07-09 12:00:05 [Information] Now listening on: "https://localhost:7156"
+2025-07-09 12:00:05 [Information] Now listening on: "http://localhost:5212"
+2025-07-09 12:00:05 [Information] Application started. Press Ctrl+C to shut down.
+2025-07-09 12:00:05 [Information] Hosting environment: "Development"
+2025-07-09 12:00:05 [Information] Content root path: "C:\.Net Training\RewardsAndRecognitionSystem\RewardsAndRecognitionSystem\RewardsAndRecognitionSystem"
+2025-07-09 12:00:06 [Information] Request starting "HTTP/2" "GET" "https"://"localhost:7156""""/""" - null null
+2025-07-09 12:00:06 [Information] Executing endpoint '"RewardsAndRecognitionSystem.Controllers.HomeController.Index (RewardsAndRecognitionSystem)"'
+2025-07-09 12:00:06 [Information] Route matched with "{action = \"Index\", controller = \"Home\", page = \"\", area = \"\"}". Executing controller action with signature "Microsoft.AspNetCore.Mvc.IActionResult Index()" on controller "RewardsAndRecognitionSystem.Controllers.HomeController" ("RewardsAndRecognitionSystem").
+2025-07-09 12:00:06 [Information] Executing action method "RewardsAndRecognitionSystem.Controllers.HomeController.Index (RewardsAndRecognitionSystem)" - Validation state: Valid
+2025-07-09 12:00:06 [Information] Executed action method "RewardsAndRecognitionSystem.Controllers.HomeController.Index (RewardsAndRecognitionSystem)", returned result "Microsoft.AspNetCore.Mvc.ViewResult" in 0.5312ms.
+2025-07-09 12:00:06 [Information] Executing ViewResult, running view "Index".
+2025-07-09 12:00:06 [Information] Executed ViewResult - view "Index" executed in 98.1735ms.
+2025-07-09 12:00:06 [Information] Executed action "RewardsAndRecognitionSystem.Controllers.HomeController.Index (RewardsAndRecognitionSystem)" in 112.9334ms
+2025-07-09 12:00:06 [Information] Executed endpoint '"RewardsAndRecognitionSystem.Controllers.HomeController.Index (RewardsAndRecognitionSystem)"'
+2025-07-09 12:00:06 [Information] Request starting "HTTP/2" "GET" "https"://"localhost:7156""""/_framework/aspnetcore-browser-refresh.js""" - null null
+2025-07-09 12:00:06 [Information] Request finished "HTTP/2" "GET" "https"://"localhost:7156""""/""" - 200 null "text/html; charset=utf-8" 313.0955ms
+2025-07-09 12:00:06 [Information] Request finished "HTTP/2" "GET" "https"://"localhost:7156""""/_framework/aspnetcore-browser-refresh.js""" - 200 16539 "application/javascript; charset=utf-8" 5.8453ms
+2025-07-09 12:00:06 [Information] Request starting "HTTP/2" "GET" "https"://"localhost:7156""""/_vs/browserLink""" - null null
+2025-07-09 12:00:06 [Information] Request finished "HTTP/2" "GET" "https"://"localhost:7156""""/_vs/browserLink""" - 200 null "text/javascript; charset=UTF-8" 34.1386ms
+2025-07-09 12:00:09 [Information] Request starting "HTTP/2" "GET" "https"://"localhost:7156""""/User""" - null null
+2025-07-09 12:00:10 [Information] Executing endpoint '"RewardsAndRecognitionSystem.Controllers.UserController.Index (RewardsAndRecognitionSystem)"'
+2025-07-09 12:00:10 [Information] Route matched with "{action = \"Index\", controller = \"User\", page = \"\", area = \"\"}". Executing controller action with signature "System.Threading.Tasks.Task`1[Microsoft.AspNetCore.Mvc.IActionResult] Index()" on controller "RewardsAndRecognitionSystem.Controllers.UserController" ("RewardsAndRecognitionSystem").
+2025-07-09 12:00:10 [Information] Executing action method "RewardsAndRecognitionSystem.Controllers.UserController.Index (RewardsAndRecognitionSystem)" - Validation state: Valid
+2025-07-09 12:00:10 [Information] Executed DbCommand ("11"ms) [Parameters=[""], CommandType='Text', CommandTimeout='30']"
+""SELECT [a].[Id], [a].[AccessFailedCount], [a].[ConcurrencyStamp], [a].[CreatedAt], [a].[Discriminator], [a].[Email], [a].[EmailConfirmed], [a].[IsActive], [a].[LockoutEnabled], [a].[LockoutEnd], [a].[Name], [a].[NormalizedEmail], [a].[NormalizedUserName], [a].[PasswordHash], [a].[PhoneNumber], [a].[PhoneNumberConfirmed], [a].[SecurityStamp], [a].[TeamId], [a].[TwoFactorEnabled], [a].[UserName], [t].[Id], [t].[DirectorId], [t].[ManagerId], [t].[Name], [t].[TeamLeadId], [a0].[Id], [a0].[AccessFailedCount], [a0].[ConcurrencyStamp], [a0].[CreatedAt], [a0].[Discriminator], [a0].[Email], [a0].[EmailConfirmed], [a0].[IsActive], [a0].[LockoutEnabled], [a0].[LockoutEnd], [a0].[Name], [a0].[NormalizedEmail], [a0].[NormalizedUserName], [a0].[PasswordHash], [a0].[PhoneNumber], [a0].[PhoneNumberConfirmed], [a0].[SecurityStamp], [a0].[TeamId], [a0].[TwoFactorEnabled], [a0].[UserName]
+FROM [AspNetUsers] AS [a]
+LEFT JOIN [Teams] AS [t] ON [a].[TeamId] = [t].[Id]
+LEFT JOIN [AspNetUsers] AS [a0] ON [t].[ManagerId] = [a0].[Id]"
+2025-07-09 12:00:10 [Information] Executed DbCommand ("3"ms) [Parameters=["@__userId_0='?' (Size = 450)"], CommandType='Text', CommandTimeout='30']"
+""SELECT [a0].[Name]
+FROM [AspNetUserRoles] AS [a]
+INNER JOIN [AspNetRoles] AS [a0] ON [a].[RoleId] = [a0].[Id]
+WHERE [a].[UserId] = @__userId_0"
+2025-07-09 12:00:10 [Information] Executed DbCommand ("3"ms) [Parameters=["@__userId_0='?' (Size = 450)"], CommandType='Text', CommandTimeout='30']"
+""SELECT [a0].[Name]
+FROM [AspNetUserRoles] AS [a]
+INNER JOIN [AspNetRoles] AS [a0] ON [a].[RoleId] = [a0].[Id]
+WHERE [a].[UserId] = @__userId_0"
+2025-07-09 12:00:10 [Information] Executed DbCommand ("3"ms) [Parameters=["@__userId_0='?' (Size = 450)"], CommandType='Text', CommandTimeout='30']"
+""SELECT [a0].[Name]
+FROM [AspNetUserRoles] AS [a]
+INNER JOIN [AspNetRoles] AS [a0] ON [a].[RoleId] = [a0].[Id]
+WHERE [a].[UserId] = @__userId_0"
+2025-07-09 12:00:10 [Information] Executed DbCommand ("3"ms) [Parameters=["@__userId_0='?' (Size = 450)"], CommandType='Text', CommandTimeout='30']"
+""SELECT [a0].[Name]
+FROM [AspNetUserRoles] AS [a]
+INNER JOIN [AspNetRoles] AS [a0] ON [a].[RoleId] = [a0].[Id]
+WHERE [a].[UserId] = @__userId_0"
+2025-07-09 12:00:10 [Information] Executed DbCommand ("2"ms) [Parameters=["@__userId_0='?' (Size = 450)"], CommandType='Text', CommandTimeout='30']"
+""SELECT [a0].[Name]
+FROM [AspNetUserRoles] AS [a]
+INNER JOIN [AspNetRoles] AS [a0] ON [a].[RoleId] = [a0].[Id]
+WHERE [a].[UserId] = @__userId_0"
+2025-07-09 12:00:10 [Information] Executed DbCommand ("2"ms) [Parameters=["@__userId_0='?' (Size = 450)"], CommandType='Text', CommandTimeout='30']"
+""SELECT [a0].[Name]
+FROM [AspNetUserRoles] AS [a]
+INNER JOIN [AspNetRoles] AS [a0] ON [a].[RoleId] = [a0].[Id]
+WHERE [a].[UserId] = @__userId_0"
+2025-07-09 12:00:10 [Information] Executed DbCommand ("2"ms) [Parameters=["@__userId_0='?' (Size = 450)"], CommandType='Text', CommandTimeout='30']"
+""SELECT [a0].[Name]
+FROM [AspNetUserRoles] AS [a]
+INNER JOIN [AspNetRoles] AS [a0] ON [a].[RoleId] = [a0].[Id]
+WHERE [a].[UserId] = @__userId_0"
+2025-07-09 12:00:10 [Information] Executed DbCommand ("2"ms) [Parameters=["@__userId_0='?' (Size = 450)"], CommandType='Text', CommandTimeout='30']"
+""SELECT [a0].[Name]
+FROM [AspNetUserRoles] AS [a]
+INNER JOIN [AspNetRoles] AS [a0] ON [a].[RoleId] = [a0].[Id]
+WHERE [a].[UserId] = @__userId_0"
+2025-07-09 12:00:10 [Information] Executed DbCommand ("2"ms) [Parameters=["@__userId_0='?' (Size = 450)"], CommandType='Text', CommandTimeout='30']"
+""SELECT [a0].[Name]
+FROM [AspNetUserRoles] AS [a]
+INNER JOIN [AspNetRoles] AS [a0] ON [a].[RoleId] = [a0].[Id]
+WHERE [a].[UserId] = @__userId_0"
+2025-07-09 12:00:10 [Information] Executed action method "RewardsAndRecognitionSystem.Controllers.UserController.Index (RewardsAndRecognitionSystem)", returned result "Microsoft.AspNetCore.Mvc.ViewResult" in 502.1576ms.
+2025-07-09 12:00:10 [Information] Executing ViewResult, running view "Index".
+2025-07-09 12:00:10 [Information] Executed ViewResult - view "Index" executed in 59.5928ms.
+2025-07-09 12:00:10 [Information] Executed action "RewardsAndRecognitionSystem.Controllers.UserController.Index (RewardsAndRecognitionSystem)" in 567.9001ms
+2025-07-09 12:00:10 [Information] Executed endpoint '"RewardsAndRecognitionSystem.Controllers.UserController.Index (RewardsAndRecognitionSystem)"'
+2025-07-09 12:00:10 [Information] Request finished "HTTP/2" "GET" "https"://"localhost:7156""""/User""" - 200 null "text/html; charset=utf-8" 629.7724ms
+2025-07-09 12:00:10 [Information] Request starting "HTTP/2" "GET" "https"://"localhost:7156""""/_framework/aspnetcore-browser-refresh.js""" - null null
+2025-07-09 12:00:10 [Information] Request starting "HTTP/2" "GET" "https"://"localhost:7156""""/_vs/browserLink""" - null null
+2025-07-09 12:00:10 [Information] Request finished "HTTP/2" "GET" "https"://"localhost:7156""""/_framework/aspnetcore-browser-refresh.js""" - 200 16539 "application/javascript; charset=utf-8" 3.0162ms
+2025-07-09 12:00:10 [Information] Request finished "HTTP/2" "GET" "https"://"localhost:7156""""/_vs/browserLink""" - 200 null "text/javascript; charset=UTF-8" 43.1406ms
+2025-07-09 12:00:12 [Information] Request starting "HTTP/2" "GET" "https"://"localhost:7156""""/User/Create""" - null null
+2025-07-09 12:00:12 [Information] Executing endpoint '"RewardsAndRecognitionSystem.Controllers.UserController.Create (RewardsAndRecognitionSystem)"'
+2025-07-09 12:00:12 [Information] Route matched with "{action = \"Create\", controller = \"User\", page = \"\", area = \"\"}". Executing controller action with signature "System.Threading.Tasks.Task`1[Microsoft.AspNetCore.Mvc.IActionResult] Create()" on controller "RewardsAndRecognitionSystem.Controllers.UserController" ("RewardsAndRecognitionSystem").
+2025-07-09 12:00:12 [Information] Executing action method "RewardsAndRecognitionSystem.Controllers.UserController.Create (RewardsAndRecognitionSystem)" - Validation state: Valid
+2025-07-09 12:00:12 [Information] Executed DbCommand ("7"ms) [Parameters=[""], CommandType='Text', CommandTimeout='30']"
+""SELECT [t].[Id], [t].[DirectorId], [t].[ManagerId], [t].[Name], [t].[TeamLeadId], [a].[Id], [a].[AccessFailedCount], [a].[ConcurrencyStamp], [a].[CreatedAt], [a].[Discriminator], [a].[Email], [a].[EmailConfirmed], [a].[IsActive], [a].[LockoutEnabled], [a].[LockoutEnd], [a].[Name], [a].[NormalizedEmail], [a].[NormalizedUserName], [a].[PasswordHash], [a].[PhoneNumber], [a].[PhoneNumberConfirmed], [a].[SecurityStamp], [a].[TeamId], [a].[TwoFactorEnabled], [a].[UserName], [a0].[Id], [a0].[AccessFailedCount], [a0].[ConcurrencyStamp], [a0].[CreatedAt], [a0].[Discriminator], [a0].[Email], [a0].[EmailConfirmed], [a0].[IsActive], [a0].[LockoutEnabled], [a0].[LockoutEnd], [a0].[Name], [a0].[NormalizedEmail], [a0].[NormalizedUserName], [a0].[PasswordHash], [a0].[PhoneNumber], [a0].[PhoneNumberConfirmed], [a0].[SecurityStamp], [a0].[TeamId], [a0].[TwoFactorEnabled], [a0].[UserName], [a1].[Id], [a1].[AccessFailedCount], [a1].[ConcurrencyStamp], [a1].[CreatedAt], [a1].[Discriminator], [a1].[Email], [a1].[EmailConfirmed], [a1].[IsActive], [a1].[LockoutEnabled], [a1].[LockoutEnd], [a1].[Name], [a1].[NormalizedEmail], [a1].[NormalizedUserName], [a1].[PasswordHash], [a1].[PhoneNumber], [a1].[PhoneNumberConfirmed], [a1].[SecurityStamp], [a1].[TeamId], [a1].[TwoFactorEnabled], [a1].[UserName]
+FROM [Teams] AS [t]
+INNER JOIN [AspNetUsers] AS [a] ON [t].[TeamLeadId] = [a].[Id]
+INNER JOIN [AspNetUsers] AS [a0] ON [t].[ManagerId] = [a0].[Id]
+INNER JOIN [AspNetUsers] AS [a1] ON [t].[DirectorId] = [a1].[Id]"
+2025-07-09 12:00:12 [Information] Executed DbCommand ("2"ms) [Parameters=["@__normalizedRoleName_0='?' (Size = 256)"], CommandType='Text', CommandTimeout='30']"
+""SELECT TOP(2) [a].[Id], [a].[ConcurrencyStamp], [a].[Name], [a].[NormalizedName]
+FROM [AspNetRoles] AS [a]
+WHERE [a].[NormalizedName] = @__normalizedRoleName_0"
+2025-07-09 12:00:12 [Information] Executed DbCommand ("6"ms) [Parameters=["@__role_Id_0='?' (Size = 450)"], CommandType='Text', CommandTimeout='30']"
+""SELECT [a0].[Id], [a0].[AccessFailedCount], [a0].[ConcurrencyStamp], [a0].[CreatedAt], [a0].[Discriminator], [a0].[Email], [a0].[EmailConfirmed], [a0].[IsActive], [a0].[LockoutEnabled], [a0].[LockoutEnd], [a0].[Name], [a0].[NormalizedEmail], [a0].[NormalizedUserName], [a0].[PasswordHash], [a0].[PhoneNumber], [a0].[PhoneNumberConfirmed], [a0].[SecurityStamp], [a0].[TeamId], [a0].[TwoFactorEnabled], [a0].[UserName]
+FROM [AspNetUserRoles] AS [a]
+INNER JOIN [AspNetUsers] AS [a0] ON [a].[UserId] = [a0].[Id]
+WHERE [a].[RoleId] = @__role_Id_0"
+2025-07-09 12:00:12 [Information] Executed action method "RewardsAndRecognitionSystem.Controllers.UserController.Create (RewardsAndRecognitionSystem)", returned result "Microsoft.AspNetCore.Mvc.ViewResult" in 66.8226ms.
+2025-07-09 12:00:12 [Information] Executing ViewResult, running view "Create".
+2025-07-09 12:00:12 [Information] Executed ViewResult - view "Create" executed in 107.1122ms.
+2025-07-09 12:00:12 [Information] Executed action "RewardsAndRecognitionSystem.Controllers.UserController.Create (RewardsAndRecognitionSystem)" in 175.5583ms
+2025-07-09 12:00:12 [Information] Executed endpoint '"RewardsAndRecognitionSystem.Controllers.UserController.Create (RewardsAndRecognitionSystem)"'
+2025-07-09 12:00:12 [Information] Request finished "HTTP/2" "GET" "https"://"localhost:7156""""/User/Create""" - 200 null "text/html; charset=utf-8" 196.781ms
+2025-07-09 12:00:12 [Information] Request starting "HTTP/2" "GET" "https"://"localhost:7156""""/lib/jquery-validation/dist/jquery.validate.min.js""" - null null
+2025-07-09 12:00:12 [Information] Request starting "HTTP/2" "GET" "https"://"localhost:7156""""/_framework/aspnetcore-browser-refresh.js""" - null null
+2025-07-09 12:00:12 [Information] Request starting "HTTP/2" "GET" "https"://"localhost:7156""""/lib/jquery-validation-unobtrusive/jquery.validate.unobtrusive.min.js""" - null null
+2025-07-09 12:00:12 [Information] Request finished "HTTP/2" "GET" "https"://"localhost:7156""""/_framework/aspnetcore-browser-refresh.js""" - 200 16539 "application/javascript; charset=utf-8" 2.3978ms
+2025-07-09 12:00:12 [Information] Request starting "HTTP/2" "GET" "https"://"localhost:7156""""/_vs/browserLink""" - null null
+2025-07-09 12:00:12 [Information] Request finished "HTTP/2" "GET" "https"://"localhost:7156""""/_vs/browserLink""" - 200 null "text/javascript; charset=UTF-8" 16.7882ms
+2025-07-09 12:00:12 [Information] Sending file. Request path: '"/lib/jquery-validation/dist/jquery.validate.min.js"'. Physical path: '"C:\.Net Training\RewardsAndRecognitionSystem\RewardsAndRecognitionSystem\RewardsAndRecognitionSystem\wwwroot\lib\jquery-validation\dist\jquery.validate.min.js"'
+2025-07-09 12:00:12 [Information] Sending file. Request path: '"/lib/jquery-validation-unobtrusive/jquery.validate.unobtrusive.min.js"'. Physical path: '"C:\.Net Training\RewardsAndRecognitionSystem\RewardsAndRecognitionSystem\RewardsAndRecognitionSystem\wwwroot\lib\jquery-validation-unobtrusive\jquery.validate.unobtrusive.min.js"'
+2025-07-09 12:00:12 [Information] Request finished "HTTP/2" "GET" "https"://"localhost:7156""""/lib/jquery-validation/dist/jquery.validate.min.js""" - 200 24604 "text/javascript" 32.6282ms
+2025-07-09 12:00:12 [Information] Request finished "HTTP/2" "GET" "https"://"localhost:7156""""/lib/jquery-validation-unobtrusive/jquery.validate.unobtrusive.min.js""" - 200 5831 "text/javascript" 32.6391ms
+2025-07-09 12:01:02 [Information] Request starting "HTTP/2" "POST" "https"://"localhost:7156""""/User/Create""" - "application/x-www-form-urlencoded" 309
+2025-07-09 12:01:02 [Information] Executing endpoint '"RewardsAndRecognitionSystem.Controllers.UserController.Create (RewardsAndRecognitionSystem)"'
+2025-07-09 12:01:02 [Information] Route matched with "{action = \"Create\", controller = \"User\", page = \"\", area = \"\"}". Executing controller action with signature "System.Threading.Tasks.Task`1[Microsoft.AspNetCore.Mvc.IActionResult] Create(RewardsAndRecognitionRepository.Models.User, System.String, System.String)" on controller "RewardsAndRecognitionSystem.Controllers.UserController" ("RewardsAndRecognitionSystem").
+2025-07-09 12:01:02 [Information] Executing action method "RewardsAndRecognitionSystem.Controllers.UserController.Create (RewardsAndRecognitionSystem)" - Validation state: Valid
+2025-07-09 12:01:02 [Information] Executed DbCommand ("2"ms) [Parameters=["@__normalizedUserName_0='?' (Size = 256)"], CommandType='Text', CommandTimeout='30']"
+""SELECT TOP(1) [a].[Id], [a].[AccessFailedCount], [a].[ConcurrencyStamp], [a].[CreatedAt], [a].[Discriminator], [a].[Email], [a].[EmailConfirmed], [a].[IsActive], [a].[LockoutEnabled], [a].[LockoutEnd], [a].[Name], [a].[NormalizedEmail], [a].[NormalizedUserName], [a].[PasswordHash], [a].[PhoneNumber], [a].[PhoneNumberConfirmed], [a].[SecurityStamp], [a].[TeamId], [a].[TwoFactorEnabled], [a].[UserName]
+FROM [AspNetUsers] AS [a]
+WHERE [a].[NormalizedUserName] = @__normalizedUserName_0"
+2025-07-09 12:01:03 [Information] Executed DbCommand ("14"ms) [Parameters=["@p0='?' (Size = 450), @p1='?' (DbType = Int32), @p2='?' (Size = 4000), @p3='?' (DbType = DateTime2), @p4='?' (Size = 5), @p5='?' (Size = 256), @p6='?' (DbType = Boolean), @p7='?' (DbType = Boolean), @p8='?' (DbType = Boolean), @p9='?' (DbType = DateTimeOffset), @p10='?' (Size = 4000), @p11='?' (Size = 256), @p12='?' (Size = 256), @p13='?' (Size = 4000), @p14='?' (Size = 4000), @p15='?' (DbType = Boolean), @p16='?' (Size = 4000), @p17='?' (DbType = Guid), @p18='?' (DbType = Boolean), @p19='?' (Size = 256)"], CommandType='Text', CommandTimeout='30']"
+""SET IMPLICIT_TRANSACTIONS OFF;
+SET NOCOUNT ON;
+INSERT INTO [AspNetUsers] ([Id], [AccessFailedCount], [ConcurrencyStamp], [CreatedAt], [Discriminator], [Email], [EmailConfirmed], [IsActive], [LockoutEnabled], [LockoutEnd], [Name], [NormalizedEmail], [NormalizedUserName], [PasswordHash], [PhoneNumber], [PhoneNumberConfirmed], [SecurityStamp], [TeamId], [TwoFactorEnabled], [UserName])
+VALUES (@p0, @p1, @p2, @p3, @p4, @p5, @p6, @p7, @p8, @p9, @p10, @p11, @p12, @p13, @p14, @p15, @p16, @p17, @p18, @p19);"
+2025-07-09 12:01:03 [Information] Executed DbCommand ("3"ms) [Parameters=["@__normalizedRoleName_0='?' (Size = 256)"], CommandType='Text', CommandTimeout='30']"
+""SELECT TOP(2) [a].[Id], [a].[ConcurrencyStamp], [a].[Name], [a].[NormalizedName]
+FROM [AspNetRoles] AS [a]
+WHERE [a].[NormalizedName] = @__normalizedRoleName_0"
+2025-07-09 12:01:03 [Information] Executed DbCommand ("1"ms) [Parameters=["@__p_0='?' (Size = 450), @__p_1='?' (Size = 450)"], CommandType='Text', CommandTimeout='30']"
+""SELECT TOP(1) [a].[UserId], [a].[RoleId]
+FROM [AspNetUserRoles] AS [a]
+WHERE [a].[UserId] = @__p_0 AND [a].[RoleId] = @__p_1"
+2025-07-09 12:01:03 [Information] Executed DbCommand ("2"ms) [Parameters=["@__normalizedRoleName_0='?' (Size = 256)"], CommandType='Text', CommandTimeout='30']"
+""SELECT TOP(2) [a].[Id], [a].[ConcurrencyStamp], [a].[Name], [a].[NormalizedName]
+FROM [AspNetRoles] AS [a]
+WHERE [a].[NormalizedName] = @__normalizedRoleName_0"
+2025-07-09 12:01:03 [Information] Executed DbCommand ("2"ms) [Parameters=["@__normalizedUserName_0='?' (Size = 256)"], CommandType='Text', CommandTimeout='30']"
+""SELECT TOP(1) [a].[Id], [a].[AccessFailedCount], [a].[ConcurrencyStamp], [a].[CreatedAt], [a].[Discriminator], [a].[Email], [a].[EmailConfirmed], [a].[IsActive], [a].[LockoutEnabled], [a].[LockoutEnd], [a].[Name], [a].[NormalizedEmail], [a].[NormalizedUserName], [a].[PasswordHash], [a].[PhoneNumber], [a].[PhoneNumberConfirmed], [a].[SecurityStamp], [a].[TeamId], [a].[TwoFactorEnabled], [a].[UserName]
+FROM [AspNetUsers] AS [a]
+WHERE [a].[NormalizedUserName] = @__normalizedUserName_0"
+2025-07-09 12:01:03 [Information] Executed DbCommand ("9"ms) [Parameters=["@p0='?' (Size = 450), @p1='?' (Size = 450), @p20='?' (Size = 450), @p2='?' (DbType = Int32), @p3='?' (Size = 4000), @p21='?' (Size = 4000), @p4='?' (DbType = DateTime2), @p5='?' (Size = 256), @p6='?' (DbType = Boolean), @p7='?' (DbType = Boolean), @p8='?' (DbType = Boolean), @p9='?' (DbType = DateTimeOffset), @p10='?' (Size = 4000), @p11='?' (Size = 256), @p12='?' (Size = 256), @p13='?' (Size = 4000), @p14='?' (Size = 4000), @p15='?' (DbType = Boolean), @p16='?' (Size = 4000), @p17='?' (DbType = Guid), @p18='?' (DbType = Boolean), @p19='?' (Size = 256)"], CommandType='Text', CommandTimeout='30']"
+""SET NOCOUNT ON;
+INSERT INTO [AspNetUserRoles] ([RoleId], [UserId])
+VALUES (@p0, @p1);
+UPDATE [AspNetUsers] SET [AccessFailedCount] = @p2, [ConcurrencyStamp] = @p3, [CreatedAt] = @p4, [Email] = @p5, [EmailConfirmed] = @p6, [IsActive] = @p7, [LockoutEnabled] = @p8, [LockoutEnd] = @p9, [Name] = @p10, [NormalizedEmail] = @p11, [NormalizedUserName] = @p12, [PasswordHash] = @p13, [PhoneNumber] = @p14, [PhoneNumberConfirmed] = @p15, [SecurityStamp] = @p16, [TeamId] = @p17, [TwoFactorEnabled] = @p18, [UserName] = @p19
+OUTPUT 1
+WHERE [Id] = @p20 AND [ConcurrencyStamp] = @p21;"
+2025-07-09 12:01:03 [Information] Executed action method "RewardsAndRecognitionSystem.Controllers.UserController.Create (RewardsAndRecognitionSystem)", returned result "Microsoft.AspNetCore.Mvc.RedirectToActionResult" in 348.9142ms.
+2025-07-09 12:01:03 [Information] Executing RedirectResult, redirecting to "/User".
+2025-07-09 12:01:03 [Information] Executed action "RewardsAndRecognitionSystem.Controllers.UserController.Create (RewardsAndRecognitionSystem)" in 374.4447ms
+2025-07-09 12:01:03 [Information] Executed endpoint '"RewardsAndRecognitionSystem.Controllers.UserController.Create (RewardsAndRecognitionSystem)"'
+2025-07-09 12:01:03 [Information] Request finished "HTTP/2" "POST" "https"://"localhost:7156""""/User/Create""" - 302 0 null 432.2034ms
+2025-07-09 12:01:03 [Information] Request starting "HTTP/2" "GET" "https"://"localhost:7156""""/User""" - null null
+2025-07-09 12:01:03 [Information] Executing endpoint '"RewardsAndRecognitionSystem.Controllers.UserController.Index (RewardsAndRecognitionSystem)"'
+2025-07-09 12:01:03 [Information] Route matched with "{action = \"Index\", controller = \"User\", page = \"\", area = \"\"}". Executing controller action with signature "System.Threading.Tasks.Task`1[Microsoft.AspNetCore.Mvc.IActionResult] Index()" on controller "RewardsAndRecognitionSystem.Controllers.UserController" ("RewardsAndRecognitionSystem").
+2025-07-09 12:01:03 [Information] Executing action method "RewardsAndRecognitionSystem.Controllers.UserController.Index (RewardsAndRecognitionSystem)" - Validation state: Valid
+2025-07-09 12:01:03 [Information] Executed DbCommand ("3"ms) [Parameters=[""], CommandType='Text', CommandTimeout='30']"
+""SELECT [a].[Id], [a].[AccessFailedCount], [a].[ConcurrencyStamp], [a].[CreatedAt], [a].[Discriminator], [a].[Email], [a].[EmailConfirmed], [a].[IsActive], [a].[LockoutEnabled], [a].[LockoutEnd], [a].[Name], [a].[NormalizedEmail], [a].[NormalizedUserName], [a].[PasswordHash], [a].[PhoneNumber], [a].[PhoneNumberConfirmed], [a].[SecurityStamp], [a].[TeamId], [a].[TwoFactorEnabled], [a].[UserName], [t].[Id], [t].[DirectorId], [t].[ManagerId], [t].[Name], [t].[TeamLeadId], [a0].[Id], [a0].[AccessFailedCount], [a0].[ConcurrencyStamp], [a0].[CreatedAt], [a0].[Discriminator], [a0].[Email], [a0].[EmailConfirmed], [a0].[IsActive], [a0].[LockoutEnabled], [a0].[LockoutEnd], [a0].[Name], [a0].[NormalizedEmail], [a0].[NormalizedUserName], [a0].[PasswordHash], [a0].[PhoneNumber], [a0].[PhoneNumberConfirmed], [a0].[SecurityStamp], [a0].[TeamId], [a0].[TwoFactorEnabled], [a0].[UserName]
+FROM [AspNetUsers] AS [a]
+LEFT JOIN [Teams] AS [t] ON [a].[TeamId] = [t].[Id]
+LEFT JOIN [AspNetUsers] AS [a0] ON [t].[ManagerId] = [a0].[Id]"
+2025-07-09 12:01:03 [Information] Executed DbCommand ("3"ms) [Parameters=["@__userId_0='?' (Size = 450)"], CommandType='Text', CommandTimeout='30']"
+""SELECT [a0].[Name]
+FROM [AspNetUserRoles] AS [a]
+INNER JOIN [AspNetRoles] AS [a0] ON [a].[RoleId] = [a0].[Id]
+WHERE [a].[UserId] = @__userId_0"
+2025-07-09 12:01:03 [Information] Executed DbCommand ("1"ms) [Parameters=["@__userId_0='?' (Size = 450)"], CommandType='Text', CommandTimeout='30']"
+""SELECT [a0].[Name]
+FROM [AspNetUserRoles] AS [a]
+INNER JOIN [AspNetRoles] AS [a0] ON [a].[RoleId] = [a0].[Id]
+WHERE [a].[UserId] = @__userId_0"
+2025-07-09 12:01:03 [Information] Executed DbCommand ("1"ms) [Parameters=["@__userId_0='?' (Size = 450)"], CommandType='Text', CommandTimeout='30']"
+""SELECT [a0].[Name]
+FROM [AspNetUserRoles] AS [a]
+INNER JOIN [AspNetRoles] AS [a0] ON [a].[RoleId] = [a0].[Id]
+WHERE [a].[UserId] = @__userId_0"
+2025-07-09 12:01:03 [Information] Executed DbCommand ("1"ms) [Parameters=["@__userId_0='?' (Size = 450)"], CommandType='Text', CommandTimeout='30']"
+""SELECT [a0].[Name]
+FROM [AspNetUserRoles] AS [a]
+INNER JOIN [AspNetRoles] AS [a0] ON [a].[RoleId] = [a0].[Id]
+WHERE [a].[UserId] = @__userId_0"
+2025-07-09 12:01:03 [Information] Executed DbCommand ("1"ms) [Parameters=["@__userId_0='?' (Size = 450)"], CommandType='Text', CommandTimeout='30']"
+""SELECT [a0].[Name]
+FROM [AspNetUserRoles] AS [a]
+INNER JOIN [AspNetRoles] AS [a0] ON [a].[RoleId] = [a0].[Id]
+WHERE [a].[UserId] = @__userId_0"
+2025-07-09 12:01:03 [Information] Executed DbCommand ("1"ms) [Parameters=["@__userId_0='?' (Size = 450)"], CommandType='Text', CommandTimeout='30']"
+""SELECT [a0].[Name]
+FROM [AspNetUserRoles] AS [a]
+INNER JOIN [AspNetRoles] AS [a0] ON [a].[RoleId] = [a0].[Id]
+WHERE [a].[UserId] = @__userId_0"
+2025-07-09 12:01:03 [Information] Executed DbCommand ("1"ms) [Parameters=["@__userId_0='?' (Size = 450)"], CommandType='Text', CommandTimeout='30']"
+""SELECT [a0].[Name]
+FROM [AspNetUserRoles] AS [a]
+INNER JOIN [AspNetRoles] AS [a0] ON [a].[RoleId] = [a0].[Id]
+WHERE [a].[UserId] = @__userId_0"
+2025-07-09 12:01:03 [Information] Executed DbCommand ("1"ms) [Parameters=["@__userId_0='?' (Size = 450)"], CommandType='Text', CommandTimeout='30']"
+""SELECT [a0].[Name]
+FROM [AspNetUserRoles] AS [a]
+INNER JOIN [AspNetRoles] AS [a0] ON [a].[RoleId] = [a0].[Id]
+WHERE [a].[UserId] = @__userId_0"
+2025-07-09 12:01:03 [Information] Executed DbCommand ("1"ms) [Parameters=["@__userId_0='?' (Size = 450)"], CommandType='Text', CommandTimeout='30']"
+""SELECT [a0].[Name]
+FROM [AspNetUserRoles] AS [a]
+INNER JOIN [AspNetRoles] AS [a0] ON [a].[RoleId] = [a0].[Id]
+WHERE [a].[UserId] = @__userId_0"
+2025-07-09 12:01:03 [Information] Executed DbCommand ("1"ms) [Parameters=["@__userId_0='?' (Size = 450)"], CommandType='Text', CommandTimeout='30']"
+""SELECT [a0].[Name]
+FROM [AspNetUserRoles] AS [a]
+INNER JOIN [AspNetRoles] AS [a0] ON [a].[RoleId] = [a0].[Id]
+WHERE [a].[UserId] = @__userId_0"
+2025-07-09 12:01:03 [Information] Executed action method "RewardsAndRecognitionSystem.Controllers.UserController.Index (RewardsAndRecognitionSystem)", returned result "Microsoft.AspNetCore.Mvc.ViewResult" in 24.0333ms.
+2025-07-09 12:01:03 [Information] Executing ViewResult, running view "Index".
+2025-07-09 12:01:03 [Information] Executed ViewResult - view "Index" executed in 6.6422ms.
+2025-07-09 12:01:03 [Information] Executed action "RewardsAndRecognitionSystem.Controllers.UserController.Index (RewardsAndRecognitionSystem)" in 31.1567ms
+2025-07-09 12:01:03 [Information] Executed endpoint '"RewardsAndRecognitionSystem.Controllers.UserController.Index (RewardsAndRecognitionSystem)"'
+2025-07-09 12:01:03 [Information] Request finished "HTTP/2" "GET" "https"://"localhost:7156""""/User""" - 200 null "text/html; charset=utf-8" 35.2083ms
+2025-07-09 12:01:03 [Information] Request starting "HTTP/2" "GET" "https"://"localhost:7156""""/_framework/aspnetcore-browser-refresh.js""" - null null
+2025-07-09 12:01:03 [Information] Request starting "HTTP/2" "GET" "https"://"localhost:7156""""/_vs/browserLink""" - null null
+2025-07-09 12:01:03 [Information] Request finished "HTTP/2" "GET" "https"://"localhost:7156""""/_framework/aspnetcore-browser-refresh.js""" - 200 16539 "application/javascript; charset=utf-8" 4.1147ms
+2025-07-09 12:01:03 [Information] Request finished "HTTP/2" "GET" "https"://"localhost:7156""""/_vs/browserLink""" - 200 null "text/javascript; charset=UTF-8" 17.5811ms

@@ -31,6 +31,7 @@ namespace RewardsAndRecognitionSystem.Controllers
             if (currentUser == null)
                 return RedirectToAction("Login", "Account", new { area = "Identity" });
 
+
             ViewBag.currentUser = currentUser;
             var userRoles = await _userManager.GetRolesAsync(currentUser);
             List<Nomination> nominationsToShow = new();
@@ -256,5 +257,7 @@ namespace RewardsAndRecognitionSystem.Controllers
 
             return RedirectToAction(nameof(Index));
         }
+       
+
     }
 }
