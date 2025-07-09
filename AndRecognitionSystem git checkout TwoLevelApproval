@@ -1,0 +1,59 @@
+[1mdiff --git a/RewardsAndRecognitionRepository/Enums/NominationStatus.cs b/RewardsAndRecognitionRepository/Enums/NominationStatus.cs[m
+[1mindex 4ff7a53..936477d 100644[m
+[1m--- a/RewardsAndRecognitionRepository/Enums/NominationStatus.cs[m
+[1m+++ b/RewardsAndRecognitionRepository/Enums/NominationStatus.cs[m
+[36m@@ -10,8 +10,9 @@[m [mnamespace RewardsAndRecognitionRepository.Enums[m
+     {[m
+         PendingManager,[m
+         PendingDirector,[m
+[31m-        Approved,[m
+[31m-        Rejected[m
+[32m+[m[32m        ManagerApproved,[m
+[32m+[m[32m        ManagerRejected,[m
+[32m+[m[32m        DirectorApproved,[m
+[32m+[m[32m        DirectorRejected[m
+     }[m
+[31m-[m
+ }[m
+[1mdiff --git a/RewardsAndRecognitionSystem/Controllers/TeamController.cs b/RewardsAndRecognitionSystem/Controllers/TeamController.cs[m
+[1mindex a8b2c4c..f1fc731 100644[m
+[1m--- a/RewardsAndRecognitionSystem/Controllers/TeamController.cs[m
+[1m+++ b/RewardsAndRecognitionSystem/Controllers/TeamController.cs[m
+[36m@@ -66,9 +66,11 @@[m [mnamespace RewardsAndRecognitionSystem.Controllers[m
+ [m
+             var managers = await _userRepo.GetAllManagersAsync(); // ✅ Required[m
+             var leads = await _userRepo.GetLeadsAsync(team.TeamLeadId);          // ✅ Required[m
+[32m+[m[32m            var directors = await _userRepo.GetAllDirectorsAsync();[m
+ [m
+             ViewBag.Managers = new SelectList(managers, "Id", "Name", team.ManagerId);[m
+             ViewBag.TeamLeads = new SelectList(leads, "Id", "Name", team.TeamLeadId);[m
+[32m+[m[32m            ViewBag.Directors = new SelectList(directors, "Id", "Name", team.DirectorId);[m
+ [m
+             return View(team);[m
+         }[m
+[1mdiff --git a/RewardsAndRecognitionSystem/Properties/launchSettings.json b/RewardsAndRecognitionSystem/Properties/launchSettings.json[m
+[1mindex 9767554..0840b70 100644[m
+[1m--- a/RewardsAndRecognitionSystem/Properties/launchSettings.json[m
+[1m+++ b/RewardsAndRecognitionSystem/Properties/launchSettings.json[m
+[36m@@ -22,7 +22,7 @@[m
+       "commandName": "Project",[m
+       "dotnetRunMessages": true,[m
+       "launchBrowser": true,[m
+[31m-      "applicationUrl": "https://localhost:7156;http://localhost:5212",[m
+[32m+[m[32m      "applicationUrl": "http://localhost:7156;http://localhost:5212",[m
+       "environmentVariables": {[m
+         "ASPNETCORE_ENVIRONMENT": "Development"[m
+       }[m
+[1mdiff --git a/RewardsAndRecognitionSystem/Views/Team/Edit.cshtml b/RewardsAndRecognitionSystem/Views/Team/Edit.cshtml[m
+[1mindex 5f975f9..6b51348 100644[m
+[1m--- a/RewardsAndRecognitionSystem/Views/Team/Edit.cshtml[m
+[1m+++ b/RewardsAndRecognitionSystem/Views/Team/Edit.cshtml[m
+[36m@@ -32,7 +32,7 @@[m
+ [m
+         <div class="mb-3">[m
+             <label asp-for="DirectorId" class="form-label">Director</label>[m
+[31m-            <select asp-for="DirectorId" asp-items="ViewBag.Director" class="form-select border-dark-subtle">[m
+[32m+[m[32m            <select asp-for="DirectorId" asp-items="ViewBag.Directors" class="form-select border-dark-subtle">[m
+                 <option value="">-- Select Director --</option>[m
+             </select>[m
+         </div>[m

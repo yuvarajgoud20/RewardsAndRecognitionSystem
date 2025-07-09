@@ -32,10 +32,33 @@ namespace RewardsAndRecognitionSystem.Controllers
                 return RedirectToAction("Login", "Account", new { area = "Identity" });
 
 
-           
-
+            ViewBag.currentUser = currentUser;
             var userRoles = await _userManager.GetRolesAsync(currentUser);
             List<Nomination> nominationsToShow = new();
+
+            if (userRoles.Contains("Director"))
+            {
+                nominationsToShow = await _context.Nominations
+                    .Include(n => n.Nominee)
+                        .ThenInclude(u => u.Team)
+                    .Include(n => n.Category)
+                    .Include(n => n.Approvals)
+                    .Include(n => n.Nominator)
+                    .Where(n => n.Nominee.Team.DirectorId == currentUser.Id)
+                    .Where(n => n.Status != NominationStatus.PendingManager)
+                    //.Where(n => n.Approvals != null)
+                    .ToListAsync();
+
+                // Track reviewed nominations
+                var alreadyReviewedIds = nominationsToShow
+                    .Where(n => n.Approvals.Any(a => a.ApproverId == currentUser.Id))
+                    .Select(n => n.Id)
+                    .ToList();
+
+                ViewBag.ReviewedNominationIds = alreadyReviewedIds;
+
+                return View(nominationsToShow);
+            }
 
             if (userRoles.Contains("Manager"))
             {
@@ -56,30 +79,6 @@ namespace RewardsAndRecognitionSystem.Controllers
 
                 ViewBag.ReviewedNominationIds = alreadyReviewedIds;
 
-                // Filter: Pending or Reviewed
-                //if (filter == "Pending")
-                //{
-                //    nominationsToShow = nominationsToShow
-                //        .Where(n => !alreadyReviewedIds.Contains(n.Id))
-                //        .ToList();
-                //}
-                //else if (filter == "Reviewed")
-                //{
-                //    nominationsToShow = nominationsToShow
-                //        .Where(n => alreadyReviewedIds.Contains(n.Id))
-                //        .ToList();
-                //}
-
-                //// Search: filter by nominee name
-                //if (!string.IsNullOrEmpty(search))
-                //{
-                //    nominationsToShow = nominationsToShow
-                //        .Where(n => n.Nominee.Name != null && n.Nominee.Name.Contains(search, StringComparison.OrdinalIgnoreCase))
-                //        .ToList();
-                //}
-
-                //ViewBag.CurrentFilter = filter;
-                //ViewBag.SearchTerm = search;
                 return View(nominationsToShow);
             }
             if (userRoles.Contains("TeamLead"))
@@ -102,16 +101,6 @@ namespace RewardsAndRecognitionSystem.Controllers
                     .Include(n => n.Category)
                     .ToListAsync();
             }
-
-            //// Search within own nominations
-            //if (!string.IsNullOrEmpty(search))
-            //{
-            //    nominationsToShow = nominationsToShow
-            //        .Where(n => n.Nominee.Name != null && n.Nominee.Name.Contains(search, StringComparison.OrdinalIgnoreCase))
-            //        .ToList();
-            //}
-
-            //ViewBag.SearchTerm = search;
             return View(nominationsToShow);
         }
 
@@ -234,6 +223,9 @@ namespace RewardsAndRecognitionSystem.Controllers
             var nomination = await _nominationRepo.GetNominationByIdAsync(id);
             var currentUser = await _userManager.GetUserAsync(User);
 
+
+            var userRole = await _userManager.GetRolesAsync(currentUser);
+
             if (nomination == null || currentUser == null)
                 return NotFound();
 
@@ -245,18 +237,17 @@ namespace RewardsAndRecognitionSystem.Controllers
             }
 
             nomination.Status = parsedAction == ApprovalAction.Approved
-                ? NominationStatus.Approved
-                : NominationStatus.Rejected;
+                ? (userRole.Contains("Manager") ? NominationStatus.ManagerApproved : NominationStatus.DirectorApproved)
+                : (userRole.Contains("Manager") ? NominationStatus.ManagerRejected : NominationStatus.DirectorRejected);
 
             await _nominationRepo.UpdateNominationAsync(nomination);
-
             var approval = new Approval
             {
                 Id = Guid.NewGuid(),
                 NominationId = id,
                 ApproverId = currentUser.Id,
                 Action = parsedAction,
-                Level = ApprovalLevel.Manager,
+                Level = (userRole.Contains("Manager") ? ApprovalLevel.Manager : ApprovalLevel.Director),
                 ActionAt = DateTime.UtcNow,
                 Remarks = remarks
             };
