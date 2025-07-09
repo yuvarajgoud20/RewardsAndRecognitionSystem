@@ -132,11 +132,45 @@
                     <a asp-action="Edit" asp-route-id="@team.Id" class="btn btn-edit">
                         <i class="bi bi-pencil-square"></i> Edit
                     </a>
-                    <a asp-action="Delete" asp-route-id="@team.Id" class="btn btn-delete">
+                    <button type="button" class="btn btn-danger" onclick="confirmDelete('@team.Id')">
                         <i class="bi bi-trash-fill"></i> Delete
-                    </a>
+                    </button>
                 </td>
             </tr>
         }
     </tbody>
 </table>
+
+<script>
+    function confirmDelete(teamId) {
+      Swal.fire({
+        title: 'Are you sure?',
+        text: "This action cannot be undone.",
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonText: 'Yes, delete it!',
+        cancelButtonText: 'No, cancel!',
+        reverseButtons: true
+      }).then((result) => {
+        if (result.isConfirmed) {
+          // Create a form dynamically
+          const form = document.createElement('form');
+          form.method = 'POST';
+          form.action = '/Team/Delete/' + teamId;
+
+          // Add anti-forgery token
+          const token = document.querySelector('input[name="__RequestVerificationToken"]');
+          if (token) {
+            const hiddenToken = document.createElement('input');
+            hiddenToken.type = 'hidden';
+            hiddenToken.name = '__RequestVerificationToken';
+            hiddenToken.value = token.value;
+            form.appendChild(hiddenToken);
+          }
+
+          document.body.appendChild(form);
+          form.submit(); // automatically execute your POST action
+        }
+      });
+    }
+</script>

@@ -20,6 +20,7 @@ namespace RewardsAndRecognitionRepository.Repos
 
         public async Task<IEnumerable<Team>> GetAllAsync()
         {
+           
             return await _context.Teams
                 .Include(t => t.TeamLead)
                 .Include(t => t.Manager)

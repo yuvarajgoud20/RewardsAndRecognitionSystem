@@ -28,7 +28,11 @@ namespace RewardsAndRecognitionRepository.Repos
 
         public async Task<User?> GetByIdAsync(string id)
         {
-            return await _context.Users.FindAsync(id);
+            return await _context.Users
+                .Include(u => u.Team)                     // load the user's Team
+                .ThenInclude(u => u.Manager)                  // load the user's Manager (if it's a navigation)
+                                                 
+                .FirstOrDefaultAsync(u => u.Id == id);
         }
 
         public async Task<IEnumerable<User>> GetActiveUsersAsync()
@@ -65,11 +69,15 @@ namespace RewardsAndRecognitionRepository.Repos
 
         public async Task DeleteAsync(string userId)
         {
-            var user = await GetByIdAsync(userId);
-            if (user != null)
+           try
             {
+                var user = await GetByIdAsync(userId);
                 _context.Users.Remove(user);
             }
+            catch(Exception ex) 
+            {
+                    throw new RnRException(ex.InnerException.Message);
+            }            
         }
 
         public async Task SaveAsync()

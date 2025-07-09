@@ -62,5 +62,16 @@ namespace RewardsAndRecognitionRepository.Repos
                 await _context.SaveChangesAsync();
             }
         }
+
+        // Getting all the Unique Categories 
+        public async Task<List<Category>> GetUniqueCategoriesAsync()
+        {
+            return await _context.Nominations
+                .Include(n => n.Category)        // ensure navigation is available
+                .Where(n => n.Category != null)  // optional filter if needed
+                .Select(n => n.Category!)        // project to Category entity
+                .Distinct()                      // remove duplicates (by key)
+                .ToListAsync();
+        }
     }
 }

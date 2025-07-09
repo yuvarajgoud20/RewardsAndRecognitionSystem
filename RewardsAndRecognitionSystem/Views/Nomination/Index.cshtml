@@ -239,12 +239,17 @@
                                 <i class="bi bi-pencil-fill"></i> Edit
                             </a>
 
-                            <button class="btn btn-danger btn-sm @( (n.Status == NominationStatus.Approved || n.Status == NominationStatus.Rejected) ? "disabled no-click" : "" )"
+                            @* <button class="btn btn-danger btn-sm @( (n.Status == NominationStatus.Approved || n.Status == NominationStatus.Rejected) ? "disabled no-click" : "" )"
                                     data-bs-toggle="modal"
                                     data-bs-target="#deleteModal"
                                     data-id="@n.Id">
                                 <i class="bi bi-trash-fill"></i> Delete
+                            </button> *@
+                            <button class="btn btn-danger btn-sm @( (n.Status == NominationStatus.Approved || n.Status == NominationStatus.Rejected) ? "disabled no-click" : "" )"
+                                    onclick="return confirmDelete('@n.Id')">
+                                <i class="bi bi-trash-fill"></i> Delete
                             </button>
+
                         </td>
                     }
                 </tr>
@@ -440,5 +445,45 @@
 
         document.getElementById("filterSelect")?.addEventListener("change", filterTable);
         document.getElementById("liveSearch")?.addEventListener("input", filterTable);
+    </script>
+
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script>
+        function confirmDelete(nominationId) {
+          Swal.fire({
+            title: 'Are you sure?',
+            text: "This action cannot be undone.",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonText: 'Yes, delete it!',
+            cancelButtonText: 'No, cancel!',
+            reverseButtons: true
+          }).then((result) => {
+            if (result.isConfirmed) {
+              // Create form dynamically
+              const form = document.createElement('form');
+              form.method = 'POST';
+              form.action = '/Nomination/DeleteConfirmed'; // Change to your controller/action
+
+              // Add Nomination ID
+              const idInput = document.createElement('input');
+              idInput.type = 'hidden';
+              idInput.name = 'id';
+              idInput.value = nominationId;
+              form.appendChild(idInput);
+
+              // Grab the anti-forgery token from hidden form
+              const tokenInput = document.querySelector('#antiForgeryForm input[name="__RequestVerificationToken"]');
+              if (tokenInput) {
+                const clone = tokenInput.cloneNode();
+                form.appendChild(clone);
+              }
+
+              document.body.appendChild(form);
+              form.submit();
+            }
+          });
+          return false;
+        }
     </script>
 }

@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
+using RewardsAndRecognitionRepository;
 using RewardsAndRecognitionRepository.Interfaces;
 using RewardsAndRecognitionRepository.Models;
 using RewardsAndRecognitionRepository.Repos;
@@ -74,7 +75,10 @@ namespace RewardsAndRecognitionSystem.Controllers
                 {
                     // Add user to selected role or default to Employee
                     var roleToAssign = string.IsNullOrEmpty(SelectedRole) ? "Employee" : SelectedRole;
-
+                    //if (roleToAssign == "Employee" && user.Team == null)
+                    //    throw new RnRException("We cannot Create Employee without Team");
+                    //if (roleToAssign == "Manager" && user.Team != null)
+                    //    throw new RnRException($"A {roleToAssign} should not assigned a team");
                     var roleResult = await _userManager.AddToRoleAsync(user, roleToAssign);
                     if (!roleResult.Succeeded)
                     {
@@ -135,29 +139,43 @@ namespace RewardsAndRecognitionSystem.Controllers
         }
 
         // GET: User/Delete/5
-        public async Task<IActionResult> Delete(string id)
-        {
-            var user = await _userManager.FindByIdAsync(id);
-            if (user == null) return NotFound();
+        //public async Task<IActionResult> Delete(string id)
+        //{
+        //    var user = await _userRepo.GetByIdAsync(id);
+        //    if (user == null) return NotFound();
 
-            return View(user);
-        }
+        //    return View(user);
+        //}
 
         // POST: User/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(string id)
         {
+            //    var user = await _userManager.FindByIdAsync(id);
+            //    if (user == null) return NotFound();
+
+            //    var result = await _userManager.DeleteAsync(user);
+            //    if (result.Succeeded)
+            //        return RedirectToAction(nameof(Index));
+
+            //    ModelState.AddModelError("", "Error deleting user.");
+            //    return View(user);
+            /* var user = await _userManager.FindByIdAsync(id);
+             await _userManager.DeleteAsync(user);
+            return RedirectToAction(nameof(Index));*/
             var user = await _userManager.FindByIdAsync(id);
-            if (user == null) return NotFound();
+            if (user == null)
+            {
+                return NotFound();
+            }
 
             var result = await _userManager.DeleteAsync(user);
-            if (result.Succeeded)
-                return RedirectToAction(nameof(Index));
+            return RedirectToAction(nameof(Index));
 
-            ModelState.AddModelError("", "Error deleting user.");
-            return View(user);
         }
+
+
 
         private async Task PopulateDropDowns()
         {

@@ -1,25 +1,67 @@
-﻿@model ErrorViewModel
+﻿@model RewardsAndRecognitionSystem.Models.MessageObject
 @{
-    ViewData["Title"] = "Error";
+    ViewData["Title"] = "Oops! Something went wrong";
 }
 
-<h1 class="text-danger">Error.</h1>
-<h2 class="text-danger">An error occurred while processing your request.</h2>
+<style>
 
-@if (Model.ShowRequestId)
-{
-    <p>
-        <strong>Request ID:</strong> <code>@Model.RequestId</code>
-    </p>
-}
+    .error-card {
+        display: flex;
+        flex-direction: column;
+        justify-content: center; /* center content vertically within card */
+        align-items: center; /* center content horizontally within card */
+        background: white;
+        max-width: auto;
+        width: 90%;
+        padding: 4rem;
+        border-radius: 12px;
+        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+        animation: fadeIn 0.6s ease-out;
+        text-align: center;
+    }
 
-<h3>Development Mode</h3>
-<p>
-    Swapping to <strong>Development</strong> environment will display more detailed information about the error that occurred.
-</p>
-<p>
-    <strong>The Development environment shouldn't be enabled for deployed applications.</strong>
-    It can result in displaying sensitive information from exceptions to end users.
-    For local debugging, enable the <strong>Development</strong> environment by setting the <strong>ASPNETCORE_ENVIRONMENT</strong> environment variable to <strong>Development</strong>
-    and restarting the app.
-</p>
+    
+
+    .error-icon {
+        font-size: 3rem;
+        color: #dc3545;
+    }
+
+    .error-title {
+        margin-top: 1rem;
+        color: #dc3545;
+        font-size: 1.75rem;
+    }
+
+    .error-message {
+        margin: 1rem 0;
+        color: #495057;
+    }
+
+    .btn-back {
+        display: inline-block;
+        margin-top: 1.5rem;
+        padding: 0.5rem 1.25rem;
+        background: #007bff;
+        color: white;
+        border-radius: 0.375rem;
+        text-decoration: none;
+        transition: background 0.3s;
+    }
+
+        .btn-back:hover {
+            background: #0056b3;
+        }
+</style>
+
+<div class="error-card">
+    <div class="error-icon">⚠️</div>
+    <div class="error-title">Something went wrong</div>
+    <div class="error-message">
+        
+<h2>An error occurred</h2>
+<p><strong>Message:</strong> @Model.Message</p>
+<p><strong>Description:</strong> @Model.ErrorDescription</p>
+    </div>
+    <a asp-action="Index" class="btn-back">← Go back home</a>
+</div>

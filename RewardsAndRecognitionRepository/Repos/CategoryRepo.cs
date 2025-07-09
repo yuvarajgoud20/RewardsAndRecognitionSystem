@@ -15,6 +15,7 @@ namespace RewardsAndRecognitionRepository.Repositories
 
         public async Task<IEnumerable<Category>> GetAllAsync()
         {
+            
             return await _context.Categories
                                  .OrderByDescending(c => c.CreatedAt)
                                  .ToListAsync();
