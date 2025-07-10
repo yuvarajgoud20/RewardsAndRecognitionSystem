@@ -105,6 +105,12 @@
                             </a>
                         </li>
 
+                        <li class="nav-item">
+                            <a class="nav-link" asp-controller="Dashboard" asp-action="Index">
+                                <i class="bi bi-speedometer2"></i> Dashboard
+                            </a>
+                        </li>
+
                         @if (User.IsInRole("Admin") || User.IsInRole("Manager") || User.IsInRole("TeamLead") || User.IsInRole("Director"))
                         {
                             <li class="nav-item">

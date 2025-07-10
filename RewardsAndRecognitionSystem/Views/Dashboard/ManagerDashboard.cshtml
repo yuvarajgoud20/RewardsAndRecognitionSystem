@@ -1,0 +1,523 @@
+﻿@* @using RewardsAndRecognitionRepository.Models
+@using RewardsAndRecognitionRepository.Enums
+@model IEnumerable<Nomination>
+
+@{
+    ViewData["Title"] = "Manager Dashboard";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+
+    var total = ViewBag.TotalNominations as int? ?? 0;
+    var pending = ViewBag.PendingNominations as int? ?? 0;
+    var approved = ViewBag.FinalApprovedNominations as int? ?? 0;
+
+    var teams = ViewBag.TeamsUnderManager as List<dynamic>;
+    var selectedTeamId = ViewBag.SelectedTeamId as string;
+    var selectedTeamNominations = ViewBag.SelectedTeamNominations as List<Nomination> ?? new();
+    var selectedTeamName = teams?.FirstOrDefault(t => t.TeamId.ToString() == selectedTeamId)?.TeamName ?? "";
+
+    // Leaderboard: include all teams even if they have 0 approved nominations
+    var leaderboard = teams
+        .Select(t => new
+        {
+            TeamName = t.TeamName,
+            Count = Model.Count(n => n.Status == NominationStatus.Approved && n.Nominee?.Team?.Name == t.TeamName)
+        })
+        .OrderByDescending(t => t.Count)
+        .ToList();
+
+    var maxCount = leaderboard.Any() ? leaderboard.Max(l => l.Count) : 1;
+}
+
+<h2 class="mb-4"><i class="bi bi-person-badge"></i> Manager Dashboard</h2>
+
+<style>
+    .dashboard-card {
+        background: white;
+        border-radius: 12px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+        padding: 20px;
+        transition: transform 0.2s ease;
+        height: 100%;
+        text-decoration: none;
+    }
+
+        .dashboard-card:hover {
+            transform: translateY(-3px);
+            text-decoration: none;
+        }
+
+    .dashboard-title {
+        font-size: 1rem;
+        font-weight: 600;
+        color: #555;
+    }
+
+    .dashboard-value {
+        font-size: 1.75rem;
+        font-weight: bold;
+        margin-top: 5px;
+    }
+
+    .bar-container {
+        margin-top: 30px;
+    }
+
+    .bar {
+        height: 14px;
+        border-radius: 6px;
+        margin-bottom: 10px;
+        transition: width 0.3s ease;
+    }
+
+    .text-blue {
+        color: #2962FF;
+    }
+
+    .text-green {
+        color: #2E7D32;
+    }
+
+    .text-orange {
+        color: #F9A825;
+    }
+</style>
+
+<!-- Summary Cards -->
+<div class="row g-4 mb-4">
+    <div class="col-md-4">
+        <a asp-controller="Nomination" asp-action="Index" asp-route-filter="all" class="dashboard-card text-blue d-block text-decoration-none">
+            <div class="dashboard-title">Total Nominations</div>
+            <div class="dashboard-value">@total</div>
+        </a>
+    </div>
+    <div class="col-md-4">
+        <a asp-controller="Nomination" asp-action="Index" asp-route-filter="pending" class="dashboard-card text-orange d-block text-decoration-none">
+            <div class="dashboard-title">Pending Reviews</div>
+            <div class="dashboard-value">@pending</div>
+        </a>
+    </div>
+    <div class="col-md-4">
+        <a asp-controller="Nomination" asp-action="Index" asp-route-filter="approved" class="dashboard-card text-green d-block text-decoration-none">
+            <div class="dashboard-title">Final Approved</div>
+            <div class="dashboard-value">@approved</div>
+        </a>
+    </div>
+</div>
+
+<!-- Teams Under You Accordion -->
+<h4 class="mt-5"><i class="bi bi-people-fill"></i> Teams Under You</h4>
+<div class="accordion mb-5" id="teamsAccordion">
+    @for (int i = 0; i < teams.Count; i++)
+    {
+        var team = teams[i];
+        var collapseId = $"collapseTeam{i}";
+        var headingId = $"headingTeam{i}";
+        <div class="accordion-item">
+            <h2 class="accordion-header" id="@headingId">
+                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#@collapseId" aria-expanded="false" aria-controls="@collapseId">
+                    @team.TeamName
+                </button>
+            </h2>
+            <div id="@collapseId" class="accordion-collapse collapse" aria-labelledby="@headingId" data-bs-parent="#teamsAccordion">
+                <div class="accordion-body">
+                    <p><strong>Team Lead:</strong> @team.TeamLeadName</p>
+                    <p><strong>Total number of nominations:</strong> @team.NominatedCount</p>
+                </div>
+            </div>
+        </div>
+    }
+</div>
+
+<!-- Leaderboard -->
+<h4 class="mt-5"><i class="bi bi-bar-chart-line-fill"></i> Teams Leaderboard</h4>
+<div class="bar-container">
+    @foreach (var item in leaderboard)
+    {
+        var percentage = maxCount > 0 ? (item.Count * 100) / maxCount : 0;
+        var isZero = item.Count == 0;
+        var width = isZero ? "100%" : $"{percentage}%";
+        var color = isZero ? "#e0e0e0" :
+        percentage >= 75 ? "#4caf50" :
+        percentage >= 50 ? "#2196f3" : "#ffc107";
+
+        <div class="mb-2">
+            <div class="d-flex justify-content-between align-items-center mb-1" style="max-width: 400px;">
+                <strong>@item.TeamName</strong>
+                <span class="badge bg-secondary">@item.Count</span>
+            </div>
+            <div class="bar" style="width:@width; background-color:@color; max-width: 400px;"></div>
+        </div>
+    }
+
+
+</div>
+
+<!-- Team Selection Inline Dropdown -->
+<h4 class="mt-5"><i class="bi bi-info-circle-fill"></i> View Nominations by Team</h4>
+<form method="get" asp-action="Index" class="mb-4 d-flex align-items-center gap-3">
+    <label class="form-label mb-0"><strong>Select Team:</strong></label>
+    <select name="teamId" class="form-select w-auto" onchange="this.form.submit()">
+        <option value="">-- Choose a team --</option>
+        @foreach (var team in teams)
+        {
+            <option value="@team.TeamId" selected="@(team.TeamId.ToString() == selectedTeamId)">
+                @team.TeamName
+            </option>
+        }
+    </select>
+</form>
+
+<!-- Selected Team Nominations Modal -->
+@if (selectedTeamNominations.Any())
+{
+    <div class="modal fade" id="teamNominationsModal" tabindex="-1" aria-labelledby="teamNominationsModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-xl modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="teamNominationsModalLabel">Nominations from @selectedTeamName</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" onclick="hideTeamModal()"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="table-responsive">
+                        <table class="table table-bordered table-striped shadow-sm">
+                            <thead class="table-primary">
+                                <tr>
+                                    <th>#</th>
+                                    <th>Nominee</th>
+                                    <th>Category</th>
+                                    <th>Description</th>
+                                    <th>Achievements</th>
+                                    <th>Status</th>
+                                    <th>Date</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @for (int i = 0; i < selectedTeamNominations.Count; i++)
+                                {
+                                    var n = selectedTeamNominations[i];
+                                    <tr>
+                                        <td>@(i + 1)</td>
+                                        <td>@n.Nominee?.Name</td>
+                                        <td>@n.Category?.Name</td>
+                                        <td>@n.Description</td>
+                                        <td>@n.Achievements</td>
+                                        <td>@n.Status</td>
+                                        <td>@n.CreatedAt.ToShortDateString()</td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" onclick="hideTeamModal()">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        window.addEventListener('load', function () {
+            var modalElement = document.getElementById("teamNominationsModal");
+            if (modalElement) {
+                var modalInstance = new bootstrap.Modal(modalElement);
+                modalInstance.show();
+            }
+        });
+
+        function hideTeamModal() {
+            var modalElement = document.getElementById("teamNominationsModal");
+            var modalInstance = bootstrap.Modal.getInstance(modalElement);
+            if (modalInstance) {
+                modalInstance.hide();
+            }
+        }
+    </script>
+} *@
+
+
+
+
+
+@using RewardsAndRecognitionRepository.Models
+@using RewardsAndRecognitionRepository.Enums
+@model IEnumerable<Nomination>
+
+@{
+    ViewData["Title"] = "Manager Dashboard";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+
+    var total = ViewBag.TotalNominations as int? ?? 0;
+    var pending = ViewBag.PendingNominations as int? ?? 0;
+    var approved = ViewBag.FinalApprovedNominations as int? ?? 0;
+
+    var teams = ViewBag.TeamsUnderManager as List<dynamic>;
+    var selectedTeamId = ViewBag.SelectedTeamId as string;
+    var selectedTeamNominations = ViewBag.SelectedTeamNominations as List<Nomination> ?? new();
+    var selectedTeamName = teams?.FirstOrDefault(t => t.TeamId.ToString() == selectedTeamId)?.TeamName ?? "";
+
+    var leaderboard = teams
+        .Select(t => new
+        {
+            TeamName = t.TeamName,
+            Count = Model.Count(n => n.Status == NominationStatus.DirectorApproved && n.Nominee?.Team?.Name == t.TeamName)
+        })
+        .OrderByDescending(t => t.Count)
+        .ToList();
+
+    var maxCount = leaderboard.Any() ? leaderboard.Max(l => l.Count) : 1;
+}
+
+<h2 class="mb-4"><i class="bi bi-person-badge"></i> Manager Dashboard</h2>
+
+<style>
+    .dashboard-card {
+        background: white;
+        border-radius: 12px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+        padding: 20px;
+        transition: transform 0.2s ease;
+        height: 100%;
+        text-decoration: none;
+    }
+
+        .dashboard-card:hover {
+            transform: translateY(-3px);
+            text-decoration: none;
+        }
+
+    .dashboard-title {
+        font-size: 1rem;
+        font-weight: 600;
+        color: #555;
+    }
+
+    .dashboard-value {
+        font-size: 1.75rem;
+        font-weight: bold;
+        margin-top: 5px;
+    }
+
+    .bar-container {
+        margin-top: 30px;
+    }
+
+    .bar {
+        height: 14px;
+        border-radius: 6px;
+        margin-bottom: 10px;
+        transition: width 0.3s ease;
+    }
+
+    .text-blue {
+        color: #2962FF;
+    }
+
+    .text-green {
+        color: #2E7D32;
+    }
+
+    .text-orange {
+        color: #F9A825;
+    }
+</style>
+
+<!-- Summary Cards -->
+<div class="row g-4 mb-4">
+    <div class="col-md-4">
+        <a asp-controller="Nomination" asp-action="Index" asp-route-filter="all" class="dashboard-card text-blue d-block text-decoration-none">
+            <div class="dashboard-title">Total Nominations</div>
+            <div class="dashboard-value">@total</div>
+        </a>
+    </div>
+    <div class="col-md-4">
+        <a asp-controller="Nomination" asp-action="Index" asp-route-filter="pending" class="dashboard-card text-orange d-block text-decoration-none">
+            <div class="dashboard-title">Pending Reviews</div>
+            <div class="dashboard-value">@pending</div>
+        </a>
+    </div>
+    <div class="col-md-4">
+        <a asp-controller="Nomination" asp-action="Index" asp-route-filter="approved" class="dashboard-card text-green d-block text-decoration-none">
+            <div class="dashboard-title">Final Approved</div>
+            <div class="dashboard-value">@approved</div>
+        </a>
+    </div>
+</div>
+
+<!-- Teams Accordion -->
+<h4 class="mt-5"><i class="bi bi-people-fill"></i> Teams Under You</h4>
+<div class="accordion mb-5" id="teamsAccordion">
+    @for (int i = 0; i < teams.Count; i++)
+    {
+        var team = teams[i];
+        var collapseId = $"collapseTeam{i}";
+        var headingId = $"headingTeam{i}";
+        <div class="accordion-item">
+            <h2 class="accordion-header" id="@headingId">
+                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#@collapseId" aria-expanded="false" aria-controls="@collapseId">
+                    @team.TeamName
+                </button>
+            </h2>
+            <div id="@collapseId" class="accordion-collapse collapse" aria-labelledby="@headingId" data-bs-parent="#teamsAccordion">
+                <div class="accordion-body">
+                    <p><strong>Team Lead:</strong> @team.TeamLeadName</p>
+                    <p><strong>Total number of nominations:</strong> @team.NominatedCount</p>
+                </div>
+            </div>
+        </div>
+    }
+</div>
+
+<!-- Leaderboard -->
+<h4 class="mt-5"><i class="bi bi-bar-chart-line-fill"></i> Teams Leaderboard</h4>
+<div class="bar-container">
+    @foreach (var item in leaderboard)
+    {
+        var percentage = maxCount > 0 ? (item.Count * 100) / maxCount : 0;
+        var isZero = item.Count == 0;
+        var width = isZero ? "100%" : $"{percentage}%";
+        var color = isZero ? "#e0e0e0" :
+        percentage >= 75 ? "#4caf50" :
+        percentage >= 50 ? "#2196f3" : "#ffc107";
+
+        <div class="mb-2">
+            <div class="d-flex justify-content-between align-items-center mb-1" style="max-width: 400px;">
+                <strong>@item.TeamName</strong>
+                <span class="badge bg-secondary">@item.Count</span>
+            </div>
+            <div class="bar" style="width:@width; background-color:@color; max-width: 400px;"></div>
+        </div>
+    }
+</div>
+
+<!-- Team Dropdown Selection -->
+<h4 class="mt-5"><i class="bi bi-info-circle-fill"></i> View Nominations by Team</h4>
+<form method="get" asp-action="Index" class="mb-4 d-flex align-items-center gap-3">
+    <label class="form-label mb-0"><strong>Select Team:</strong></label>
+    <select name="teamId" class="form-select w-auto" onchange="this.form.submit()">
+        <option value="">-- Choose a team --</option>
+        @foreach (var team in teams)
+        {
+            <option value="@team.TeamId" selected="@(team.TeamId.ToString() == selectedTeamId)">
+                @team.TeamName
+            </option>
+        }
+    </select>
+</form>
+
+@if (!string.IsNullOrEmpty(selectedTeamId))
+{
+    <div class="modal fade" id="teamNominationsModal" tabindex="-1" aria-labelledby="teamNominationsModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-xl modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="teamNominationsModalLabel">Nominations from @selectedTeamName</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" onclick="hideTeamModal()"></button>
+                </div>
+                <div class="modal-body">
+
+                    <!-- 🔍 Search Input + Export Button -->
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <input type="text" id="searchInput" class="form-control w-25" placeholder="Search by Nominee Name..." onkeyup="filterNominations()" />
+
+                        <a asp-controller="Nomination"
+                           asp-action="ExportTeamNominationsToExcel"
+                           asp-route-teamId="@selectedTeamId"
+                           class="btn btn-success ms-3">
+                            <i class="bi bi-file-earmark-excel-fill"></i> Export to Excel
+                        </a>
+                    </div>
+
+                    @if (selectedTeamNominations.Any())
+                    {
+                        <div class="table-responsive">
+                            <table class="table table-bordered table-striped shadow-sm" id="nominationsTable">
+                                <thead class="table-primary">
+                                    <tr>
+                                        <th>#</th>
+                                        <th>Nominee</th>
+                                        <th>Category</th>
+                                        <th>Description</th>
+                                        <th>Achievements</th>
+                                        <th>Status</th>
+                                        <th>Date</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @for (int i = 0; i < selectedTeamNominations.Count; i++)
+                                    {
+                                        var n = selectedTeamNominations[i];
+                                        <tr>
+                                            <td>@(i + 1)</td>
+                                            <td>@n.Nominee?.Name</td>
+                                            <td>@n.Category?.Name</td>
+                                            <td>@n.Description</td>
+                                            <td>@n.Achievements</td>
+                                            <td>@n.Status</td>
+                                            <td>@n.CreatedAt.ToShortDateString()</td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="alert alert-info mb-0">
+                            No nominations yet for this team.
+                        </div>
+                    }
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" onclick="hideTeamModal()">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal and Filtering Scripts -->
+    <script>
+        window.addEventListener('load', function () {
+            const modalElement = document.getElementById("teamNominationsModal");
+            if (modalElement) {
+                const modalInstance = new bootstrap.Modal(modalElement);
+                modalInstance.show();
+            }
+        });
+
+        function hideTeamModal() {
+            const modalElement = document.getElementById("teamNominationsModal");
+            const modalInstance = bootstrap.Modal.getInstance(modalElement);
+            if (modalInstance) {
+                modalInstance.hide();
+
+                // Reset dropdown
+                const teamSelect = document.querySelector("select[name='teamId']");
+                if (teamSelect) {
+                    teamSelect.selectedIndex = 0;
+                }
+
+                // Clean URL
+                const url = new URL(window.location);
+                url.searchParams.delete("teamId");
+                window.history.replaceState({}, document.title, url);
+            }
+        }
+
+        // 🔍 Filter nominations table by nominee name
+        function filterNominations() {
+            const input = document.getElementById("searchInput");
+            const filter = input.value.toLowerCase();
+            const table = document.getElementById("nominationsTable");
+            const rows = table.getElementsByTagName("tr");
+
+            for (let i = 1; i < rows.length; i++) {
+                const nomineeCell = rows[i].getElementsByTagName("td")[1];
+                if (nomineeCell) {
+                    const name = nomineeCell.textContent || nomineeCell.innerText;
+                    rows[i].style.display = name.toLowerCase().includes(filter) ? "" : "none";
+                }
+            }
+        }
+    </script>
+}

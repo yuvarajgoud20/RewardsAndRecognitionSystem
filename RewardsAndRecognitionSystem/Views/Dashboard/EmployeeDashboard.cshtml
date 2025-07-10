@@ -1,0 +1,37 @@
+﻿@model IEnumerable<RewardsAndRecognitionRepository.Models.Nomination>
+@{
+    ViewData["Title"] = "My Nominations";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h2>My Nominations</h2>
+
+@if (!Model.Any())
+{
+    <p>You haven't submitted or received any nominations yet.</p>
+}
+else
+{
+    <table class="table">
+        <thead>
+            <tr>
+                <th>#</th>
+                <th>Nominee</th>
+                <th>Category</th>
+                <th>Status</th>
+            </tr>
+        </thead>
+        <tbody>
+            @for (int i = 0; i < Model.Count(); i++)
+            {
+                var n = Model.ElementAt(i);
+                <tr>
+                    <td>@(i + 1)</td>
+                    <td>@n.Nominee?.Name</td>
+                    <td>@n.Category?.Name</td>
+                    <td>@n.Status</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}

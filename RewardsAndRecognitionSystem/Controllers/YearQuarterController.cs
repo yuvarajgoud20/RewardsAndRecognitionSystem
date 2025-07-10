@@ -1,5 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
+using RewardsAndRecognitionRepository.Enums;
 using RewardsAndRecognitionRepository.Interfaces;
 using RewardsAndRecognitionRepository.Models;
 
@@ -35,6 +37,8 @@ namespace RewardsAndRecognitionSystem.Controllers
         // GET: /YearQuarter/Create
         public IActionResult Create()
         {
+            ViewBag.Quarters = new SelectList(Enum.GetValues(typeof(Quarter)));
+
             return View();
         }
 
@@ -49,7 +53,7 @@ namespace RewardsAndRecognitionSystem.Controllers
                 await _yearQuarterRepo.AddAsync(yq);
                 return RedirectToAction(nameof(Index));
             }
-
+            ViewBag.Quarters = new SelectList(Enum.GetValues(typeof(Quarter)));
             return View(yq);
         }
 
@@ -59,7 +63,7 @@ namespace RewardsAndRecognitionSystem.Controllers
             var yq = await _yearQuarterRepo.GetByIdAsync(id);
             if (yq == null)
                 return NotFound();
-
+            ViewBag.Quarters = new SelectList(Enum.GetValues(typeof(Quarter)));
             return View(yq);
         }
 
@@ -77,7 +81,7 @@ namespace RewardsAndRecognitionSystem.Controllers
                 await _yearQuarterRepo.UpdateAsync(yq);
                 return RedirectToAction(nameof(Index));
             }
-
+            ViewBag.Quarters = new SelectList(Enum.GetValues(typeof(Quarter)));
             return View(yq);
         }
 

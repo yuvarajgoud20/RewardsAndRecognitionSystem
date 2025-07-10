@@ -119,6 +119,7 @@
             <th><i class="bi bi-tag-fill"></i> Name</th>
             <th class="desc-cell"><i class="bi bi-card-text"></i> Description</th>
             <th><i class="bi bi-calendar-event"></i> Created Date</th>
+            <th><i class="bi bi-check-circle-fill"></i> Status</th>
             <th><i class="bi bi-tools"></i> Actions</th>
         </tr>
     </thead>
@@ -129,6 +130,16 @@
                 <td>@category.Name</td>
                 <td class="desc-cell">@category.Description</td>
                 <td>@category.CreatedAt.ToShortDateString()</td>
+                <td>
+                    @if (category.isActive)
+                    {
+                        <span class="badge bg-success"><i class="bi bi-check-circle-fill"></i> Active</span>
+                    }
+                    else
+                    {
+                        <span class="badge bg-secondary"><i class="bi bi-x-circle-fill"></i> Inactive</span>
+                    }
+                </td>
                 <td class="actions-cell">
                     <a asp-action="Edit" asp-route-id="@category.Id" class="btn btn-indigo btn-sm">
                         <i class="bi bi-pencil-fill"></i> Edit
@@ -138,63 +149,15 @@
                     </a>
                     <button type="button" class="btn btn-danger" onclick="confirmDelete('@category.Id')">
                         <i class="bi bi-trash-fill"></i> Delete
-                    </button> 
-                    @* <button type="button"
-                            class="btn btn-danger btn-sm"
-                            onclick="return confirmDelete('@category.Id')">
-                        <i class="bi bi-trash-fill"></i> Delete
-                    </button> *@
+                    </button>
                 </td>
             </tr>
         }
     </tbody>
 </table>
-
 <script type="text/javascript">
     const categoriesInNominations = @Html.Raw(ViewBag.CategoryIdsJson);
 </script>
-
-
-@* <script>
-    function confirmDelete(categoryId) {
-    //       if (categoriesInNominations.includes(categoryId)) {
-    //   alert("This category is in use in a nomination and cannot be deleted.");
-    //   Stop here—no further action
-    //   return;
-    // }
-      Swal.fire({
-        title: 'Are you sure?',
-        text: "This action cannot be undone.",
-        icon: 'warning',
-        showCancelButton: true,
-        confirmButtonText: 'Yes, delete it!',
-        cancelButtonText: 'No, cancel!',
-        reverseButtons: true
-      }).then((result) => {
-        if (result.isConfirmed) {
-          // Create a form dynamically
-          const form = document.createElement('form');
-          form.method = 'POST';
-          form.action = '/Category/Delete/' + categoryId;
-
-          // Add anti-forgery token
-          const token = document.querySelector('input[name="__RequestVerificationToken"]');
-          if (token) {
-            const hiddenToken = document.createElement('input');
-            hiddenToken.type = 'hidden';
-            hiddenToken.name = '__RequestVerificationToken';
-            hiddenToken.value = token.value;
-            form.appendChild(hiddenToken);
-          }
-
-          document.body.appendChild(form);
-          form.submit(); // automatically execute your POST action
-        }
-      });
-    }
-</script>
-
- *@
 
 <script>
         function confirmDelete(categoryId) {
@@ -208,11 +171,7 @@
         reverseButtons: true
       }).then((result) => {
         if (result.isConfirmed) {
-          // Check AFTER confirmation
-          if (categoriesInNominations.includes(String(categoryId))) {
-               alert("This category is in use in a nomination and cannot be deleted.");
-               return;
-          }
+          
 
           // Create a form dynamically for POST deletion
           const form = document.createElement('form');

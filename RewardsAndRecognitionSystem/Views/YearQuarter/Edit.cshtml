@@ -17,7 +17,7 @@
 
         <div class="mb-3">
             <label asp-for="Quarter" class="form-label">Quarter</label>
-            <select asp-for="Quarter" class="form-select" asp-items="Html.GetEnumSelectList<RewardsAndRecognitionRepository.Enums.Quarter>()">
+            <select asp-for="Quarter" class="form-select" asp-items="ViewBag.Quarters">
                 <option value="">-- Select Quarter --</option>
             </select>
             <span asp-validation-for="Quarter" class="text-danger"></span>
