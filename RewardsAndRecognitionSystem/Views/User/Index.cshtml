@@ -1,6 +1,10 @@
 ﻿@model IEnumerable<RewardsAndRecognitionRepository.Models.User>
+
 @{
     var userRoles = ViewBag.UserRoles as Dictionary<string, string>;
+    var roles = ViewBag.Roles as List<string>;
+    var selectedRole = ViewBag.SelectedRole as string;
+    var nameQuery = ViewBag.NameQuery as string;
     ViewData["Title"] = "Users List";
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
@@ -13,6 +17,8 @@
         --danger: #c62828;
         --danger-hover: #b71c1c;
         --text-light: #fff;
+        --success: #4caf50;
+        --success-dark: #388e3c;
     }
 
     .user-header {
@@ -20,11 +26,11 @@
         justify-content: space-between;
         align-items: center;
         margin: 30px 0 20px;
+        flex-wrap: wrap;
+        gap: 10px;
     }
 
-    .create-btn {
-        background: linear-gradient(to right, var(--indigo-main), var(--indigo-light));
-        color: var(--text-light);
+    .create-btn, .excel-btn {
         padding: 10px 20px;
         border-radius: 6px;
         font-weight: 500;
@@ -33,14 +39,16 @@
         display: inline-flex;
         align-items: center;
         gap: 8px;
-       
+        color: var(--text-light);
     }
 
-        .create-btn:hover {
-            background: var(--indigo-dark);
-            
-            color: var(--text-light);
-        }
+    .create-btn {
+        background: linear-gradient(to right, var(--indigo-main), var(--indigo-light));
+    }
+
+    .excel-btn {
+        background: linear-gradient(to right, var(--success), var(--success-dark));
+    }
 
     .users-table {
         width: 100%;
@@ -71,75 +79,167 @@
         }
 
     .btn {
-        padding: 8px 14px;
+        background: none;
         border: none;
-        border-radius: 5px;
+        cursor: pointer;
+        font-size: 1.1rem;
+        padding: 6px;
+    }
+
+    .btn-edit i {
+        color: var(--indigo-main);
+    }
+
+    .btn-edit:hover i {
+        color: var(--indigo-dark);
+    }
+
+    .btn-delete i {
+        color: var(--danger);
+    }
+
+    .btn-delete:hover i {
+        color: var(--danger-hover);
+    }
+
+    .filter-form select,
+    .filter-form input[type="text"] {
+        min-width: 180px;
+        padding: 6px 10px;
+        border-radius: 6px;
+        border: 1px solid #ccc;
         font-size: 0.9rem;
-        font-weight: 500;
-        text-decoration: none;
-        display: inline-flex;
-        align-items: center;
-        gap: 6px;
-        transition: background-color 0.3s ease;
     }
 
-    .btn-edit {
-        background: var(--indigo-main);
-        color: var(--text-light);
+    .clear-btn {
+        position: absolute;
+        right: 8px;
+        top: 50%;
+        transform: translateY(-50%);
+        background: transparent;
+        border: none;
+        font-size: 1rem;
+        color: #999;
+        cursor: pointer;
     }
 
-        .btn-edit:hover {
-            background: var(--indigo-dark);
-            color: white;
-        }
-
-    .btn-delete {
-        background: var(--danger);
-        color: white;
+    .filter-wrapper {
+        position: relative;
     }
-
-        .btn-delete:hover {
-            background: var(--danger-hover);
-            color: white;
-        }
 </style>
 
 <div class="user-header">
     <h2><i class="bi bi-people-fill me-2"></i> Users</h2>
-    <a asp-action="Create" class="create-btn">
-        <i class="bi bi-person-plus-fill"></i> Create User
-    </a>
+
+    <div class="d-flex align-items-center gap-3 flex-wrap">
+        <form asp-action="Index" method="get" class="d-flex align-items-center gap-2 filter-form">
+            <select name="role" class="form-select form-select-sm" onchange="this.form.submit()">
+                <option value="">-- All Roles --</option>
+                @foreach (var role in roles)
+                {
+                    <option value="@role" selected="@(role == selectedRole)">@role</option>
+                }
+            </select>
+
+            <div class="filter-wrapper">
+                <input type="text" name="name" value="@nameQuery" placeholder="Search by name..." oninput="this.form.submit()" />
+                @if (!string.IsNullOrWhiteSpace(nameQuery))
+                {
+                    <button type="button" class="clear-btn" onclick="document.querySelector('[name=name]').value=''; this.form.submit();">×</button>
+                }
+            </div>
+        </form>
+
+        <a asp-action="ExportToExcel" asp-route-role="@selectedRole" asp-route-name="@nameQuery" class="excel-btn">
+            <i class="bi bi-file-earmark-excel-fill"></i> Export to Excel
+        </a>
+
+        <a asp-action="Create" class="create-btn">
+            <i class="bi bi-person-plus-fill"></i> Create User
+        </a>
+    </div>
 </div>
 
-<table class="users-table">
-    <thead>
-        <tr>
-            <th><i class="bi bi-person-fill"></i> Name</th>
-            <th><i class="bi bi-envelope-fill"></i> Email</th>
-            <th><i class="bi bi-diagram-3-fill"></i> Team</th>
-            <th><i class="bi bi-person-badge-fill"></i> Manager</th>
-            <th><i class="bi bi-award-fill"></i> Role</th>
-            <th><i class="bi bi-tools"></i> Actions</th>
-        </tr>
-    </thead>
-    <tbody>
-        @foreach (var user in Model)
-        {
-            <tr>
-                <td>@user.Name</td>
-                <td>@user.Email</td>
-                <td>@(user.Team?.Name ?? "Not Assigned")</td>
-                <td>@(user.Team?.Manager?.Name ?? "No Manager")</td>
-                <td>@userRoles[user.Id]</td>
-                <td>
-                    <a asp-action="Edit" asp-route-id="@user.Id" class="btn btn-edit">
-                        <i class="bi bi-pencil-square"></i> Edit
-                    </a>
-                    <a asp-action="Delete" asp-route-id="@user.Id" class="btn btn-delete">
-                        <i class="bi bi-trash-fill"></i> Delete
-                    </a>
-                </td>
-            </tr>
+<div id="userTableContainer">
+    @await Html.PartialAsync("_UserTablePartial", Model)
+</div>
+
+<!-- Edit Modal -->
+<div class="modal fade" id="editUserModal" tabindex="-1" aria-labelledby="editUserModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content rounded-4 border-0 shadow-sm">
+            <div class="modal-header">
+                <h5 class="modal-title fw-semibold" id="editUserModalLabel">Edit User</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" onclick="closeModal()"></button>
+            </div>
+            <div class="modal-body p-4" id="editUserModalBody">
+                <div class="text-center p-4">
+                    <div class="spinner-border text-primary" role="status"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Delete Form -->
+<form id="deleteForm" method="post" asp-action="Delete">
+    <input type="hidden" name="id" id="deleteUserId" />
+</form>
+
+@section Scripts {
+    <script>
+        function confirmDelete(userId) {
+            if (confirm("Are you sure you want to delete this user?")) {
+                document.getElementById("deleteUserId").value = userId;
+                document.getElementById("deleteForm").submit();
+            }
         }
-    </tbody>
-</table>
+
+        function openEditModal(userId) {
+            const modal = new bootstrap.Modal(document.getElementById('editUserModal'));
+            modal.show();
+
+            fetch(`/User/EditPartial/${userId}`)
+                .then(response => response.text())
+                .then(html => {
+                    document.getElementById('editUserModalBody').innerHTML = html;
+                });
+        }
+
+        function closeModal() {
+            const modalElement = document.getElementById('editUserModal');
+            const modal = bootstrap.Modal.getInstance(modalElement);
+            modal.hide();
+        }
+
+        document.addEventListener('submit', function (e) {
+            if (e.target && e.target.id === 'editUserForm') {
+                e.preventDefault();
+                const form = e.target;
+                const formData = new FormData(form);
+
+                fetch(form.action, {
+                    method: 'POST',
+                    body: formData
+                })
+                .then(res => {
+                    const contentType = res.headers.get("content-type");
+                    if (res.ok && contentType && contentType.includes("application/json")) {
+                        return res.json();
+                    } else {
+                        return res.text().then(html => { throw html; });
+                    }
+                })
+                .then(json => {
+                    if (json.success) {
+                        closeModal();
+                        location.reload();
+                    }
+                })
+                .catch(html => {
+                    document.getElementById('editUserModalBody').innerHTML = html;
+                });
+            }
+        });
+    </script>
+}

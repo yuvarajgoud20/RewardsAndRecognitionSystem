@@ -10,7 +10,7 @@ using RewardsAndRecognitionRepository.Repos;
 
 namespace RewardsAndRecognitionSystem.Controllers
 {
-    [Authorize(Roles = "Manager,TeamLead,Admin,Director")]
+   [Authorize(Roles = "Manager,TeamLead,Admin,Director")]
     public class NominationController : Controller
     {
         private readonly INominationRepo _nominationRepo;

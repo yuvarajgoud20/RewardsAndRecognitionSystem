@@ -1,0 +1,52 @@
+﻿@model IEnumerable<RewardsAndRecognitionRepository.Models.User>
+@{
+    var userRoles = ViewBag.UserRoles as Dictionary<string, string>;
+}
+
+<table class="users-table">
+    <thead>
+        <tr>
+            <th>Name</th>
+            <th>Email</th>
+            <th>Team</th>
+            <th>Manager</th>
+            <th>Role</th>
+            <th style="width: 120px;">Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var user in Model)
+        {
+            var role = userRoles.ContainsKey(user.Id) ? userRoles[user.Id] : "No Role";
+
+            // Team display logic
+            string teamName = (role == "Admin" || role == "Director")
+            ? "Not Applicable"
+            : user.Team?.Name ?? "Not Assigned";
+
+            // Manager display logic
+            string managerName = role switch
+            {
+                "Manager" => "Self",
+                "Admin" or "Director" => "Not Applicable",
+                _ => user.Team?.Manager?.Name ?? "Not Assigned"
+            };
+
+            <tr>
+                <td>@user.Name</td>
+                <td>@user.Email</td>
+                <td>@teamName</td>
+                <td>@managerName</td>
+                <td>@role</td>
+                <td>
+                    <button class="btn btn-edit" onclick="openEditModal('@user.Id')" title="Edit">
+                        <i class="bi bi-pencil-square"></i>
+                    </button>
+                    <button class="btn btn-delete" onclick="confirmDelete('@user.Id')" title="Delete">
+                        <i class="bi bi-trash-fill"></i>
+                    </button>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
