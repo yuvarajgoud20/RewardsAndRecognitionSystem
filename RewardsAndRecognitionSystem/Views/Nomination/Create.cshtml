@@ -84,7 +84,7 @@
 <div class="scroll-wrapper">
     <div class="card-form">
         <h2>Create Nomination</h2>
-
+        @Html.AntiForgeryToken()
         <form asp-action="Create">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
 

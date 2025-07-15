@@ -24,6 +24,10 @@
 
     .create-btn {
         background: linear-gradient(to right, var(--indigo-main), var(--indigo-light));
+    }
+
+
+    .create-btn {
         color: var(--text-light);
         padding: 10px 20px;
         border-radius: 6px;
@@ -33,12 +37,10 @@
         display: inline-flex;
         align-items: center;
         gap: 8px;
-       
     }
 
         .create-btn:hover {
             background: var(--indigo-dark);
-            
             color: var(--text-light);
         }
 
@@ -104,14 +106,24 @@
         }
 </style>
 
-<div class="user-header">
-    <h2><i class="bi bi-people-fill me-2"></i> Users</h2>
-    <a asp-action="Create" class="create-btn">
-        <i class="bi bi-person-plus-fill"></i> Create User
-    </a>
+<div class="user-header d-flex justify-content-between align-items-center mb-3" style="gap: 20px;">
+    <h2 style="margin: 0;"><i class="bi bi-people-fill me-2"></i> Users</h2>
+
+    <div class="d-flex align-items-center" style="gap: 12px;">
+        <input type="text" id="liveSearchUsers" class="form-control" placeholder="🔍 Search by Name" style="max-width: 220px;" />
+
+        <button class="btn btn-success" onclick="exportTableToExcelusers('usersTable')" style="padding: 8px 14px;">
+            <i class="bi bi-file-earmark-excel-fill"></i> Download
+        </button>
+
+        <a asp-action="Create" class="btn btn-primary d-flex align-items-center" style="padding: 8px 14px; text-decoration: none;">
+            <i class="bi bi-person-plus-fill me-1"></i> Create
+        </a>
+    </div>
 </div>
 
-<table class="users-table">
+
+<table class="users-table" id="usersTable">
     <thead>
         <tr>
             <th><i class="bi bi-person-fill"></i> Name</th>
@@ -125,7 +137,7 @@
     <tbody>
         @foreach (var user in Model)
         {
-            <tr>
+            <tr data-name="@user.Name.ToLower()">
                 <td>@user.Name</td>
                 <td>@user.Email</td>
                 <td>@(user.Team?.Name ?? "Not Assigned")</td>
@@ -143,36 +155,42 @@
         }
     </tbody>
 </table>
-<script>
-    function confirmDelete(userId) {
-      Swal.fire({
-        title: 'Are you sure?',
-        text: "This action cannot be undone.",
-        icon: 'warning',
-        showCancelButton: true,
-        confirmButtonText: 'Yes, delete it!',
-        cancelButtonText: 'No, cancel!',
-        reverseButtons: true
-      }).then((result) => {
-        if (result.isConfirmed) {
-          // Create a form dynamically
-          const form = document.createElement('form');
-          form.method = 'POST';
-          form.action = '/User/Delete/' + userId;
+@section Scripts {
+    <script>
+        function confirmDelete(userId) {
+          Swal.fire({
+            title: 'Are you sure?',
+            text: "This action cannot be undone.",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonText: 'Yes, delete it!',
+            cancelButtonText: 'No, cancel!',
+            reverseButtons: true
+          }).then((result) => {
+            if (result.isConfirmed) {
+              // Create a form dynamically
+              const form = document.createElement('form');
+              form.method = 'POST';
+              form.action = '/User/Delete/' + userId;
 
-          // Add anti-forgery token
-          const token = document.querySelector('input[name="__RequestVerificationToken"]');
-          if (token) {
-            const hiddenToken = document.createElement('input');
-            hiddenToken.type = 'hidden';
-            hiddenToken.name = '__RequestVerificationToken';
-            hiddenToken.value = token.value;
-            form.appendChild(hiddenToken);
-          }
+              // Add anti-forgery token
+              const token = document.querySelector('input[name="__RequestVerificationToken"]');
+              if (token) {
+                const hiddenToken = document.createElement('input');
+                hiddenToken.type = 'hidden';
+                hiddenToken.name = '__RequestVerificationToken';
+                hiddenToken.value = token.value;
+                form.appendChild(hiddenToken);
+              }
 
-          document.body.appendChild(form);
-          form.submit(); // automatically execute your POST action
+              document.body.appendChild(form);
+              form.submit(); // automatically execute your POST action
+            }
+          });
         }
-      });
-    }
-</script>
+    </script>
+    <script src="~/js/Nomination.js">
+
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+}

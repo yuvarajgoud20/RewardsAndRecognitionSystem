@@ -5,7 +5,7 @@
 @{
     ViewData["Title"] = "Nominations List";
     Layout = "~/Views/Shared/_Layout.cshtml";
-
+    var selectedFilter = Context.Request.Query["filter"].ToString()?.ToLower() ?? "all";
     var reviewedIds = ViewBag.ReviewedNominationIds as List<Guid> ?? new List<Guid>();
     var nominationsList = Model.ToList();
     var isManager = User.IsInRole("Manager");
@@ -231,13 +231,32 @@
 
 @if (isTeamLead)
 {
-    <div class="text-end mb-3">
-        <a asp-action="Create" class="btn btn-indigo">
-            <i class="bi bi-plus-circle-fill"></i> Create Nomination
-        </a>
+    <div class="filter-bar d-flex justify-content-between align-items-center mb-3">
+        <!-- Left: Search Input -->
+        <div style="flex: 1;">
+            <input type="text" id="liveSearch" class="form-control" placeholder="🔍 Search by Nominee" style="max-width: 300px;" />
+        </div>
+
+        <!-- Right: Excel, Filter, and Create Nomination -->
+        <div style="display: flex; gap: 10px; align-items: center;">
+            <button class="btn btn-success" onclick="exportTableToExcel('nominationsTable')" style="padding: 8px;">
+                <i class="bi bi-file-earmark-excel-fill"></i> Download
+            </button>
+            <select id="filterSelect" class="form-select" style="width: 150px;">
+                <option value="all">All</option>
+                <option value="pending">Pending</option>
+                <option value="reviewed">Reviewed</option>
+                <option value="directorapproved">Approved</option>
+                <option value="directorrejected">Rejected</option>
+            </select>
+            <a asp-action="Create" class="btn btn-indigo" style="white-space: nowrap;">
+                <i class="bi bi-plus-circle-fill"></i> Create Nomination
+            </a>
+        </div>
     </div>
 
-    <table class="table-custom">
+
+    <table class="table-custom" id="nominationsTable">
         <thead>
             <tr>
                 <th>#</th>
@@ -253,18 +272,19 @@
             @for (int i = 0; i < nominationsList.Count; i++)
             {
                 var n = nominationsList[i];
-                <tr>
+                <tr data-name="@n.Nominee?.Name?.ToLower()"
+                    data-status="@n.Status"
+                    class="@(ViewBag.ReviewedNominationIds.Contains(n.Id) ? "reviewed" : "pending")">
                     <td>@(i + 1)</td>
                     <td>@n.Nominee?.Name</td>
                     <td>@n.Nominee?.Team?.Name</td>
                     <td>@n.Category?.Name</td>
                     <td>@n.Status</td>
-                    <td>@n.CreatedAt.ToShortDateString()</td>
+                    <td>@n.CreatedAt.ToString("dd/MM/yyyy")</td>
                     <td>
                         <a asp-action="Details" asp-route-id="@n.Id" class="btn btn-indigo btn-sm">
                             <i class="bi bi-eye-fill"></i> Details
                         </a>
-
 
                         <a asp-action="Edit"
                            asp-route-id="@n.Id"
@@ -280,6 +300,7 @@
                         </button>
                     </td>
                 </tr>
+
             }
         </tbody>
     </table>
@@ -287,15 +308,25 @@
 
 @if (isManager || isDirector)
 {
-    <div class="filter-bar">
-        <input type="text" id="liveSearch" placeholder="🔍 Search by Nominee" />
-        <select id="filterSelect">
-            <option value="all">All</option>
-            <option value="pending">Pending</option>
-            <option value="reviewed">Reviewed</option>
-            <option value="approved">Approved</option>
-            <option value="rejected">Rejected</option>
-        </select>
+    <div class="filter-bar d-flex justify-content-between align-items-center mb-3">
+        <!-- Left: Search Input -->
+        <div style="flex: 1;">
+            <input type="text" id="liveSearch" class="form-control" placeholder="🔍 Search by Nominee" style="max-width: 300px;" />
+        </div>
+
+        <!-- Right: Excel, Filter, and Create Nomination -->
+        <div style="display: flex; gap: 10px; align-items: center;">
+            <button class="btn btn-success" onclick="exportTableToExcel('nominationsTable')" style="padding: 8px;">
+                <i class="bi bi-file-earmark-excel-fill"></i> Download
+            </button>
+            <select id="filterSelect" class="form-select" style="width: 150px;">
+                <option value="all">All</option>
+                <option value="pending">Pending</option>
+                <option value="reviewed">Reviewed</option>
+                <option value="directorapproved">Approved</option>
+                <option value="directorrejected">Rejected</option>
+            </select>
+        </div>
     </div>
 
     <table class="table-custom" id="nominationsTable">
@@ -324,12 +355,13 @@
                     managerRemarks = n.Approvals?.FirstOrDefault(a => a.ApproverId != ViewBag.currentUser.Id)?.Remarks ?? "No Remarks";
                     directorRemarks = n.Approvals?.FirstOrDefault(a => a.ApproverId == ViewBag.currentUser.Id)?.Remarks ?? "No Remarks";
                     managerApprovalStatus = n.Approvals?.FirstOrDefault(a => a.ApproverId != ViewBag.currentUser.Id)?.Action.ToString() ?? "No Action Taken";
-                } else
+                }
+                else
                 {
                     managerRemarks = n.Approvals?.FirstOrDefault()?.Remarks ?? "No Remarks";
                 }
 
-                
+
 
                 <tr class="@(isReviewed ? "reviewed" : "pending")"
                     data-index="@i"
@@ -345,15 +377,15 @@
                     data-reviewed="@isReviewed.ToString().ToLower()"
                     data-director="@isDirector.ToString().ToLower()"
                     data-approval_status="@managerApprovalStatus"
-                    data-director_remarks ="@directorRemarks"
-                    data-manager_remarks ="@managerRemarks">
+                    data-director_remarks="@directorRemarks"
+                    data-manager_remarks="@managerRemarks">
                     <td>@(i + 1)</td>
                     <td>@n.Nominee?.Name</td>
                     <td>@n.Nominee?.Team?.Name</td>
                     <td>@n.Category?.Name</td>
                     <td>@n.Nominator?.Name</td>
                     <td>@n.Status</td>
-                    <td>@n.CreatedAt.ToShortDateString()</td>
+                    <td>@n.CreatedAt.ToString("dd/MM/yyyy")</td>
                     <td>
                         <button class="btn btn-indigo btn-sm open-popup" data-index="@i">
                             <i class="bi bi-eye-fill"></i> @(isReviewed ? "View" : "Review")
@@ -409,6 +441,7 @@
     <script src="~/js/Nomination.js">
 
     </script>
+    <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script>
         function confirmDelete(nominationId) {
@@ -447,5 +480,25 @@
           });
           return false;
         }
+    </script>
+    <script>
+        const IS_MANAGER=@User.IsInRole("Manager").ToString().ToLower();
+        const IS_DIRECTOR=@User.IsInRole("Director").ToString().ToLower();
+        const IS_TEAMLEAD=@User.IsInRole("TeamLead").ToString().ToLower();
+            document.addEventListener("DOMContentLoaded", () => {
+            const preselectedFilter = "@selectedFilter";
+            const filterSelect = document.getElementById("filterSelect");
+            const liveSearchInput = document.getElementById("liveSearch");
+
+            if (filterSelect && preselectedFilter) {
+                filterSelect.value = preselectedFilter;
+            }
+
+            // Clear search box
+            if (liveSearchInput) liveSearchInput.value = "";
+
+            // Trigger the filtering logic
+            filterTable();
+        });
     </script>
 }

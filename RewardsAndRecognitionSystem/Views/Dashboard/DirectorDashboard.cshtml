@@ -2,16 +2,8 @@
 @using RewardsAndRecognitionRepository.Enums
 @model IEnumerable<Nomination>
 
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-
-
-
-<script>
-    const viewCount = sessionStorage.getItem('viewCount');
-</script>
-
 @{
-    ViewData["Title"] = "Manager Dashboard";
+    ViewData["Title"] = "Director Dashboard";
     Layout = "~/Views/Shared/_Layout.cshtml";
 
     var total = ViewBag.TotalNominations;
@@ -19,26 +11,14 @@
     var rejected = ViewBag.FinalRejectedNominations;
     var pending = total - (approved + rejected);
 
-
-    var teams = ViewBag.TeamsUnderManager as List<dynamic>;
+    var teams = ViewBag.Teams as List<dynamic>;
     var selectedTeamId = ViewBag.SelectedTeamId as string;
     var selectedTeamNominations = ViewBag.SelectedTeamNominations as List<Nomination> ?? new();
     var selectedTeamName = teams?.FirstOrDefault(t => t.TeamId.ToString() == selectedTeamId)?.TeamName ?? "";
-
-    var leaderboard = teams
-        .Select(t => new
-        {
-            TeamName = t.TeamName,
-            Count = Model.Count(n => n.Status == NominationStatus.DirectorApproved && n.Nominee?.Team?.Name == t.TeamName)
-        })
-        .OrderByDescending(t => t.Count)
-        .ToList();
-
-    var maxCount = leaderboard.Any() ? leaderboard.Max(l => l.Count) : 1;
 }
+<h2 class="mb-4"><i class="bi bi-award"></i> Director Dashboard</h2>
 
-<h2 class="mb-4"><i class="bi bi-person-badge"></i> Manager Dashboard</h2>
-
+<!-- Styling Part-->
 <style>
     .dashboard-card {
         background: white;
@@ -91,24 +71,25 @@
     }
 </style>
 
-<!-- Summary Cards -->
+
+
 <div class="row g-4 mb-4">
     <div class="col-md-3">
         <a asp-controller="Nomination" asp-action="Index" asp-route-filter="all" class="dashboard-card text-blue d-block text-decoration-none">
             <div class="dashboard-title">Total Nominations</div>
-            <div class="dashboard-value">@ViewBag.TotalNominations</div>
+            <div class="dashboard-value text-blue">@ViewBag.TotalNominations</div>
         </a>
     </div>
     <div class="col-md-3">
         <a asp-controller="Nomination" asp-action="Index" asp-route-filter="pending" class="dashboard-card text-orange d-block text-decoration-none">
             <div class="dashboard-title">Pending Reviews</div>
-            <div class="dashboard-value">@ViewBag.PendingNominations</div>
+            <div class="dashboard-value text-orange">@ViewBag.PendingNominations</div>
         </a>
     </div>
     <div class="col-md-3">
         <a asp-controller="Nomination" asp-action="Index" asp-route-filter="directorapproved" class="dashboard-card text-green d-block text-decoration-none">
             <div class="dashboard-title">Final Approved</div>
-            <div class="dashboard-value">@ViewBag.FinalApprovedNominations</div>
+            <div class="dashboard-value text-green">@ViewBag.FinalApprovedNominations</div>
         </a>
     </div>
     <div class="col-md-3">
@@ -119,8 +100,7 @@
     </div>
 </div>
 
-
-<!-- Teams Accordion -->
+ 
 <h4 class="mt-5"><i class="bi bi-people-fill"></i> Teams Under You</h4>
 <div class="accordion mb-5" id="teamsAccordion">
     @for (int i = 0; i < teams.Count; i++)
@@ -130,20 +110,19 @@
         var headingId = $"headingTeam{i}";
         <div class="accordion-item">
             <h2 class="accordion-header" id="@headingId">
-                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#@collapseId" aria-expanded="false" aria-controls="@collapseId">
+                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#@collapseId">
                     @team.TeamName
                 </button>
             </h2>
             <div id="@collapseId" class="accordion-collapse collapse" aria-labelledby="@headingId" data-bs-parent="#teamsAccordion">
                 <div class="accordion-body">
                     <p><strong>Team Lead:</strong> @team.TeamLeadName</p>
-                    <p><strong>Total number of nominations:</strong> @team.NominatedCount</p>
+                    <p><strong>Total Nominations by Team Lead:</strong> @team.NominatedCount</p>
                 </div>
             </div>
         </div>
     }
 </div>
-
 
 <!-- Graph representation for each team -->
 @{

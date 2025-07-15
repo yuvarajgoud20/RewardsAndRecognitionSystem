@@ -1,49 +1,257 @@
 ﻿@model RewardsAndRecognitionRepository.Models.Team
 
+
+
 @{
+
     ViewData["Title"] = "Edit Team";
+
+    var isAjax = Context.Request.Headers["X-Requested-With"] == "XMLHttpRequest";
+
+    Layout = isAjax ? null : "~/Views/Shared/_Layout.cshtml";
+
 }
 
-<h2 class="mb-4">Edit Team</h2>
 
-<div class="card shadow-sm border-0 p-4" style="max-width: 600px; margin: auto;">
-    <form asp-action="Edit" method="post">
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" />
+
+
+
+<style>
+
+    .edit-card {
+        background-color: #f3f4fd;
+        padding: 20px 10px;
+        border-radius: 16px;
+        color: #1a237e;
+        width: 100%;
+        max-width: 500px;
+        margin: 0 auto;
+        opacity: 0;
+        transform: translateY(30px);
+        animation: fadeSlideIn 0.5s ease forwards;
+        box-shadow: 0 12px 24px rgba(0, 0, 0, 0.1);
+        transition: all 0.4s ease-in-out;
+    }
+
+
+
+    @@keyframes fadeSlideIn {
+
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+
+
+    .form-label {
+        font-weight: 500;
+    }
+
+
+
+    .form-select, .form-control {
+        font-size: 0.95rem;
+        padding: 10px;
+        border-radius: 8px;
+    }
+
+
+
+    .btn-save {
+        background-color: #303f9f;
+        border: none;
+        padding: 10px 20px;
+        color: white;
+        border-radius: 8px;
+        transition: background-color 0.3s ease;
+    }
+
+
+
+        .btn-save:hover {
+            background-color: #303f9f;
+            border: none;
+            padding: 10px 20px;
+            color: white;
+            border-radius: 8px;
+            transition: background-color 0.3s ease;
+        }
+
+
+
+    .btn-cancel {
+        background-color: #7f8c8d;
+        border: none;
+        padding: 10px 20px;
+        color: white;
+        border-radius: 8px;
+        transition: background-color 0.3s ease;
+    }
+
+
+
+        .btn-cancel:hover {
+            background-color: #616a6b;
+        }
+
+
+
+    @@media (max-width: 576px) {
+
+        .edit-card {
+            padding: 15px 20px;
+        }
+    }
+
+</style>
+
+
+
+<div class="edit-card">
+
+    <h4 class="mb-4"><i class="bi bi-pencil-fill me-2"></i>Edit Team</h4>
+
+
+
+    <form id="editTeamForm" asp-action="Edit" asp-controller="Team" asp-route-id="@Model.Id" method="post">
+
+        @Html.AntiForgeryToken()
+
         <input type="hidden" asp-for="Id" />
 
+
+
         <div class="mb-3">
+
             <label asp-for="Name" class="form-label">Team Name</label>
-            <input asp-for="Name" class="form-control border-dark-subtle" />
+
+            <input asp-for="Name" class="form-control" />
+
             <span asp-validation-for="Name" class="text-danger"></span>
+
         </div>
+
+
+
+        <div class="mb-3">
+
+            <label asp-for="TeamLeadId" class="form-label">Team Lead</label>
+
+            <select asp-for="TeamLeadId" asp-items="ViewBag.TeamLeads" class="form-select">
+
+                <option value="">-- Select Team Lead --</option>
+
+            </select>
+
+        </div>
+
+
+
+        <div class="mb-3">
+
+            <label asp-for="ManagerId" class="form-label">Manager</label>
+
+            <select asp-for="ManagerId" asp-items="ViewBag.Managers" class="form-select">
+
+                <option value="">-- Select Manager --</option>
+
+            </select>
+
+        </div>
+
+
 
         <div class="mb-4">
-            <label asp-for="TeamLeadId" class="form-label">Team Lead</label>
-            <select asp-for="TeamLeadId" asp-items="ViewBag.TeamLeads" class="form-select border-dark-subtle">
-                <option value="">-- Select Team Lead --</option>
-            </select>
-        </div>
 
-        <div class="mb-3">
-            <label asp-for="ManagerId" class="form-label">Manager</label>
-            <select asp-for="ManagerId" asp-items="ViewBag.Managers" class="form-select border-dark-subtle">
-                <option value="">-- Select Manager --</option>
-            </select>
-        </div>
-
-        <div class="mb-3">
             <label asp-for="DirectorId" class="form-label">Director</label>
-            <select asp-for="DirectorId" asp-items="ViewBag.Directors" class="form-select border-dark-subtle">
+
+            <select asp-for="DirectorId" asp-items="ViewBag.Directors" class="form-select">
+
                 <option value="">-- Select Director --</option>
+
             </select>
+
         </div>
+
+
 
         <div class="d-flex justify-content-between">
-            <a asp-action="Index" class="btn btn-outline-secondary px-4">Cancel</a>
-            <button type="submit" class="btn btn-dark px-4">Update</button>
+
+            <button type="button" class="btn btn-cancel" data-bs-dismiss="modal">
+
+                <i class="bi bi-x-circle"></i> Cancel
+
+            </button>
+
+            <button type="submit" class="btn btn-save">
+
+                <i class="bi bi-save-fill"></i> Update
+
+            </button>
+
         </div>
+
     </form>
+
 </div>
 
+
+
 @section Scripts {
+
     <partial name="_ValidationScriptsPartial" />
+
+    <script>
+
+        document.getElementById("editTeamForm").addEventListener("submit", function (e) {
+
+            e.preventDefault();
+
+            const form = this;
+
+            const formData = new FormData(form);
+
+
+
+            fetch(form.action, {
+
+                method: "POST",
+
+                headers: {
+
+                    'RequestVerificationToken': form.querySelector('[name="__RequestVerificationToken"]').value
+
+                },
+
+                body: formData
+
+            })
+
+                .then(res => {
+
+                    if (res.ok) {
+
+                        window.location.href = '/Team/Index';
+
+                    } else {
+
+                        return res.text().then(html => {
+
+                            document.getElementById("editModalBody").innerHTML = html;
+
+                        });
+
+                    }
+
+                });
+
+        });
+
+    </script>
+
 }
+

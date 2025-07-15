@@ -85,11 +85,21 @@ namespace RewardsAndRecognitionSystem.Controllers
             {
                 // For TeamLead or others — show their own nominations
                 nominationsToShow = await _context.Nominations
-                    .Include(n => n.Nominee)
-                    .ThenInclude(u => u.Team)
-                    .Include(n => n.Category)
-                    .Where(n => n.NominatorId == currentUser.Id)
-                    .ToListAsync();
+     .Include(n => n.Nominee)
+     .ThenInclude(u => u.Team)
+     .Include(n => n.Category)
+     .Include(n => n.Approvals)
+     .Include(n => n.Nominator)
+     .Where(n => n.NominatorId == currentUser.Id)
+     .ToListAsync();
+                var alreadyReviewedIds = nominationsToShow
+                    .Where(n => n.Approvals.Any(a => a.ApproverId == currentUser.Team.DirectorId))
+                    .Select(n => n.Id)
+                    .ToList();
+
+                ViewBag.ReviewedNominationIds = alreadyReviewedIds;
+
+                return View(nominationsToShow);
             }
 
             if (userRoles.Contains("Admin"))
@@ -257,7 +267,5 @@ namespace RewardsAndRecognitionSystem.Controllers
 
             return RedirectToAction(nameof(Index));
         }
-       
-
     }
 }

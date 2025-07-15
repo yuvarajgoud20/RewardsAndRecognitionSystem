@@ -1,4 +1,6 @@
-﻿using Microsoft.AspNetCore.Identity;
+﻿using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.EntityFrameworkCore;
 using RewardsAndRecognitionRepository.Dapper;
@@ -24,7 +26,7 @@ try
     var builder = WebApplication.CreateBuilder(args);
 
     // Enable internal Serilog diagnostics (optional, helps debug filters)
-    Serilog.Debugging.SelfLog.Enable(Console.Error);
+    /*Serilog.Debugging.SelfLog.Enable(Console.Error);
     // Configure Serilog programmatically for fully separated logs
     Log.Logger = new LoggerConfiguration()
         .MinimumLevel.Verbose()
@@ -68,6 +70,7 @@ try
         )
         .CreateLogger();
     builder.Host.UseSerilog();
+    */
 
     // Add services to the container.
     var connectionString = builder.Configuration.GetConnectionString("DefaultConnection") ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
@@ -107,11 +110,11 @@ try
         options.LoginPath = "/Identity/Account/Login";
     });
 
-    // Custom Exception Filter
-    /*builder.Services.AddControllersWithViews(config =>
+    //CSRF Token
+    builder.Services.AddControllersWithViews(options =>
     {
-        config.Filters.Add(typeof(CustomExceptionFilter));
-    });*/
+        options.Filters.Add(new AutoValidateAntiforgeryTokenAttribute());
+    });
 
     var app = builder.Build();
     
@@ -143,6 +146,7 @@ try
     app.UseRouting();
 
 
+
     app.UseAuthentication();
 
     app.UseAuthorization();
@@ -151,6 +155,21 @@ try
         name: "default",
         pattern: "{controller=Home}/{action=Index}/{id?}");
     app.MapRazorPages();
+    app.UseStatusCodePages(async context =>
+    {
+        var response = context.HttpContext.Response;
+        if (response.StatusCode == 400)
+        {
+            // Sign out the current user
+            await context.HttpContext.SignOutAsync();
+
+            // Clear authentication cookies (optional but recommended)
+            context.HttpContext.Response.Cookies.Delete(".AspNetCore.Identity.Application");
+
+            // Redirect to login page
+            response.Redirect("/Identity/Account/Login");
+        }
+    });
 
 
     app.Run();

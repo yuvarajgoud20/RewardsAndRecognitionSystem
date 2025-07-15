@@ -16,6 +16,7 @@
     </dl>
 
     <form asp-action="DeleteConfirmed" method="post">
+        @Html.AntiForgeryToken()
         <input type="hidden" asp-for="Id" />
         <div class="d-flex justify-content-between">
             <a asp-action="Index" class="btn btn-outline-secondary">Cancel</a>

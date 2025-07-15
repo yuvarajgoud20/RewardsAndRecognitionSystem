@@ -28,6 +28,7 @@
 
 <div class="card p-4 shadow-sm" style="max-width: 600px; margin: auto;">
     <form asp-action="Create" method="post">
+        @Html.AntiForgeryToken()
         <div class="mb-3">
             <label asp-for="Year" class="form-label">Year</label>
             <input asp-for="Year" class="form-control" />

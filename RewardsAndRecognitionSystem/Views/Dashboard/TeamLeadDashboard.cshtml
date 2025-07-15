@@ -4,11 +4,6 @@
 @{
     ViewData["Title"] = "Team Lead Dashboard";
     Layout = "~/Views/Shared/_Layout.cshtml";
-
-    var total = Model.Count();
-    var pending = Model.Count(n => n.Status == NominationStatus.PendingManager);
-    var approved = Model.Count(n => n.Status == NominationStatus.DirectorApproved);
-    var rejected = Model.Count(n => n.Status == NominationStatus.DirectorRejected);
 }
 
 <!-- 🔄 Loading Spinner -->
@@ -20,6 +15,7 @@
     </div>
 </div>
 
+<br />
 <h2 class="mb-4"><i class="bi bi-people-fill"></i> Team Lead Dashboard</h2>
 
 <div class="d-flex justify-content-end mb-3">
@@ -38,14 +34,15 @@
         height: 100%;
         text-decoration: none;
     }
-
         .dashboard-card:hover {
             transform: translateY(-3px);
+            text-decoration: none;
         }
 
     .dashboard-title {
-        font-size: 1rem;
+        font-size: 1.1rem;
         font-weight: 600;
+        margin-top: 10px;
         color: #555;
     }
 
@@ -53,6 +50,23 @@
         font-size: 1.75rem;
         font-weight: bold;
         margin-top: 5px;
+        color: #222;
+    }
+
+    
+    .clickable-card {
+        text-decoration: none;
+    }
+
+    .bar-container {
+        margin-top: 30px;
+    }
+
+    .bar {
+        height: 14px;
+        border-radius: 6px;
+        margin-bottom: 10px;
+        transition: width 0.3s ease;
     }
 
     .text-blue {
@@ -66,46 +80,37 @@
     .text-orange {
         color: #F9A825;
     }
-
-    .text-red {
-        color: #D32F2F;
-    }
-
-    .clickable-card {
-        text-decoration: none;
-    }
 </style>
-
 <div class="row g-4 mb-4">
     <div class="col-md-3">
-        <a href="@Url.Action("Index", "Nomination", new { filter = "all" })" class="clickable-card">
-            <div class="dashboard-card text-blue">
+        <a href="@Url.Action("Index", "Nomination", new { filter = "all" })" class="clickable-card" class="dashboard-card text-blue d-block text-decoration-none">
+            <div class="dashboard-card">
                 <div class="dashboard-title">Total Nominations</div>
-                <div class="dashboard-value">@total</div>
+                <div class="dashboard-value text-blue ">@ViewBag.TotalNominations</div>
             </div>
         </a>
     </div>
     <div class="col-md-3">
-        <a href="@Url.Action("Index", "Nomination", new { filter = "pending" })" class="clickable-card">
-            <div class="dashboard-card text-orange">
-                <div class="dashboard-title">Pending Manager</div>
-                <div class="dashboard-value">@pending</div>
+        <a href="@Url.Action("Index", "Nomination", new { filter = "pending" })" class="clickable-card" class="dashboard-card text-orange d-block text-decoration-none">
+            <div class="dashboard-card">
+                <div class="dashboard-title">Pending Reviews</div>
+                <div class="dashboard-value text-orange">@ViewBag.PendingNominations</div>
             </div>
         </a>
     </div>
     <div class="col-md-3">
-        <a href="@Url.Action("Index", "Nomination", new { filter = "approved" })" class="clickable-card">
-            <div class="dashboard-card text-green">
-                <div class="dashboard-title">Approved</div>
-                <div class="dashboard-value">@approved</div>
+        <a href="@Url.Action("Index", "Nomination", new { filter = "directorapproved" })" class="clickable-card" class="dashboard-card text-green d-block text-decoration-none">
+            <div class="dashboard-card">
+                <div class="dashboard-title">Final Approved</div>
+                <div class="dashboard-value text-green">@ViewBag.FinalApprovedNominations</div>
             </div>
         </a>
     </div>
     <div class="col-md-3">
-        <a href="@Url.Action("Index", "Nomination", new { filter = "rejected" })" class="clickable-card">
-            <div class="dashboard-card text-red">
-                <div class="dashboard-title">Rejected By Manager</div>
-                <div class="dashboard-value">@rejected</div>
+        <a href="@Url.Action("Index", "Nomination", new { filter = "directorrejected" })" class="clickable-card" class="dashboard-card text-red d-block text-decoration-none">
+            <div class="dashboard-card">
+                <div class="dashboard-title">Final Rejected</div>
+                <div class="dashboard-value text-danger">@ViewBag.RejectedNominations</div>
             </div>
         </a>
     </div>

@@ -70,6 +70,43 @@
         document.getElementById("popupOverlay").style.display = "flex";
     });
 });
+function exportTableToExcel(tableId) {
+    const table = document.getElementById(tableId);
+    const clonedTable = table.cloneNode(true);
+
+    // Remove rows that are hidden (i.e., filtered out)
+    const rows = clonedTable.querySelectorAll("tbody tr");
+    rows.forEach(row => {
+        if (row.style.display === "none") {
+            row.remove();
+        }
+    });
+
+    // Remove action buttons column if desired
+    clonedTable.querySelectorAll("td:last-child, th:last-child").forEach(cell => cell.remove());
+
+    const wb = XLSX.utils.table_to_book(clonedTable, { sheet: "Nominations" });
+    XLSX.writeFile(wb, "Nominations.xlsx");
+}
+function exportTableToExcelusers(tableId) {
+    const table = document.getElementById(tableId);
+    const clonedTable = table.cloneNode(true);
+
+    // Remove rows that are hidden (i.e., filtered out)
+    const rows = clonedTable.querySelectorAll("tbody tr");
+    rows.forEach(row => {
+        if (row.style.display === "none") {
+            row.remove();
+        }
+    });
+
+    // Remove action buttons column if desired
+    clonedTable.querySelectorAll("td:last-child, th:last-child").forEach(cell => cell.remove());
+
+    const wb = XLSX.utils.table_to_book(clonedTable, { sheet: "users" });
+    XLSX.writeFile(wb, "users.xlsx");
+}
+
 
 function closePopup() {
     document.getElementById("popupOverlay").style.display = "none";
@@ -96,17 +133,33 @@ function filterTable() {
         const name = row.getAttribute("data-name");
         const reviewed = row.classList.contains("reviewed");
         const pending = row.classList.contains("pending");
-        const status = (row.getAttribute("data-status") || "").toLowerCase();
+        const status = (row.getAttribute("data-status") || "");
         let show = true;
         if (search && !name.includes(search)) show = false;
         if (filter === "pending" && !pending) show = false;
         if (filter === "reviewed" && !reviewed) show = false;
-        if (filter === "approved" && status != "approved") show = false;
-        if (filter === "rejected" && status != "rejected") show = false;
+        if (filter === "directorapproved" && status != "DirectorApproved") show = false;
+        if (filter === "directorrejected" && status != "DirectorRejected") show = false;
+        
 
         row.style.display = show ? "" : "none";
     });
 }
+function filterTableUsers() {
+    const search = document.getElementById("liveSearchUsers").value.toLowerCase();
+    //const filter = document.getElementById("filterSelectUsers").value;
 
+    document.querySelectorAll("#usersTable tbody tr").forEach(row => {
+        const name = row.getAttribute("data-name") || "";
+        //  const role = row.getAttribute("data-role") || "";
+        let show = true;
+        if (search && !name.includes(search)) show = false;
+        // if (filter !== "all" && role !== filter.toLowerCase()) show = false;
+        row.style.display = show ? "" : "none";
+    });
+}
+
+document.getElementById("filterSelectUsers")?.addEventListener("change", filterTableUsers);
+document.getElementById("liveSearchUsers")?.addEventListener("input", filterTableUsers);
 document.getElementById("filterSelect")?.addEventListener("change", filterTable);
 document.getElementById("liveSearch")?.addEventListener("input", filterTable);

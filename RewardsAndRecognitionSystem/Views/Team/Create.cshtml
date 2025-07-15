@@ -1,10 +1,14 @@
 ﻿@model RewardsAndRecognitionRepository.Models.Team
 
 @{
+
     ViewData["Title"] = "Create Team";
+
     Layout = "~/Views/Shared/_Layout.cshtml";
+
 }
 <style>
+
     .btn-indigo {
         background: #303f9f;
         color: white;
@@ -29,7 +33,7 @@
 <h2 class="mb-4 text-center">Create New Team</h2>
 
 <div class="card shadow-sm border-0 p-4" style="max-width: 600px; margin: auto;">
-    <form asp-action="Create" id="myForm" method="post">
+    <form asp-action="Create" method="post">
         <div class="form-group mb-3">
             <label asp-for="Name" class="form-label fw-semibold">Team Name</label>
             <input asp-for="Name" class="form-control border-dark-subtle" />
@@ -38,21 +42,21 @@
 
         <div class="form-group mb-4">
             <label asp-for="TeamLeadId" class="form-label fw-semibold">Team Lead</label>
-            <select asp-for="TeamLeadId" name="TeamLeadId" class="form-select border-dark-subtle" asp-items="@ViewBag.TeamLeads">
+            <select asp-for="TeamLeadId" class="form-select border-dark-subtle" asp-items="@ViewBag.TeamLeads">
                 <option value="">-- Select Team Lead --</option>
             </select>
         </div>
 
         <div class="form-group mb-3">
             <label asp-for="ManagerId" class="form-label fw-semibold">Manager</label>
-            <select asp-for="ManagerId" name="ManagerId" class="form-select border-dark-subtle" asp-items="@ViewBag.Managers">
+            <select asp-for="ManagerId" class="form-select border-dark-subtle" asp-items="@ViewBag.Managers">
                 <option value="">-- Select Manager --</option>
             </select>
         </div>
 
         <div class="form-group mb-4">
             <label asp-for="DirectorId" class="form-label fw-semibold">Director</label>
-            <select asp-for="DirectorId" name="DirectorId"class="form-select border-dark-subtle" asp-items="@ViewBag.Directors">
+            <select asp-for="DirectorId" class="form-select border-dark-subtle" asp-items="@ViewBag.Directors">
                 <option value="">-- Select Director --</option>
             </select>
         </div>
@@ -65,22 +69,8 @@
 </div>
 
 @section Scripts {
+
     @await Html.PartialAsync("_ValidationScriptsPartial")
+
 }
 
-
-
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-<script>
-    $("#myForm").on("submit", function(e) {
-      const teamLead = $("select[name='TeamLeadId']").val();
-    
-      if (!teamLead) {
-        e.preventDefault();       // Cancel the submit
-        alert("You must select a Team Lead For Team.");
-        $("select[name='TeamLeadId']").focus();
-        return false;
-      }
-      // Otherwise, form submits normally
-    });
-</script>
