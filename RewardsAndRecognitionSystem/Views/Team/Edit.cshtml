@@ -1,7 +1,4 @@
-﻿@model RewardsAndRecognitionRepository.Models.Team
-
-
-
+﻿@model RewardsAndRecognitionSystem.ViewModels.TeamViewModel
 @{
 
     ViewData["Title"] = "Edit Team";
@@ -120,6 +117,8 @@
     <form id="editTeamForm" asp-action="Edit" asp-controller="Team" asp-route-id="@Model.Id" method="post">
 
         @Html.AntiForgeryToken()
+
+        <div asp-validation-summary="All" class="text-danger"></div>
 
         <input type="hidden" asp-for="Id" />
 

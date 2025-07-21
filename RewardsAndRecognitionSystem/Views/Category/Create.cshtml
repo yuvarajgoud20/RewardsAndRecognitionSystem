@@ -1,4 +1,4 @@
-﻿@model RewardsAndRecognitionRepository.Models.Category
+﻿@model RewardsAndRecognitionSystem.ViewModels.CategoryViewModel
 
 @{
     ViewData["Title"] = "Create Category";
@@ -30,6 +30,7 @@
 <div class="card shadow-sm border-0 p-4" style="max-width: 600px; margin: auto;">
     <form asp-action="Create" method="post">
         @Html.AntiForgeryToken()
+        @* <div asp-validation-summary="All" class="text-danger"></div> *@
         <div class="mb-3">
             <label asp-for="Name" class="form-label"></label>
             <input asp-for="Name" class="form-control border-dark-subtle" />
@@ -54,7 +55,7 @@
         </div>
     </form>
 </div>
-
+@* 
 @section Scripts {
     @await Html.PartialAsync("_ValidationScriptsPartial")
-}
+} *@

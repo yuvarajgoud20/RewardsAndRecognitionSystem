@@ -1,21 +1,25 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using AutoMapper;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 using RewardsAndRecognitionRepository.Interfaces;
 using RewardsAndRecognitionRepository.Models;
 using RewardsAndRecognitionRepository.Service;
+using RewardsAndRecognitionSystem.ViewModels;
 
 namespace RewardsAndRecognitionSystem.Controllers
 {
     [Authorize(Roles = "Admin")]
     public class CategoryController : Controller
     {
+        private readonly IMapper _mapper;
         private readonly ICategoryRepo _categoryRepo;
         private readonly INominationRepo _nominationRepo;
         private readonly ICategoryService _categoryService;
 
-        public CategoryController(ICategoryRepo categoryRepo, INominationRepo nominationRepo,ICategoryService service)
+        public CategoryController(IMapper mapper,ICategoryRepo categoryRepo, INominationRepo nominationRepo,ICategoryService service)
         {
+            _mapper = mapper;
             _categoryRepo = categoryRepo;
             _nominationRepo = nominationRepo;
             _categoryService = service;
@@ -26,7 +30,8 @@ namespace RewardsAndRecognitionSystem.Controllers
         {
            // var categories = await _categoryRepo.GetAllAsync();
            var categories=await _categoryService.GetAllAsync();
-            return View(categories);
+            var viewModelList = _mapper.Map<List<CategoryViewModel>>(categories);
+            return View(viewModelList);
         }
 
         // GET: Category/Details/5
@@ -34,7 +39,8 @@ namespace RewardsAndRecognitionSystem.Controllers
         {
             var category = await _categoryRepo.GetByIdAsync(id);
             if (category == null) return NotFound();
-            return View(category);
+            var viewModel= _mapper.Map<CategoryViewModel>(category);    
+            return View(viewModel);
         }
 
         // GET: Category/Create
@@ -46,40 +52,58 @@ namespace RewardsAndRecognitionSystem.Controllers
         // POST: Category/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create(Category category)
+        public async Task<IActionResult> Create(CategoryViewModel viewModel)
         {
             if (ModelState.IsValid)
             {
+                var category = _mapper.Map<Category>(viewModel);
                 category.Id = Guid.NewGuid();
                 category.CreatedAt = DateTime.UtcNow;
 
                 await _categoryRepo.AddAsync(category);
                 return RedirectToAction(nameof(Index));
             }
-            return View(category);
+            return View(viewModel);
         }
 
         // GET: Category/Edit/5
         public async Task<IActionResult> Edit(Guid id)
         {
             var category = await _categoryRepo.GetByIdAsync(id);
+            var viewModel=_mapper.Map<CategoryViewModel>(category);
             if (category == null) return NotFound();
-            return View(category);
+            return View(viewModel);
         }
 
         // POST: Category/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(Guid id, Category category)
+        public async Task<IActionResult> Edit(Guid id, CategoryViewModel viewModel)
         {
-            if (id != category.Id) return BadRequest();
+            if (id != viewModel.Id)
+                return BadRequest();
 
-            if (ModelState.IsValid)
+            // 🔒 Fetch existing record from DB
+            var existing = await _categoryRepo.GetByIdAsync(id);
+            if (existing == null)
+                return NotFound();
+
+            if (!ModelState.IsValid)
             {
-                await _categoryRepo.UpdateAsync(category);
-                return RedirectToAction(nameof(Index));
+                ModelState.Clear();
+                var existingModel=_mapper.Map<CategoryViewModel>(existing);
+                return View(existingModel);
             }
-            return View(category);
+
+            // 🔐 Only update editable properties
+            existing.Name = viewModel.Name;
+            existing.Description =viewModel.Description;
+            existing.isActive = viewModel.isActive;
+            existing.CreatedAt = viewModel.CreatedAt;
+
+            // ✅ Save updated record
+            await _categoryRepo.UpdateAsync(existing);
+            return RedirectToAction(nameof(Index));
         }
 
         // GET: Category/Delete/5

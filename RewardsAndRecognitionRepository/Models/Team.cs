@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -9,6 +10,7 @@ namespace RewardsAndRecognitionRepository.Models
     public class Team
     {
         public Guid Id { get; set; }
+      
         public string Name { get; set; } = string.Empty;
 
         public string TeamLeadId { get; set; }
@@ -16,6 +18,7 @@ namespace RewardsAndRecognitionRepository.Models
 
         public string ManagerId { get; set; }
         public User? Manager { get; set; }
+   
         public string DirectorId { get; set; }
         public User? Director { get; set; }
 

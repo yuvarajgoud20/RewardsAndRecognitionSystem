@@ -1,4 +1,4 @@
-﻿@model RewardsAndRecognitionRepository.Models.Nomination
+﻿@model RewardsAndRecognitionSystem.ViewModels.NominationViewModel
 @{
     ViewData["Title"] = "Edit Nomination";
     Layout = "~/Views/Shared/_Layout.cshtml";
@@ -8,6 +8,7 @@
 
 <form asp-action="Edit" method="post" class="card p-4 shadow bg-white text-dark">
     @Html.AntiForgeryToken()
+
     <input type="hidden" asp-for="Id" />
     <input type="hidden" asp-for="NominatorId" />
     <input type="hidden" asp-for="NomineeId" />

@@ -1,9 +1,12 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using AutoMapper;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using RewardsAndRecognitionRepository.Enums;
 using RewardsAndRecognitionRepository.Interfaces;
 using RewardsAndRecognitionRepository.Models;
+using RewardsAndRecognitionSystem.ViewModels;
 
 namespace RewardsAndRecognitionSystem.Controllers
 {
@@ -11,9 +14,11 @@ namespace RewardsAndRecognitionSystem.Controllers
     public class YearQuarterController : Controller
     {
         private readonly IYearQuarterRepo _yearQuarterRepo;
+        private readonly IMapper _mapper;
 
-        public YearQuarterController(IYearQuarterRepo yearQuarterRepo)
+        public YearQuarterController(IMapper mapper,IYearQuarterRepo yearQuarterRepo)
         {
+            _mapper = mapper;
             _yearQuarterRepo = yearQuarterRepo;
         }
 
@@ -21,7 +26,8 @@ namespace RewardsAndRecognitionSystem.Controllers
         public async Task<IActionResult> Index()
         {
             var quarters = await _yearQuarterRepo.GetAllAsync();
-            return View(quarters);
+            var qList= _mapper.Map<List<YearQuarterViewModel>>(quarters);   
+            return View(qList);
         }
 
         // GET: /YearQuarter/Details/5
@@ -30,8 +36,8 @@ namespace RewardsAndRecognitionSystem.Controllers
             var quarter = await _yearQuarterRepo.GetByIdAsync(id);
             if (quarter == null)
                 return NotFound();
-
-            return View(quarter);
+            var quarterView = _mapper.Map<YearQuarterViewModel>(quarter);
+            return View(quarterView);
         }
 
         // GET: /YearQuarter/Create
@@ -45,16 +51,19 @@ namespace RewardsAndRecognitionSystem.Controllers
         // POST: /YearQuarter/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create(YearQuarter yq)
+        public async Task<IActionResult> Create(YearQuarterViewModel yq)
         {
-            if (ModelState.IsValid)
+            if (!ModelState.IsValid)
             {
-                yq.Id = Guid.NewGuid();
-                await _yearQuarterRepo.AddAsync(yq);
-                return RedirectToAction(nameof(Index));
+                
+                ViewBag.Quarters = new SelectList(Enum.GetValues(typeof(Quarter)));
+                ModelState.Remove("Year");
+                return View(yq);
             }
-            ViewBag.Quarters = new SelectList(Enum.GetValues(typeof(Quarter)));
-            return View(yq);
+                yq.Id = Guid.NewGuid();
+               var yearQuarter=_mapper.Map<YearQuarter>(yq); 
+                await _yearQuarterRepo.AddAsync(yearQuarter);
+                return RedirectToAction(nameof(Index));                
         }
 
         // GET: /YearQuarter/Edit/5
@@ -63,27 +72,48 @@ namespace RewardsAndRecognitionSystem.Controllers
             var yq = await _yearQuarterRepo.GetByIdAsync(id);
             if (yq == null)
                 return NotFound();
+
             ViewBag.Quarters = new SelectList(Enum.GetValues(typeof(Quarter)));
-            return View(yq);
+            var yearQuarter = _mapper.Map<YearQuarterViewModel>(yq);
+            return View(yearQuarter);
         }
+
 
         // POST: /YearQuarter/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(Guid id, YearQuarter yq)
+        public async Task<IActionResult> Edit(Guid id, YearQuarterViewModel yq)
         {
             if (id != yq.Id)
                 return BadRequest();
 
+            // 🔒 Fetch existing record from DB
+            var existing = await _yearQuarterRepo.GetByIdAsync(id);
+            
+            if (existing == null)
+                return NotFound();
 
-            if (ModelState.IsValid)
+            if (!ModelState.IsValid)
             {
-                await _yearQuarterRepo.UpdateAsync(yq);
-                return RedirectToAction(nameof(Index));
+                // Re-populate dropdown and return view with user input preserved
+                ViewBag.Quarters = new SelectList(Enum.GetValues(typeof(Quarter)));
+                // Clear ModelState entries for fields that were removed from the form
+                var existingYearQuarter = _mapper.Map<YearQuarterViewModel>(existing);
+                //ModelState.Clear();
+                return View(existingYearQuarter);
             }
-            ViewBag.Quarters = new SelectList(Enum.GetValues(typeof(Quarter)));
-            return View(yq);
+
+            // 🔐 Only update fields that are editable (never trust full model from form)
+            existing.Quarter = yq.Quarter;
+            existing.Year = yq.Year;
+            existing.StartDate = yq.StartDate;
+            existing.EndDate = yq.EndDate;
+            existing.IsActive = yq.IsActive;
+            // ✅ Save updated data
+            await _yearQuarterRepo.UpdateAsync(existing);
+            return RedirectToAction(nameof(Index));
         }
+
 
         // GET: /YearQuarter/Delete/5
         public async Task<IActionResult> Delete(Guid id)
