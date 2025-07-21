@@ -9,6 +9,7 @@ using RewardsAndRecognitionRepository.Interfaces;
 using RewardsAndRecognitionRepository.Models;
 using RewardsAndRecognitionRepository.Repos;
 using RewardsAndRecognitionSystem.ViewModels;
+using RewardsAndRecognitionRepository.Service;
 
 namespace RewardsAndRecognitionSystem.Controllers
 {
@@ -19,13 +20,21 @@ namespace RewardsAndRecognitionSystem.Controllers
         private readonly INominationRepo _nominationRepo;
         private readonly ApplicationDbContext _context;
         private readonly UserManager<User> _userManager;
+        private readonly IEmailService _emailService;
 
-        public NominationController(IMapper mapper,INominationRepo nominationRepo, ApplicationDbContext context, UserManager<User> userManager)
+        public NominationController(
+            IMapper mapper
+            INominationRepo nominationRepo, 
+            ApplicationDbContext context,
+            UserManager<User> userManager,
+            IEmailService emailService)
+
         {
             _nominationRepo = nominationRepo;
             _context = context;
             _userManager = userManager;
             _mapper = mapper;
+            _emailService = emailService;
         }
 
         // GET: Nomination
@@ -308,6 +317,96 @@ namespace RewardsAndRecognitionSystem.Controllers
 
             _context.Approvals.Add(approval);
             await _context.SaveChangesAsync();
+
+
+            // Fetch nominator and nominee
+            var nominator = await _userManager.FindByIdAsync(nomination.NominatorId);
+            var nominee = await _userManager.FindByIdAsync(nomination.NomineeId);
+
+            if (nomination.Status == NominationStatus.DirectorApproved)
+            {
+                // Notify the nominator
+                if (nominator != null)
+                {
+                    await _emailService.SendEmailAsync(
+                        subject: "🎉 Your Nomination is Approved!",
+                        isHtml: true,
+                        body: $@"
+                        <body style=""font-family: Arial, sans-serif; margin: 0; padding: 0; background-color: #ffffff;"">
+                          <div style=""background-color: #ffffff; padding: 10px 20px; max-width: 600px; margin: auto; color: #000;"">
+                            <img src=""cid:bannerImage"" alt=""Zelis Banner"" style=""width: 100%; max-width: 600px;"">
+                            <h2 style='color: green;'>Congratulations!</h2>
+                            <p>Your nomination for <strong>{nominee?.Name}</strong> has been <strong>approved by the Director</strong>.</p>
+                            <p>Thank you for recognizing great work on our Rewards and Recognition platform.</p>
+                            <p style='color: gray;'>Regards,<br/>Rewards & Recognition Team</p>
+                            
+                          </div>
+                        </body>",
+                        to: nominator.Email
+                    );
+                }
+
+                // Notify the nominee
+                if (nominee != null)
+                {
+                    await _emailService.SendEmailAsync(
+                        subject: "🎖️ You Have Been Selected for an Award!",
+                        isHtml: true,
+                        body: $@"<body style=""font-family: Arial, sans-serif; margin: 0; padding: 0; background-color: #ffffff;"">
+                          <div style=""background-color: #ffffff; padding: 10px 20px; max-width: 600px; margin: auto; color: #000;"">
+                            <img src=""cid:bannerImage"" alt=""Zelis Banner"" style=""width: 100%; max-width: 600px;"">
+                            <h2 style='color: navy;'>Congratulations {nominee.Name}!</h2>
+                            <p>You have been selected for an <strong>award</strong> in the category of <strong>{nomination.Category.Name}</strong> for <strong>{nomination.YearQuarter.Quarter}</strong>.</p>
+                            <p>This recognition comes as part of our Rewards & Recognition initiative. Keep up the amazing work!</p>
+                            <p style='color: gray;'>Cheers,<br/>Rewards & Recognition Team</p>
+                          </div>
+                        </body>",
+                        to: nominee.Email
+                    );
+                }
+            }
+
+
+            return RedirectToAction(nameof(Index));
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> RevertBack(Guid id, string reason)
+        {
+            var nomination = await _nominationRepo.GetNominationByIdAsync(id);
+            var currentUser = await _userManager.GetUserAsync(User);
+
+            if (nomination == null || currentUser == null)
+                return NotFound();
+
+            // Change status
+            nomination.Status = NominationStatus.PendingManager;
+            await _nominationRepo.UpdateNominationAsync(nomination);
+
+            // Delete existing approvals
+            var approvals = _context.Approvals.Where(a => a.NominationId == id);
+            _context.Approvals.RemoveRange(approvals);
+            await _context.SaveChangesAsync();
+
+            // Get team lead
+            var teamLead = await _userManager.FindByIdAsync(nomination.Nominator.Id);
+            if (teamLead != null)
+            {
+                await _emailService.SendEmailAsync(
+                    subject: "Nomination Reverted",
+                    isHtml:true,
+                    body: $@"
+                     <body style=""font-family: Arial, sans-serif; margin: 0; padding: 0; background-color: #ffffff;"">
+                          <div style=""background-color: #ffffff; padding: 10px 20px; max-width: 600px; margin: auto; color: #000;"">
+                            <img src=""cid:bannerImage"" alt=""Zelis Banner"" style=""width: 100%; max-width: 600px;"">
+                            Hi {teamLead.Name},<br/><br/>
+                            Your nomination <strong>for {nomination.Nominee.Name}</strong> has been reverted back for the following reason:<br/><blockquote>{reason}</blockquote>
+                            <br/>Please review and resubmit if needed.<br/><br/>Regards,<br/>R&R Team
+                          </div>
+                        </body>",
+                    to: teamLead.Email
+                );
+            }
 
             return RedirectToAction(nameof(Index));
         }

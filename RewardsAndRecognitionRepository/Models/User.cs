@@ -11,8 +11,9 @@ namespace RewardsAndRecognitionRepository.Models
 {
     public class User : IdentityUser
     {
-      
+
         public string Name { get; set; } 
+
 
         public Guid? TeamId { get; set; }
 

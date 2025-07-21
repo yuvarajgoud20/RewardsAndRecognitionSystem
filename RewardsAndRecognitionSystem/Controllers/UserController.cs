@@ -11,6 +11,7 @@ using RewardsAndRecognitionRepository.Interfaces;
 using RewardsAndRecognitionRepository.Models;
 using RewardsAndRecognitionRepository.Repos;
 using RewardsAndRecognitionSystem.ViewModels;
+using RewardsAndRecognitionRepository.Service;
 
 namespace RewardsAndRecognitionSystem.Controllers
 {
@@ -22,15 +23,22 @@ namespace RewardsAndRecognitionSystem.Controllers
         private readonly UserManager<User> _userManager;
         private readonly ITeamRepo _teamRepo;
         private readonly ApplicationDbContext _context;
+        private readonly IEmailService _emailService;
 
-
-        public UserController(IMapper mapper, IUserRepo userRepo, UserManager<User> userManager, ITeamRepo teamRepo, ApplicationDbContext context)
+        public UserController(
+            IMapper mapper
+            IUserRepo userRepo, 
+            UserManager<User> userManager, 
+            ITeamRepo teamRepo, 
+            ApplicationDbContext context,
+            IEmailService emailService )
         {
             _mapper = mapper;
             _userRepo = userRepo;
             _userManager = userManager;
             _teamRepo = teamRepo;
             _context = context;
+            _emailService = emailService;
         }
 
         // GET: User
@@ -72,9 +80,6 @@ namespace RewardsAndRecognitionSystem.Controllers
             }
 
             var user = _mapper.Map<User>(viewModel);
-
-       
-
             if (ModelState.IsValid)
             {
                 user.UserName = user.Email;
@@ -96,6 +101,47 @@ namespace RewardsAndRecognitionSystem.Controllers
                         await PopulateDropDowns();
                         return View(user);
                     }
+
+                    //string imgAddress = "https://phxonline-my.sharepoint.com/:i:/g/personal/myuvaraj_goud_zelis_com/EXr_YatQxidNn2RFFt3o-KEBuqUi54Vn0lVYm7Btlv62qg?e=zW1cqe";
+
+                    await _emailService.SendEmailAsync(
+                        subject: "🎉 Welcome to Rewards and Recognition!",
+                        to: user.Email,
+                        isHtml:true,
+                        body: $@"
+                        <body style=""font-family: Arial, sans-serif; margin: 0; padding: 0; background-color: #ffffff;"">
+                          <div style=""background-color: #ffffff; padding: 10px 20px; max-width: 600px; margin: auto; color: #000;"">
+                            <img src=""cid:bannerImage"" alt=""Zelis Banner"" style=""width: 100%; max-width: 600px;"">
+
+                            <p>Dear <strong>{user.Name}</strong>,</p>
+
+                            <p>Welcome to the <strong>Rewards and Recognition</strong> platform!</p>
+
+                            <p>
+                              Your account has been successfully created. Below are your login credentials:
+                            </p>
+
+                            <p style=""font-size: 16px;"">
+                              <strong>Email:</strong> {user.Email}<br>
+                              <strong>Temporary Password:</strong> <span style=""color: #black;"">{password}</span>
+                            </p>
+
+                            <p>
+                              Please log in and <strong>change your password immediately</strong> to secure your account.
+                            </p>
+
+                            <p>
+                              If you have any questions or need help accessing your account, feel free to contact our support team.
+                            </p>
+
+                            <p style=""font-size: 13px; color: #999; text-align: center;"">
+                              — This email was sent from the <strong>Rewards & Recognition</strong> system
+                            </p>
+                          </div>
+                        </body>
+                        "
+                    );
+
 
                     return RedirectToAction(nameof(Index));
                 }
