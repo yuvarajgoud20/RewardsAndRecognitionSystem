@@ -1,4 +1,4 @@
-﻿@model IEnumerable<RewardsAndRecognitionRepository.Models.YearQuarter>
+﻿@model IEnumerable<RewardsAndRecognitionSystem.ViewModels.YearQuarterViewModel>
 @{
     ViewData["Title"] = "Year Quarters";
     Layout = "~/Views/Shared/_Layout.cshtml";
@@ -133,8 +133,8 @@
             <tr>
                 <td>@yq.Year</td>
                 <td>@yq.Quarter</td>
-                <td>@yq.StartDate.ToShortDateString()</td>
-                <td>@yq.EndDate.ToShortDateString()</td>
+                <td>@(yq.StartDate.HasValue? yq.StartDate.Value.ToShortDateString() : "")</td>
+                <td>@(yq.EndDate.HasValue? yq.EndDate.Value.ToShortDateString() : "")</td>
                 <td>@(yq.IsActive ? "✅ Yes" : "❌ No")</td>
                 <td>
                     <a asp-action="Details" asp-route-id="@yq.Id" class="btn btn-secondary">

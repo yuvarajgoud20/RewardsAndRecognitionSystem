@@ -1,8 +1,11 @@
-﻿using Microsoft.AspNetCore.Authentication;
+using FluentValidation;
+using FluentValidation.AspNetCore;
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
 using RewardsAndRecognitionRepository.Dapper;
 using RewardsAndRecognitionRepository.Data;
 using RewardsAndRecognitionRepository.Interfaces;
@@ -13,13 +16,21 @@ using RewardsAndRecognitionRepository.Repos.Dapper;
 using RewardsAndRecognitionRepository.Repositories;
 using RewardsAndRecognitionRepository.Service;
 using RewardsAndRecognitionSystem.Common;
+using RewardsAndRecognitionSystem.CustomMappers;
 using RewardsAndRecognitionSystem.Filters;
+using RewardsAndRecognitionSystem.FluentValidators;
 using RewardsAndRecognitionSystem.Middleware;
+using RewardsAndRecognitionSystem.ViewModels;
 using Serilog;
 using Serilog.Filters.Expressions;
 
-try
+internal class Program
 {
+
+    private static async Task Main(string[] args)
+    {
+        try
+        {
     // Enable Serilog internal debugging (optional but useful)
     Serilog.Debugging.SelfLog.Enable(Console.Error);
 
@@ -77,6 +88,27 @@ try
 
     builder.Services.AddDbContext<ApplicationDbContext>(options =>
                    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+          // Fluent Validations COnfiguration
+          builder.Services.AddAutoMapper(cfg =>
+            {
+                cfg.AddProfile<UserMappingProfile>();
+                cfg.AddProfile<CategoryMappingProfle>();
+                cfg.AddProfile<TeamViewMapperProfile>();
+                cfg.AddProfile<YearQuarterMappingProfile>();
+                cfg.AddProfile<NominationMapperProfile>();
+
+            });
+
+
+
+            builder.Services.AddFluentValidationAutoValidation(); // For model binding
+            builder.Services.AddFluentValidationClientsideAdapters(); // For client-side validation
+
+            builder.Services.AddTransient<IValidator<UserViewModel>, UserViewValidator>();
+            builder.Services.AddTransient<IValidator<TeamViewModel>, TeamViewValidator>();
+            builder.Services.AddTransient<IValidator<CategoryViewModel>, CategoryViewValidator>();
+            builder.Services.AddTransient<IValidator<YearQuarterViewModel>, YearQuarterViewValidator>();
+            builder.Services.AddTransient<IValidator<NominationViewModel>, NominationViewValidator>();
 
     builder.Services.AddRazorPages();
     builder.Services.ConfigureApplicationCookie(options =>
@@ -144,64 +176,61 @@ try
         app.UseHsts();
     }
 
-    app.UseHttpsRedirection();
-    app.UseStaticFiles();
-
-    app.UseRouting();
+            app.UseRouting();
 
 
 
-    app.UseAuthentication();
+            app.UseAuthentication();
 
-    app.UseAuthorization();
+            app.UseAuthorization();
 
-    app.MapControllerRoute(
-        name: "default",
-        pattern: "{controller=Home}/{action=Index}/{id?}");
-    app.MapRazorPages();
-    app.UseStatusCodePages(async context =>
-    {
-        var response = context.HttpContext.Response;
-        if (response.StatusCode == 400)
-        {
-            // Sign out the current user
-            await context.HttpContext.SignOutAsync();
+            app.MapControllerRoute(
+                name: "default",
+                pattern: "{controller=Home}/{action=Index}/{id?}");
+            app.MapRazorPages();
+            app.UseStatusCodePages(async context =>
+            {
+                var response = context.HttpContext.Response;
+                if (response.StatusCode == 400)
+                {
+                    // Sign out the current user
+                    await context.HttpContext.SignOutAsync();
 
-            // Clear authentication cookies (optional but recommended)
-            context.HttpContext.Response.Cookies.Delete(".AspNetCore.Identity.Application");
+                    // Clear authentication cookies (optional but recommended)
+                    context.HttpContext.Response.Cookies.Delete(".AspNetCore.Identity.Application");
 
-            // Redirect to login page
-            response.Redirect("/Identity/Account/Login");
+                    // Redirect to login page
+                    response.Redirect("/Identity/Account/Login");
+                }
+            });
+
+
+            app.Run();
         }
-    });
+        catch (Exception ex)
+        {
+            var statusCode = ex switch
+            {
+                ArgumentNullException => 400,
+                UnauthorizedAccessException => 401,
+                KeyNotFoundException => 404,
+                _ => 500
+            };
 
+            // ✅ Log error using Serilog with extra info
+            Log.Fatal(ex,
+                "Startup exception occurred. StatusCode={StatusCode}, Type={Type}, Message={Message}",
+                statusCode,
+                ex.GetType().FullName,
+                ex.Message);
+            // Now start a minimal host that returns a user-friendly error page
+            var errorApp = WebApplication.Create();
 
-    app.Run();
-}
-catch(Exception ex)
-{
-    var statusCode = ex switch
-    {
-        ArgumentNullException => 400,
-        UnauthorizedAccessException => 401,
-        KeyNotFoundException => 404,
-        _ => 500
-    };
-
-    // ✅ Log error using Serilog with extra info
-    Log.Fatal(ex,
-        "Startup exception occurred. StatusCode={StatusCode}, Type={Type}, Message={Message}",
-        statusCode,
-        ex.GetType().FullName,
-        ex.Message);
-    // Now start a minimal host that returns a user-friendly error page
-    var errorApp = WebApplication.Create();
-
-    errorApp.Run(async context =>
-    {
-        context.Response.StatusCode = statusCode;
-        context.Response.ContentType = "text/html";
-        await context.Response.WriteAsync(@"
+            errorApp.Run(async context =>
+            {
+                context.Response.StatusCode = statusCode;
+                context.Response.ContentType = "text/html";
+                await context.Response.WriteAsync(@"
             <html>
                 <head><title>Error</title></head>
                 <body>
@@ -210,11 +239,13 @@ catch(Exception ex)
                     <p>Please try again later or contact support.</p>
                 </body>
             </html>");
-    });
-    errorApp.Run();
+            });
+            errorApp.Run();
 
-}
-finally
-{
-    Log.CloseAndFlush(); // 🚨 Always flush logs on app exit
+        }
+        finally
+        {
+            Log.CloseAndFlush(); // 🚨 Always flush logs on app exit
+        }
+    }
 }

@@ -1,13 +1,16 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using AutoMapper;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using RewardsAndRecognitionRepository;
 using RewardsAndRecognitionRepository.Interfaces;
 using RewardsAndRecognitionRepository.Models;
 using RewardsAndRecognitionRepository.Repos;
+using RewardsAndRecognitionSystem.ViewModels;
 using RewardsAndRecognitionRepository.Service;
 
 namespace RewardsAndRecognitionSystem.Controllers
@@ -15,6 +18,7 @@ namespace RewardsAndRecognitionSystem.Controllers
     [Authorize(Roles = "Admin")]
     public class UserController : Controller
     {
+        private readonly IMapper _mapper;
         private readonly IUserRepo _userRepo;
         private readonly UserManager<User> _userManager;
         private readonly ITeamRepo _teamRepo;
@@ -22,12 +26,14 @@ namespace RewardsAndRecognitionSystem.Controllers
         private readonly IEmailService _emailService;
 
         public UserController(
+            IMapper mapper
             IUserRepo userRepo, 
             UserManager<User> userManager, 
             ITeamRepo teamRepo, 
             ApplicationDbContext context,
             IEmailService emailService )
         {
+            _mapper = mapper;
             _userRepo = userRepo;
             _userManager = userManager;
             _teamRepo = teamRepo;
@@ -50,12 +56,9 @@ namespace RewardsAndRecognitionSystem.Controllers
                 var roles = await _userManager.GetRolesAsync(user);
                 userRoles[user.Id] = roles.FirstOrDefault() ?? "No Role";
             }
-
-            
-
             ViewBag.UserRoles = userRoles;
-
-            return View(users);
+            var usersList=_mapper.Map<List<UserViewModel>>(users);
+            return View(usersList);
         }
 
         // GET: User/Create
@@ -68,9 +71,15 @@ namespace RewardsAndRecognitionSystem.Controllers
         // POST: User/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create(User user, string password, string SelectedRole)
+        public async Task<IActionResult> Create(UserViewModel viewModel)
         {
-            
+            if (!ModelState.IsValid)
+            {
+                await PopulateDropDowns();
+                return View(viewModel);
+            }
+
+            var user = _mapper.Map<User>(viewModel);
             if (ModelState.IsValid)
             {
                 user.UserName = user.Email;
@@ -78,16 +87,12 @@ namespace RewardsAndRecognitionSystem.Controllers
                 user.EmailConfirmed = true;
                 user.CreatedAt = DateTime.UtcNow;
 
-                var result = await _userManager.CreateAsync(user, password);
+                var result = await _userManager.CreateAsync(user, viewModel.PasswordHash);
 
                 if (result.Succeeded)
                 {
                     // Add user to selected role or default to Employee
-                    var roleToAssign = string.IsNullOrEmpty(SelectedRole) ? "Employee" : SelectedRole;
-                    //if (roleToAssign == "Employee" && user.Team == null)
-                    //    throw new RnRException("We cannot Create Employee without Team");
-                    //if (roleToAssign == "Manager" && user.Team != null)
-                    //    throw new RnRException($"A {roleToAssign} should not assigned a team");
+                    var roleToAssign = viewModel.SelectedRole;
                     var roleResult = await _userManager.AddToRoleAsync(user, roleToAssign);
                     if (!roleResult.Succeeded)
                     {
@@ -144,9 +149,9 @@ namespace RewardsAndRecognitionSystem.Controllers
                 foreach (var error in result.Errors)
                     ModelState.AddModelError("", error.Description);
             }
-
+            //ModelState.Clear();
             await PopulateDropDowns();
-            return View(user);
+            return View(viewModel);
         }
 
         // GET: User/Edit/5
@@ -155,18 +160,31 @@ namespace RewardsAndRecognitionSystem.Controllers
             var user = await _userManager.FindByIdAsync(id);
             if (user == null) return NotFound();
 
+            var viewModel = _mapper.Map<UserViewModel>(user);
+
             await PopulateDropDowns();
-            return View(user);
+            return View(viewModel);
         }
 
         // POST: User/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(string id, User updatedUser)
+        public async Task<IActionResult> Edit(string id, UserViewModel updatedUserViewModel)
         {
+            if (!ModelState.IsValid)
+            {
+                var usermodel = await _userManager.FindByIdAsync(id);
+                var userViewmodel=_mapper.Map<UserViewModel>(usermodel);
+                ModelState.Clear();
+                await PopulateDropDowns();
+                return View(userViewmodel);
+            }
+
+            var updatedUser = _mapper.Map<User>(updatedUserViewModel);
+
             var user = await _userManager.FindByIdAsync(id);
             if (user == null) return NotFound();
-
+            
             if (ModelState.IsValid)
             {
                 user.NormalizedUserName = updatedUser.Email.ToUpper();
@@ -183,37 +201,16 @@ namespace RewardsAndRecognitionSystem.Controllers
                 foreach (var error in result.Errors)
                     ModelState.AddModelError("", error.Description);
             }
-
+            ModelState.Clear();
             await PopulateDropDowns();
-            return View(updatedUser);
+            return View(user);
         }
 
-        // GET: User/Delete/5
-        //public async Task<IActionResult> Delete(string id)
-        //{
-        //    var user = await _userRepo.GetByIdAsync(id);
-        //    if (user == null) return NotFound();
-
-        //    return View(user);
-        //}
-
-        // POST: User/Delete/5
+     
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(string id)
         {
-            //    var user = await _userManager.FindByIdAsync(id);
-            //    if (user == null) return NotFound();
-
-            //    var result = await _userManager.DeleteAsync(user);
-            //    if (result.Succeeded)
-            //        return RedirectToAction(nameof(Index));
-
-            //    ModelState.AddModelError("", "Error deleting user.");
-            //    return View(user);
-            /* var user = await _userManager.FindByIdAsync(id);
-             await _userManager.DeleteAsync(user);
-            return RedirectToAction(nameof(Index));*/
             var user = await _userManager.FindByIdAsync(id);
             if (user == null)
             {

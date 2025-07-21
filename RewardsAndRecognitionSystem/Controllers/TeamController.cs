@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using AutoMapper;
+using Microsoft.AspNetCore.Authorization;
 
 using Microsoft.AspNetCore.Identity;
 
@@ -11,6 +12,7 @@ using Microsoft.EntityFrameworkCore;
 using RewardsAndRecognitionRepository.Interfaces;
 
 using RewardsAndRecognitionRepository.Models;
+using RewardsAndRecognitionSystem.ViewModels;
 
 
 namespace RewardsAndRecognitionSystem.Controllers
@@ -22,6 +24,7 @@ namespace RewardsAndRecognitionSystem.Controllers
     public class TeamController : Controller
 
     {
+        private readonly IMapper _mapper;
 
         private readonly ITeamRepo _teamRepo;
 
@@ -31,10 +34,10 @@ namespace RewardsAndRecognitionSystem.Controllers
 
         private readonly UserManager<User> _userManager;
 
-        public TeamController(ITeamRepo teamRepo, IUserRepo userRepo, UserManager<User> userManager, ApplicationDbContext context)
+        public TeamController(IMapper mapper,ITeamRepo teamRepo, IUserRepo userRepo, UserManager<User> userManager, ApplicationDbContext context)
 
         {
-
+            _mapper = mapper;
             _teamRepo = teamRepo;
 
             _userRepo = userRepo;
@@ -132,23 +135,21 @@ namespace RewardsAndRecognitionSystem.Controllers
 
         [ValidateAntiForgeryToken]
 
-        public async Task<IActionResult> Create(Team team)
-
+        public async Task<IActionResult> Create(TeamViewModel viewModel)
         {
-
             if (ModelState.IsValid)
 
             {
-
+                var team=_mapper.Map<Team>(viewModel);
                 await _teamRepo.AddAsync(team);
 
                 return RedirectToAction(nameof(Index));
 
             }
-
+            //ModelState.Clear();
             await LoadDropdownsAsync();
 
-            return View(team);
+            return View(viewModel);
 
         }
 
@@ -157,135 +158,110 @@ namespace RewardsAndRecognitionSystem.Controllers
         public async Task<IActionResult> Edit(Guid id)
 
         {
+          
 
-            var team = await _teamRepo.GetByIdAsync(id);
-
-            if (team == null)
-
+           if(ModelState.IsValid)
             {
+                var existingteam = await _teamRepo.GetByIdAsync(id);
+                var team = _mapper.Map<TeamViewModel>(existingteam);
 
-                return NotFound();
+                if (team == null)
 
+                {
+
+                    return NotFound();
+
+                }
+
+                var managers = await _userRepo.GetAllManagersAsync(); // ✅ Required
+
+                var leads = await _userRepo.GetLeadsAsync(team.TeamLeadId);
+
+                var directors = await _userRepo.GetAllDirectorsAsync();// ✅ Required
+
+                ViewBag.Managers = new SelectList(managers, "Id", "Name", team.ManagerId);
+
+                ViewBag.TeamLeads = new SelectList(leads, "Id", "Name", team.TeamLeadId);
+
+                ViewBag.Directors = new SelectList(directors, "Id", "Name", team.DirectorId);
+
+                if (Request.Headers["X-Requested-With"] == "XMLHttpRequest")
+
+                {
+
+                    return PartialView("Edit", team); // Use a partial view here
+
+                }
+
+                return View(team);
             }
-
-            var managers = await _userRepo.GetAllManagersAsync(); // ✅ Required
-
-            var leads = await _userRepo.GetLeadsAsync(team.TeamLeadId);
-
-            var directors = await _userRepo.GetAllDirectorsAsync();// ✅ Required
-
-            ViewBag.Managers = new SelectList(managers, "Id", "Name", team.ManagerId);
-
-            ViewBag.TeamLeads = new SelectList(leads, "Id", "Name", team.TeamLeadId);
-
-            ViewBag.Directors = new SelectList(directors, "Id", "Name", team.DirectorId);
-
-            if (Request.Headers["X-Requested-With"] == "XMLHttpRequest")
-
-            {
-
-                return PartialView("Edit", team); // Use a partial view here
-
-            }
-
-            return View(team);
-
+            else
+            {  return View(); }
         }
 
 
         // POST: TeamController/Edit/5
 
         [HttpPost]
-
         [ValidateAntiForgeryToken]
-
-        public async Task<IActionResult> Edit(Guid id, Team updatedTeam)
-
+        public async Task<IActionResult> Edit(Guid id, TeamViewModel updatedTeam)
         {
-
             if (id != updatedTeam.Id)
+                return BadRequest();
 
+            // 🔒 Fetch existing team from DB
+            var existingTeam = await _teamRepo.GetByIdAsync(id);
+            if (existingTeam == null)
                 return NotFound();
 
-            if (ModelState.IsValid)
+            // ✅ Custom validation (example)
+            // You can add specific rules here if needed
 
+            if (!ModelState.IsValid)
             {
-
-                var existingTeam = await _teamRepo.GetByIdAsync(id);
-
-                if (existingTeam == null)
-
-                    return NotFound();
-
-                // If the team lead has changed
-
-                if (existingTeam.TeamLeadId != updatedTeam.TeamLeadId)
-
-                {
-
-                    // Unassign previous team lead
-
-                    if (!string.IsNullOrEmpty(existingTeam.TeamLeadId))
-
-                    {
-
-                        var oldLead = await _userRepo.GetByIdAsync(existingTeam.TeamLeadId);
-
-                        if (oldLead != null)
-
-                        {
-
-                            oldLead.TeamId = null;
-
-                            await _userRepo.UpdateAsync(oldLead);
-
-                        }
-
-                    }
-
-                    // Assign new team lead
-
-                    if (!string.IsNullOrEmpty(updatedTeam.TeamLeadId))
-
-                    {
-
-                        var newLead = await _userRepo.GetByIdAsync(updatedTeam.TeamLeadId);
-
-                        if (newLead != null)
-
-                        {
-
-                            newLead.TeamId = existingTeam.Id;
-
-                            await _userRepo.UpdateAsync(newLead);
-
-                        }
-
-                    }
-
-                }
-
-                // ✅ Update only properties, not the whole object
-
-                existingTeam.Name = updatedTeam.Name;
-
-                existingTeam.TeamLeadId = updatedTeam.TeamLeadId;
-
-                existingTeam.ManagerId = updatedTeam.ManagerId;
-
-                existingTeam.DirectorId = updatedTeam.DirectorId;
-
-                await _teamRepo.UpdateAsync(existingTeam);
-
-                return RedirectToAction(nameof(Index));
-
+                await LoadDropdownsAsync(); 
+                //ModelState.Clear(); 
+                var teamViewModel=_mapper.Map<TeamViewModel>(existingTeam);
+                return View(teamViewModel); 
             }
 
-            await LoadDropdownsAsync();
+            // Check for team lead change
+            if (existingTeam.TeamLeadId != updatedTeam.TeamLeadId)
+            {
+                // Unassign old team lead
+                if (!string.IsNullOrEmpty(existingTeam.TeamLeadId))
+                {
+                    var oldLead = await _userRepo.GetByIdAsync(existingTeam.TeamLeadId);
+                    if (oldLead != null)
+                    {
+                        oldLead.TeamId = null;
+                        await _userRepo.UpdateAsync(oldLead);
+                    }
+                }
 
-            return View(updatedTeam);
+                // Assign new team lead
+                if (!string.IsNullOrEmpty(updatedTeam.TeamLeadId))
+                {
+                    var newLead = await _userRepo.GetByIdAsync(updatedTeam.TeamLeadId);
+                    if (newLead != null)
+                    {
+                        newLead.TeamId = existingTeam.Id;
+                        await _userRepo.UpdateAsync(newLead);
+                    }
+                }
+            }
 
+            // Only update the editable fields
+            existingTeam.Name = updatedTeam.Name;
+            existingTeam.TeamLeadId = updatedTeam.TeamLeadId;
+            existingTeam.ManagerId = updatedTeam.ManagerId;
+            existingTeam.DirectorId = updatedTeam.DirectorId;
+
+            // ✅ Save changes
+            await _teamRepo.UpdateAsync(existingTeam);
+            return RedirectToAction(nameof(Index));
         }
+
 
 
         // GET: TeamController/Details/5

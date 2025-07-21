@@ -1,9 +1,14 @@
-﻿@using RewardsAndRecognitionRepository.Models
-@model RewardsAndRecognitionRepository.Models.YearQuarter
+﻿
+
+@model RewardsAndRecognitionSystem.ViewModels.YearQuarterViewModel
+
 @{
+
     ViewData["Title"] = "Create Year Quarter";
+
 }
 <style>
+
     .btn-indigo {
         background: #303f9f;
         color: white;
@@ -29,6 +34,7 @@
 <div class="card p-4 shadow-sm" style="max-width: 600px; margin: auto;">
     <form asp-action="Create" method="post">
         @Html.AntiForgeryToken()
+        @* <div asp-validation-summary="All" class="text-danger"></div>  *@
         <div class="mb-3">
             <label asp-for="Year" class="form-label">Year</label>
             <input asp-for="Year" class="form-control" />
@@ -67,8 +73,7 @@
     </form>
 </div>
 
-@section Scripts {
-    @{
-        await Html.RenderPartialAsync("_ValidationScriptsPartial");
-    }
-}
+
+
+
+

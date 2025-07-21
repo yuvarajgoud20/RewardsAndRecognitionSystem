@@ -11,12 +11,13 @@ namespace RewardsAndRecognitionRepository.Models
 {
     public class User : IdentityUser
     {
-        [Required]
-        public string Name { get; set; }
+
+        public string Name { get; set; } 
+
 
         public Guid? TeamId { get; set; }
-        
 
+        
         public bool? IsActive { get; set; } = true;
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 
