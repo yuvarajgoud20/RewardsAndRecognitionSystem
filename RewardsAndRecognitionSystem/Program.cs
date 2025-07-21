@@ -26,7 +26,7 @@ try
     var builder = WebApplication.CreateBuilder(args);
 
     // Enable internal Serilog diagnostics (optional, helps debug filters)
-    /*Serilog.Debugging.SelfLog.Enable(Console.Error);
+    Serilog.Debugging.SelfLog.Enable(Console.Error);
     // Configure Serilog programmatically for fully separated logs
     Log.Logger = new LoggerConfiguration()
         .MinimumLevel.Verbose()
@@ -70,7 +70,7 @@ try
         )
         .CreateLogger();
     builder.Host.UseSerilog();
-    */
+        
 
     // Add services to the container.
     var connectionString = builder.Configuration.GetConnectionString("DefaultConnection") ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
@@ -88,6 +88,10 @@ try
     builder.Services.AddSingleton<IModelMetadataProvider, EmptyModelMetadataProvider>();
 
     builder.Services.AddDatabaseDeveloperPageExceptionFilter();
+
+    builder.Services.Configure<EmailSettings>(builder.Configuration.GetSection("EmailSettings"));
+    builder.Services.AddScoped<IEmailService, EmailService>();
+
 
     builder.Services.AddIdentity<User, IdentityRole>()
         .AddEntityFrameworkStores<ApplicationDbContext>()
