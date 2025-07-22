@@ -23,7 +23,7 @@ namespace RewardsAndRecognitionSystem.Controllers
         private readonly IEmailService _emailService;
 
         public NominationController(
-            IMapper mapper
+            IMapper mapper,
             INominationRepo nominationRepo, 
             ApplicationDbContext context,
             UserManager<User> userManager,

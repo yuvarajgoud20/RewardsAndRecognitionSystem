@@ -26,7 +26,7 @@ namespace RewardsAndRecognitionSystem.Controllers
         private readonly IEmailService _emailService;
 
         public UserController(
-            IMapper mapper
+            IMapper mapper,
             IUserRepo userRepo, 
             UserManager<User> userManager, 
             ITeamRepo teamRepo, 
@@ -123,7 +123,7 @@ namespace RewardsAndRecognitionSystem.Controllers
 
                             <p style=""font-size: 16px;"">
                               <strong>Email:</strong> {user.Email}<br>
-                              <strong>Temporary Password:</strong> <span style=""color: #black;"">{password}</span>
+                              <strong>Temporary Password:</strong> <span style=""color: #black;"">{viewModel.PasswordHash}</span>
                             </p>
 
                             <p>

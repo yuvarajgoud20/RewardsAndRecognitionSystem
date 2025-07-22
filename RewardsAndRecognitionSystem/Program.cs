@@ -203,7 +203,7 @@ internal class Program
                     response.Redirect("/Identity/Account/Login");
                 }
             });
-
+            app.UseStaticFiles();
 
             app.Run();
         }
