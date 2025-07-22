@@ -1,52 +1,104 @@
 ﻿@using RewardsAndRecognitionSystem.ViewModels
+
 @model UserViewModel
 
+
+
 @{
+
     ViewData["Title"] = "Edit User";
+
     Layout = "~/Views/Shared/_Layout.cshtml";
+
 }
+
+
 
 <h2 class="mb-4">Edit User</h2>
 
+
+
 <div class="card shadow-sm border-0 p-4" style="max-width: 600px; margin: auto;">
+
     <form asp-action="Edit" method="post">
+
         @Html.AntiForgeryToken()
+
+
 
         <input type="hidden" asp-for="Id" />
 
+
+
         <div class="form-group mb-3">
+
             <label asp-for="Name" class="form-label fw-semibold">Name</label>
+
             <input asp-for="Name" class="form-control border-dark-subtle" />
+
             <span asp-validation-for="Name" class="text-danger"></span>
+
         </div>
 
+
+
         <div class="form-group mb-3">
+
             <label asp-for="Email" class="form-label fw-semibold">Email</label>
+
             <input asp-for="Email" class="form-control border-dark-subtle" readonly />
+
             <small class="text-muted">Email cannot be edited</small>
+
         </div>
 
+
+
         <div class="form-group mb-3">
+
             <label asp-for="TeamId" class="form-label fw-semibold">Team</label>
 
+
+
             @if (ViewBag.CanEditTeam)  // Check if the team can be edited
+
             {
+
                 <select asp-for="TeamId" asp-items="ViewBag.Teams" class="form-select border-dark-subtle">
+
                     <option value="">-- Select Team --</option>
+
                 </select>
+
             }
+
             else
+
             {
-                <select class="form-select border-dark-subtle" disabled>
-                    <option value="@Model.TeamId">@Model.Team?.Name</option>  <!-- Display current team if it's disabled -->
-                </select>
+
+                <input type="text" class="form-control border-dark-subtle" value="@Model.Team?.Name" readonly />
+
+                <input type="hidden" asp-for="TeamId" />
+
                 <small class="text-muted">You cannot edit the team for this role</small>
+
             }
+
+
+
         </div>
 
+
+
         <div class="d-flex justify-content-between">
+
             <a asp-action="Index" class="btn btn-outline-secondary px-4">Cancel</a>
+
             <button type="submit" class="btn btn-dark px-4">Save Changes</button>
+
         </div>
+
     </form>
+
 </div>
+

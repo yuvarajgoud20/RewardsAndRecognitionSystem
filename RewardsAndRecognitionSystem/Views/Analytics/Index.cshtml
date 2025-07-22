@@ -376,10 +376,12 @@
                                     Promise.all([
                     fetchAnalyticsData(id),
                     fetchTeamSummary(id)
-                ]).finally(() => {
-                    hideLoading();
-                    $('#chartsHeader').text(`Analytics for ${year} ${quarterText}`);
-                });
+                ]);
+
+                // .finally(() => {
+                //     hideLoading();
+                //     $('#chartsHeader').text(`Analytics for ${year} ${quarter}`);
+                // });
 
                             hideLoading();
                             break;

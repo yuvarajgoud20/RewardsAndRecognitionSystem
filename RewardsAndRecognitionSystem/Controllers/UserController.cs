@@ -155,34 +155,51 @@ namespace RewardsAndRecognitionSystem.Controllers
         }
         // GET: User/Edit/5
         public async Task<IActionResult> Edit(string id)
+
         {
+
             var user = await _userManager.FindByIdAsync(id);
+
             if (user == null) return NotFound();
 
-            var viewModel = _mapper.Map<UserViewModel>(user);
+            var userWithTeam = await _context.Users
+
+     .Include(u => u.Team)
+
+     .FirstOrDefaultAsync(u => u.Id == user.Id);
+
+            var viewModel = new UserViewModel
+
+            {
+
+                Id = userWithTeam.Id,
+
+                Name = userWithTeam.Name,
+
+                Email = userWithTeam.Email,
+
+                TeamId = userWithTeam.TeamId,
+
+                Team = userWithTeam.Team // ✅ This is what was missing
+
+            };
+
 
             // Check the user's roles
-            var roles = await _userManager.GetRolesAsync(user);
-            bool isTeamLeadOrManager = roles.Contains("TeamLead") || roles.Contains("Manager");
 
-            // Store the flag indicating whether the team can be edited
-            ViewBag.CanEditTeam = !isTeamLeadOrManager;
+            var roles = await _userManager.GetRolesAsync(user);
+
+            bool isRestrictedRole = roles.Contains("TeamLead") || roles.Contains("Manager") || roles.Contains("Director");
+
+            ViewBag.CanEditTeam = !isRestrictedRole;
+
 
             await PopulateDropDowns();
+
             return View(viewModel);
+
         }
 
-        // GET: User/Edit/5
-        //public async Task<IActionResult> Edit(string id)
-        //{
-        //    var user = await _userManager.FindByIdAsync(id);
-        //    if (user == null) return NotFound();
-
-        //    var viewModel = _mapper.Map<UserViewModel>(user);
-
-        //    await PopulateDropDowns();
-        //    return View(viewModel);
-        //}
 
         // POST: User/Edit/5
         // POST: User/Edit/5
@@ -238,60 +255,23 @@ namespace RewardsAndRecognitionSystem.Controllers
             return View(user);
         }
 
-        //[HttpPost]
-        //[ValidateAntiForgeryToken]
-        //public async Task<IActionResult> Edit(string id, UserViewModel updatedUserViewModel)
-        //{
-        //    if (!ModelState.IsValid)
-        //    {
-        //        var usermodel = await _userManager.FindByIdAsync(id);
-        //        var userViewmodel=_mapper.Map<UserViewModel>(usermodel);
-        //        ModelState.Clear();
-        //        await PopulateDropDowns();
-        //        return View(userViewmodel);
-        //    }
-
-        //    var updatedUser = _mapper.Map<User>(updatedUserViewModel);
-
-        //    var user = await _userManager.FindByIdAsync(id);
-        //    if (user == null) return NotFound();
-
-        //    if (ModelState.IsValid)
-        //    {
-        //        user.NormalizedUserName = updatedUser.Email.ToUpper();
-        //        user.UserName = updatedUser.Email;
-        //        user.Name = updatedUser.Name;
-        //        user.Email = updatedUser.Email;
-        //        user.NormalizedEmail = updatedUser.Email.ToUpper();
-        //        user.TeamId = updatedUser.TeamId;
-
-        //        var result = await _userManager.UpdateAsync(user);
-        //        if (result.Succeeded)
-        //            return RedirectToAction(nameof(Index));
-
-        //        foreach (var error in result.Errors)
-        //            ModelState.AddModelError("", error.Description);
-        //    }
-        //    ModelState.Clear();
-        //    await PopulateDropDowns();
-        //    return View(user);
-        //}
+        
 
 
-        //[HttpPost, ActionName("Delete")]
-        //[ValidateAntiForgeryToken]
-        //public async Task<IActionResult> DeleteConfirmed(string id)
-        //{
-        //    var user = await _userManager.FindByIdAsync(id);
-        //    if (user == null)
-        //    {
-        //        return NotFound();
-        //    }
+        [HttpPost, ActionName("Delete")]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> DeleteConfirmed(string id)
+        {
+            var user = await _userManager.FindByIdAsync(id);
+            if (user == null)
+            {
+                return NotFound();
+            }
 
-        //    var result = await _userManager.DeleteAsync(user);
-        //    return RedirectToAction(nameof(Index));
+            var result = await _userManager.DeleteAsync(user);
+            return RedirectToAction(nameof(Index));
 
-        //}
+        }
 
 
 

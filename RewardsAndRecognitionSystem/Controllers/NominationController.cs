@@ -170,11 +170,15 @@ namespace RewardsAndRecognitionSystem.Controllers
             ViewBag.Categories = new SelectList(await _context.Categories.ToListAsync(), "Id", "Name");
             var activeQuarter = _context.YearQuarters.FirstOrDefault(yq => yq.IsActive);
             Nomination nomination = new Nomination();
-            var viewModel = _mapper.Map<NominationViewModel>(nomination);
+
             if (activeQuarter != null)
             {
-                nomination.YearQuarterId= activeQuarter.Id;
+                nomination.YearQuarterId = activeQuarter.Id;
             }
+
+
+            var viewModel = _mapper.Map<NominationViewModel>(nomination);
+            
             ViewData["ActiveQuarterDisplay"] = activeQuarter.Quarter + " - " + activeQuarter.Year;
             ViewBag.NominatorId = currentUser.Id;
             ViewBag.Status = NominationStatus.PendingManager;
