@@ -193,19 +193,55 @@ namespace RewardsAndRecognitionSystem.Controllers
             await PopulateDropDowns();
             return View(viewModel);
         }
-
         // GET: User/Edit/5
         public async Task<IActionResult> Edit(string id)
+
         {
+
             var user = await _userManager.FindByIdAsync(id);
+
             if (user == null) return NotFound();
 
-            var viewModel = _mapper.Map<UserViewModel>(user);
+            var userWithTeam = await _context.Users
+
+     .Include(u => u.Team)
+
+     .FirstOrDefaultAsync(u => u.Id == user.Id);
+
+            var viewModel = new UserViewModel
+
+            {
+
+                Id = userWithTeam.Id,
+
+                Name = userWithTeam.Name,
+
+                Email = userWithTeam.Email,
+
+                TeamId = userWithTeam.TeamId,
+
+                Team = userWithTeam.Team // ✅ This is what was missing
+
+            };
+
+
+            // Check the user's roles
+
+            var roles = await _userManager.GetRolesAsync(user);
+
+            bool isRestrictedRole = roles.Contains("TeamLead") || roles.Contains("Manager") || roles.Contains("Director");
+
+            ViewBag.CanEditTeam = !isRestrictedRole;
+
 
             await PopulateDropDowns();
+
             return View(viewModel);
+
         }
 
+
+        // POST: User/Edit/5
         // POST: User/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
@@ -214,7 +250,7 @@ namespace RewardsAndRecognitionSystem.Controllers
             if (!ModelState.IsValid)
             {
                 var usermodel = await _userManager.FindByIdAsync(id);
-                var userViewmodel=_mapper.Map<UserViewModel>(usermodel);
+                var userViewmodel = _mapper.Map<UserViewModel>(usermodel);
                 ModelState.Clear();
                 await PopulateDropDowns();
                 return View(userViewmodel);
@@ -224,7 +260,19 @@ namespace RewardsAndRecognitionSystem.Controllers
 
             var user = await _userManager.FindByIdAsync(id);
             if (user == null) return NotFound();
-            
+
+            // Check the user's roles
+            var roles = await _userManager.GetRolesAsync(user);
+            bool isTeamLeadOrManager = roles.Contains("TeamLead") || roles.Contains("Manager");
+
+            // If the user is a TeamLead or Manager, prevent changing the TeamId
+            if (isTeamLeadOrManager && updatedUser.TeamId != user.TeamId)
+            {
+                ModelState.AddModelError("", "Team cannot be changed for TeamLead or Manager roles.");
+                await PopulateDropDowns();
+                return View(updatedUserViewModel);
+            }
+
             if (ModelState.IsValid)
             {
                 user.NormalizedUserName = updatedUser.Email.ToUpper();
@@ -241,12 +289,15 @@ namespace RewardsAndRecognitionSystem.Controllers
                 foreach (var error in result.Errors)
                     ModelState.AddModelError("", error.Description);
             }
+
             ModelState.Clear();
             await PopulateDropDowns();
             return View(user);
         }
 
-     
+        
+
+
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(string id)

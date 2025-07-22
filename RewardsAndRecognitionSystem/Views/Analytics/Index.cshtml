@@ -1,0 +1,693 @@
+﻿@{
+    ViewData["Title"] = "Analytics";
+    var selectedYQId = ViewBag.SelectedYearQuarterId?.ToString() ?? "";
+}
+
+<style>
+    .scroll-wrapper {
+        overflow-x: auto;
+        overflow-y: hidden;
+        white-space: nowrap;
+        scroll-behavior: smooth;
+        padding-bottom: 10px;
+    }
+
+
+        .scroll-wrapper canvas {
+            display: inline-block;
+            min-width: 700px;
+        }
+
+    .scroll-controls {
+        position: absolute;
+        top: 50%;
+        transform: translateY(-50%);
+        z-index: 1;
+        background: rgba(255, 255, 255, 0.8);
+        border: none;
+        font-size: 1.2rem;
+        padding: 4px 10px;
+        cursor: pointer;
+        border-radius: 50%;
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+    }
+
+    .scroll-left {
+        left: 0;
+    }
+
+    .scroll-right {
+        right: 0;
+    }
+
+    .no-data-message {
+        color: #999;
+        font-size: 1.1rem;
+        text-align: center;
+        margin: 20px 0;
+    }
+
+    /* Centering the pie chart */
+    #teamPieContainer {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 400px; /* You can adjust the height as needed */
+        margin-top: 20px;
+        width: 100%;
+        margin-bottom: 20px;
+    }
+
+    /* Ensuring the pie chart has the same size */
+    #teamPieChart {
+        width: 400px !important; /* You can adjust the size as needed */
+        height: 400px !important; /* You can adjust the size as needed */
+        /* display:block; */
+        margin: 0 auto;
+    }
+
+    #chartsHeader {
+        margin-top: 100px;
+        margin-bottom: 200px;
+    }
+
+
+    .modal-fullscreen canvas {
+        width: 100% !important;
+        height: 100% !important;
+    }
+
+    #chartsContainer .col {
+        margin-bottom: 20px;
+    }
+
+    /* If needed, you can also add some space between the top row elements */
+    .row.mb-4 {
+        margin-bottom: 20px;
+    }
+    /* All existing styles remain unchanged */
+    /* ... (keep your original CSS styles here) ... */
+</style>
+
+<h2 class="mb-4">Analytics Dashboard</h2>
+
+<div class="row mb-4">
+    <div class="col-md-3">
+        <label for="yearDropdown" class="form-label">Select Year:</label>
+        <select id="yearDropdown" class="form-select">
+            <option value="">-- Select Year --</option>
+        </select>
+    </div>
+    <div class="col-md-3">
+        <label for="quarterDropdown" class="form-label">Select Quarter:</label>
+        <select id="quarterDropdown" class="form-select" disabled>
+            <option value="">-- Select Quarter --</option>
+        </select>
+    </div>
+    <div class="col-md-3 d-flex align-items-end">
+        <button class="btn btn-success" onclick="exportAllCharts()">📄 Export All Charts</button>
+    </div>
+</div>
+
+<div id="dashboardExportContent">
+    <div class="row mb-4" id="teamPieContainer" style="display:none;">
+        <div class="col-md-12">
+            <div class="card shadow-sm">
+                <div class="card-header fw-semibold">Team-wise Nominations</div>
+                <div class="card-body">
+                    <canvas id="teamPieChart" width="300" height="300"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="chartsHeader" class="mb-3 fw-bold fs-5"></div>
+    <div id="chartsContainer" class="row row-cols-1 row-cols-md-2 g-4"></div>
+</div>
+<!-- Medium Popup Modal -->
+<div class="modal fade" id="maximizeChartModal" tabindex="-1" aria-labelledby="maximizeChartLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                @* <h5 class="modal-title fw-semibold text-dark" id="maximizeChartLabel"></h5> *@
+                <h5 id="maximizeChartLabel" class="modal-title fw-semibold d-flex align-items-center gap-2 border-bottom pb-2" style="color: #000;">
+                    <i class="bi bi-bar-chart-fill text-primary fs-5"></i>
+
+                </h5>
+
+
+
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <canvas id="fullscreenChartCanvas"></canvas>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+<!-- Team Details Modal -->
+<div class="modal fade" id="teamModal" tabindex="-1" aria-labelledby="teamModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-scrollable">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="teamModalLabel">Team Details</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body" id="teamModalBody">
+                <!-- Content inserted by JS -->
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<!-- Include existing modals -->
+<!-- ... modal HTML remains unchanged ... -->
+@section Scripts {
+    <script src=https://cdn.jsdelivr.net/npm/chart.js></script>
+    <script src=https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels></script>
+    <script src=https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js></script>
+    <script src=https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js></script>
+
+    <script>
+                const teamColors = {}, charts = [];
+                const colorPalette = ['#4e79a7','#f28e2b','#e15759','#76b7b2','#59a14f','#edc949','#af7aa1','#ff9da7','#9c755f','#bab0ab','#2c3e50','#3498db'];
+                let teamPieChartInstance = null, fullscreenChartInstance = null;
+                const preselectedYearQuarterId = '@selectedYQId';
+
+                $(document).ready(function () {
+                    fetchYears().then(() => {
+                        if (preselectedYearQuarterId) {
+                            loadActiveQuarterData(preselectedYearQuarterId);
+                        }
+                    });
+
+                    $('#yearDropdown').change(function () {
+                        const year = $(this).val();
+                        resetAll();
+                        if (year) fetchQuarters(year);
+                    });
+
+                    $('#quarterDropdown').change(function () {
+                        const year = $('#yearDropdown').val();
+                        const quarterText = $('option:selected', this).text();
+                        const id = $(this).val();
+                        resetQuarter();  // ✅ Destroy existing charts
+                        showLoading();   // ✅ Show loading indicator
+
+                        if (id) {
+                            $('#chartsHeader').text(`Analytics for ${year} ${quarterText}`);
+                            Promise.all([
+                                fetchAnalyticsData(id),
+                                fetchTeamSummary(id)
+                            ]).finally(hideLoading);
+                        }
+                    });
+                });
+                                      function maximizeChart(category, data) {
+                    const canvas = document.getElementById('fullscreenChartCanvas');
+                    const ctx = canvas.getContext('2d');
+
+                    // Destroy previous chart instance if exists
+                    if (fullscreenChartInstance) {
+                        fullscreenChartInstance.destroy();
+                        fullscreenChartInstance = null;
+                    }
+
+                    // Set fixed canvas dimensions
+                    canvas.width = 700;
+                    canvas.height = 400;
+
+                    // Extract data
+                    const labels = data.map(d => d.team);
+                    const datasets = [
+                        {
+                            label: 'Approved',
+                            data: data.map(d => d.approvedCount),
+                            backgroundColor: '#4caf50',
+                            borderWidth: 1.5,
+                            stack: category,
+                            barThickness: 40
+                        },
+                        {
+                            label: 'Pending',
+                            data: data.map(d => d.pendingCount),
+                            backgroundColor: '#ffc107',
+                            borderWidth: 1.5,
+                            stack: category,
+                            barThickness: 40
+                        },
+                        {
+                            label: 'Rejected',
+                            data: data.map(d => d.rejectedCount),
+                            backgroundColor: '#f44336',
+                            borderWidth: 1.5,
+                            stack: category,
+                            barThickness: 40
+                        }
+                    ];
+
+                    // Create chart
+                    fullscreenChartInstance = new Chart(ctx, {
+                        type: 'bar',
+                        data: {
+                            labels: labels,
+                            datasets: datasets
+                        },
+                        options: {
+                            responsive: false,
+                            maintainAspectRatio: false,
+                            plugins: {
+                                legend: { position: 'top' },
+                                datalabels: {
+                                    anchor: 'center',
+                                    align: 'center',
+                                    color: '#fff',
+                                    clamp: true,
+                                    font: {
+                                        weight: 'bold',
+                                        size: 14
+                                    },
+                                    formatter: value => value > 0 ? value : ''
+                                }
+                            },
+                            scales: {
+                                x: {
+                                    stacked: true,
+                                    ticks: { color: '#000' },
+                                    grid: { display: false }
+                                },
+                                y: {
+                                    stacked: true,
+                                    beginAtZero: true,
+                                    ticks: { color: '#000', stepSize: 1 },
+                                    grid: { color: '#eee' }
+                                }
+                            }
+                        },
+                        plugins: [ChartDataLabels]
+                    });
+
+                    // Set dynamic modal title with icon
+                    document.getElementById('maximizeChartLabel').innerHTML = `
+                        <div class="d-flex align-items-center gap-2">
+                            <i class="bi bi-bar-chart-fill text-primary fs-5"></i>
+                            <span>Category: ${category}</span>
+                        </div>
+                    `;
+
+                    // Show modal
+                    new bootstrap.Modal(document.getElementById('maximizeChartModal')).show();
+                }
+
+
+
+                function resetAll() {
+                    $('#chartsHeader').text('');
+                    $('#quarterDropdown').prop('disabled', true).html('<option>-- Select Quarter --</option>');
+                    $('#chartsContainer').empty();
+                    $('#teamPieContainer').hide();
+                }
+
+                function resetQuarter() {
+                    // ✅ Destroy bar charts
+                    charts.forEach(chart => chart.destroy());
+                    charts.length = 0;
+
+                    // ✅ Destroy pie chart
+                    if (teamPieChartInstance) {
+                        teamPieChartInstance.destroy();
+                        teamPieChartInstance = null;
+                    }
+
+                    // ✅ Destroy fullscreen chart
+                    if (fullscreenChartInstance) {
+                        fullscreenChartInstance.destroy();
+                        fullscreenChartInstance = null;
+                    }
+
+                    $('#chartsContainer').empty();
+                    $('#teamPieContainer').hide();
+                    $('#chartsHeader').text('');
+                }
+
+
+                function showLoading() {
+                    $('#chartsContainer').html('<p class="text-muted">Loading charts...</p>');
+                    $('#teamPieContainer').hide();
+                }
+
+                function hideLoading() {
+                    // You could hide a loading spinner here if you add one
+                }
+
+                function fetchYears() {
+                    return $.get('/Analytics/GetYears', data => {
+                        $('#yearDropdown').html('<option>-- Select Year --</option>' + data.map(y => `<option>${y}</option>`));
+                    });
+                }
+
+                function fetchQuarters(year) {
+                    return $.get(`/Analytics/GetQuarters?year=${year}`, data => {
+                        $('#quarterDropdown').prop('disabled', false)
+                            .html('<option>-- Select Quarter --</option>' + data.map(q => `<option value="${q.id}">${q.name}</option>`));
+                    });
+                }
+
+                async function loadActiveQuarterData(id) {
+                    const res = await fetch(`/Analytics/GetYears`);
+                    const years = await res.json();
+
+                    for (const year of years) {
+                        const qData = await fetch(`/Analytics/GetQuarters?year=${year}`).then(r => r.json());
+                        const match = qData.find(q => q.id === id);
+                        if (match) {
+                            $('#yearDropdown').val(year);
+                            $('#quarterDropdown').html('<option>-- Select Quarter --</option>' +
+                                qData.map(q => `<option value="${q.id}" ${q.id === id ? 'selected' : ''}>${q.name}</option>`));
+                            $('#quarterDropdown').prop('disabled', false);
+                            $('#chartsHeader').text(`Analytics for ${year} ${match.name}`);
+
+                            resetQuarter();  // Clear any previous charts
+                            showLoading();   // Optional loading state
+                                    Promise.all([
+                    fetchAnalyticsData(id),
+                    fetchTeamSummary(id)
+                ]);
+
+                // .finally(() => {
+                //     hideLoading();
+                //     $('#chartsHeader').text(`Analytics for ${year} ${quarter}`);
+                // });
+
+                            hideLoading();
+                            break;
+                        }
+                    }
+                }
+
+                function fetchAnalyticsData(id) {
+                    return $.get(`/Analytics/GetAnalyticsData?yearQuarterId=${id}`, data => {
+                              if (data.categoryTeamData?.length) {
+                    renderCategoryTeamCharts(data.categoryTeamData);
+                } else {
+                    $('#chartsContainer').html(`
+                        <div class="col">
+                            <div class="card shadow-sm text-center p-4">
+                                <h5 class="text-muted mb-2">📉 No Analytics Data</h5>
+                                <p class="mb-0">There are no nominations or team analytics available for the selected quarter.</p>
+                            </div>
+                        </div>
+                    `);
+                }
+
+                    });
+                }
+
+                function fetchTeamSummary(id) {
+                    return $.get(`/Analytics/GetQuarterTeamSummary?yearQuarterId=${id}`, data => {
+                        if (data.length) {
+                            $('#teamPieContainer').show();
+                            renderPie(data, 'teamPieChart', teamPieChartInstance, 'team');
+                        } else {
+                            $('#teamPieContainer').hide();
+                        }
+                    });
+                }
+
+                function renderPie(data, ctxId, instance, labelKey) {
+                    const ctx = document.getElementById(ctxId).getContext('2d');
+                    const labels = data.map(d => d[labelKey]);
+                    const counts = data.map(d => d.count);
+                    const colors = labels.map(l => getTeamColor(l));
+
+                    if (instance) instance.destroy();
+
+                    teamPieChartInstance = new Chart(ctx, {
+                        type: 'pie',
+                        data: {
+                            labels: labels,
+                            datasets: [{
+                                data: counts,
+                                backgroundColor: colors,
+                                borderWidth: 1
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            plugins: {
+                                legend: {
+                                    position: 'bottom',
+                                    labels: { color: '#000', boxWidth: 10 }
+                                },
+                                datalabels: {
+                                    color: '#000',
+                                    font: { weight: 'bold', size: 14 },
+                                    formatter: value => value > 0 ? value : ''
+                                }
+                            }
+                        },
+                        plugins: [ChartDataLabels]
+                    });
+                }
+
+                       function renderCategoryTeamCharts(data) {
+                    const container = $('#chartsContainer');
+                    container.empty();
+                    charts.length = 0;
+
+                    const grouped = data.reduce((acc, d) => {
+                        (acc[d.category] ||= []).push({
+                            team: d.team,
+                            approvedCount: d.approvedCount,
+                            pendingCount: d.pendingCount,
+                            rejectedCount: d.rejectedCount
+                        });
+                        return acc;
+                    }, {});
+
+                    Object.entries(grouped).forEach(([category, list], index) => {
+                        const canvasId = `categoryChart_${index}`;
+
+                        container.append(`
+                            <div class="col">
+                                <div class="card shadow-sm h-100">
+                                    <div class="card-body">
+                                        <div class="d-flex justify-content-between align-items-center mb-2">
+                                            <h5 class="card-title">${category}</h5>
+                                            <div>
+                                                <button class="btn btn-sm btn-outline-secondary me-2" onclick="maximizeChart('${category}', ${JSON.stringify(list).replace(/"/g, '&quot;')})">🔍 Maximize</button>
+                                                <button class="btn btn-sm btn-outline-secondary" onclick="showTeamModal('${category}', ${JSON.stringify(list).replace(/"/g, '&quot;')})">📊 View More</button>
+                                            </div>
+                                        </div>
+                                        <div class="scroll-wrapper">
+                                            <canvas id="${canvasId}" height="320"></canvas>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        `);
+
+                        // Prepare the data for the stacked bar chart
+                        const teams = list.map(d => d.team);
+
+                        // Get the maximum count for the chart Y-axis scale
+                        const maxCount = Math.max(...list.map(d => d.approvedCount + d.pendingCount + d.rejectedCount), 1);
+
+                        const datasets = [
+                            {
+                                label: 'Approved',
+                                data: list.map(d => d.approvedCount),
+                                backgroundColor: '#4caf50', // Green for Approved
+                                borderColor: '#4caf50',
+                                borderWidth: 1.5,
+                                stack: category,
+                                barThickness: 40
+                            },
+                            {
+                                label: 'Pending',
+                                data: list.map(d => d.pendingCount),
+                                backgroundColor: '#ffc107', // Yellow for Pending
+                                borderColor: '#ffc107',
+                                borderWidth: 1.5,
+                                stack: category,
+                                barThickness: 40
+                            },
+                            {
+                                label: 'Rejected',
+                                data: list.map(d => d.rejectedCount),
+                                backgroundColor: '#f44336', // Red for Rejected
+                                borderColor: '#f44336',
+                                borderWidth: 1.5,
+                                stack: category,
+                                barThickness: 40
+                            }
+                        ];
+
+                        // Create the stacked bar chart
+                        const ctx = document.getElementById(canvasId).getContext('2d');
+
+                        const chart = new Chart(ctx, {
+                            type: 'bar',
+                            data: {
+                                labels: list.map(d => d.team),
+                                datasets: datasets
+                            },
+                            options: {
+                                responsive: true,
+                                plugins: {
+                                    legend: { display: true },
+                                    datalabels: {
+                                        anchor: 'top',
+                                        align: 'center',
+                                        color: '#000',
+                                        font: { weight: 'bold', size: 14 },
+                                        formatter: value => value > 0 ? value : ''
+                                    }
+                                },
+                                scales: {
+                                    y: {
+                                        beginAtZero: true,
+                                        stacked: true, // Stack the bars
+                                        suggestedMax: maxCount + 1,
+                                        ticks: { stepSize: 1, color: '#000' },
+                                        grid: { color: '#eee' }
+                                    },
+                                    x: {
+                                        ticks: { color: '#000' },
+                                        grid: { display: false }
+                                    }
+                                }
+                            },
+                            plugins: [ChartDataLabels]
+                        });
+
+                        charts.push(chart);
+                    });
+                }
+
+
+
+
+                function getTeamColor(name) {
+                    if (!teamColors[name]) {
+                        teamColors[name] = colorPalette[Object.keys(teamColors).length % colorPalette.length];
+                    }
+                    return teamColors[name];
+                }
+
+                function exportAllCharts() {
+            const chartCanvases = document.querySelectorAll('#dashboardExportContent canvas');
+
+            const images = Array.from(chartCanvases).map(canvas => {
+                return canvas.toDataURL('image/png');
+            });
+
+            $.ajax({
+                type: "POST",
+                url: "/Analytics/GenerateChartsPdf",
+                contentType: "application/json",
+                data: JSON.stringify(images),
+                success: function () {
+                    window.location.href = "/Analytics/DownloadChartsPdf";
+                }
+            });
+        }
+
+
+                function exportAllCharts() {
+                    const exportElement = document.getElementById('dashboardExportContent');
+                    html2canvas(exportElement, { scale: 2, useCORS: true }).then(canvas => {
+                        const img = canvas.toDataURL('image/png');
+                        const { jsPDF } = window.jspdf;
+                        const pdf = new jsPDF('p', 'mm', 'a4');
+                        const w = pdf.internal.pageSize.getWidth();
+                        const h = canvas.height * (w / canvas.width);
+                        pdf.addImage(img, 'PNG', 0, 10, w, h);
+                        pdf.save('Analytics_Dashboard.pdf');
+                    });
+                }
+
+
+                function showTeamModal(category, data) {
+                    let html = `<h6>${category}</h6><table class="table table-bordered mt-2"><thead><tr><th>Team</th><th>Nominations</th></tr></thead><tbody>`;
+                    data.forEach(d => {
+                        html += `<tr><td>${d.team}</td><td>${d.count}</td></tr>`;
+                    });
+                    html += '</tbody></table>';
+                    $('#teamModalBody').html(html);
+                    new bootstrap.Modal($('#teamModal')[0]).show();
+                }
+                        function exportChartsAsWord() {
+                    const chartElements = document.querySelectorAll('canvas');
+                    const imagePromises = Array.from(chartElements).map(canvas =>
+                        html2canvas(canvas).then(c => c.toDataURL('image/png'))
+                    );
+
+                    Promise.all(imagePromises).then(images => {
+                        $.ajax({
+                            type: "POST",
+                            url: "/Analytics/ExportChartsToWord",
+                            contentType: "application/json",
+                            data: JSON.stringify(images),
+                            success: function () {
+                                window.location.href = "/Analytics/DownloadWord";
+                            }
+                        });
+                    });
+                }
+
+
+                     function showTeamModal(category, list) {
+                    const modal = $('#teamModal');
+                    modal.find('.modal-title').text(`Category: ${category}`);
+                    const modalBody = modal.find('.modal-body');
+                    modalBody.empty();  // Clear any previous content
+
+                    // Create a table to display team data
+                    let tableContent = `
+                        <table class="table table-striped">
+                            <thead>
+                                <tr>
+                                    <th scope="col">Team</th>
+                                    <th scope="col">Approved</th>
+                                    <th scope="col">Pending</th>
+                                    <th scope="col">Rejected</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                    `;
+
+                    // Loop through the list and add rows to the table
+                    list.forEach(item => {
+                        tableContent += `
+                            <tr>
+                                <td>${item.team}</td>
+                                <td>${item.approvedCount}</td>
+                                <td>${item.pendingCount}</td>
+                                <td>${item.rejectedCount}</td>
+                            </tr>
+                        `;
+                    });
+
+                    // Close the table and append it to the modal
+                    tableContent += `
+                            </tbody>
+                        </table>
+                    `;
+
+                    modalBody.append(tableContent);
+
+                    // Show the modal
+                    modal.modal('show');
+                }
+
+
+                    // new bootstrap.Modal($('#maximizeChartModal')[0]).show();
+
+    </script>
+}
+

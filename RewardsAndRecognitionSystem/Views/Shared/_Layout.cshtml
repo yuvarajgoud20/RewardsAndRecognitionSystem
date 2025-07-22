@@ -24,7 +24,7 @@
     <!-- ASP Validation Scripts -->
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
-    <link rel="stylesheet" href="~/DataAnnotations_Testing.styles.css" asp-append-version="true" />
+    
 
 
     <style>
@@ -157,6 +157,18 @@
                                         </a>
                                     </li>
                                 </ul>
+                            </li>
+                        }
+                        @if (User.IsInRole("Manager") || User.IsInRole("Director"))
+                        {
+                            <li class="nav-item dropdown">
+                                <a class="nav-link" asp-controller="Analytics" asp-action="RedirectToCurrent">
+
+                                    <i class="bi bi-bar-chart"></i> Analytics
+                                </a>
+
+
+
                             </li>
                         }
                     </ul>

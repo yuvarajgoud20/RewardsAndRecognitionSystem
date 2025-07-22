@@ -49,6 +49,14 @@ namespace RewardsAndRecognitionSystem.Controllers
 
             List<Nomination> allNominations = new();
             List<Nomination> deletednominations = new();
+
+            var activeQuarter = await _context.YearQuarters.FirstOrDefaultAsync(yq => yq.IsActive);
+            if (activeQuarter == null)
+            {
+                TempData["Message"] = "❌ No active quarter is set.";
+                return View(new List<Nomination>());
+            }
+
             ViewBag.currentUser = currentUser;
             var userRoles = await _userManager.GetRolesAsync(currentUser);
             List<Nomination> nominationsToShow = new();
@@ -61,6 +69,7 @@ namespace RewardsAndRecognitionSystem.Controllers
                     .Include(n => n.Category)
                     .Include(n => n.Approvals)
                     .Include(n => n.Nominator)
+                          .Where(n => n.YearQuarterId == activeQuarter.Id)
                     .Where(n => n.Nominee.Team.DirectorId == currentUser.Id)
                     .Where(n => n.Status != NominationStatus.PendingManager)
                     //.Where(n => n.Approvals != null)
@@ -97,6 +106,7 @@ namespace RewardsAndRecognitionSystem.Controllers
                     .Include(n => n.Category)
                     .Include(n => n.Approvals)
                     .Include(n => n.Nominator)
+                     .Where(n => n.YearQuarterId == activeQuarter.Id)
                     .Where(n => n.Nominee.Team.ManagerId == currentUser.Id)
                     .ToListAsync();
 
@@ -129,6 +139,7 @@ namespace RewardsAndRecognitionSystem.Controllers
                      .Include(n => n.Category)
                      .Include(n => n.Approvals)
                      .Include(n => n.Nominator)
+                      .Where(n => n.YearQuarterId == activeQuarter.Id)
                      .Where(n => n.NominatorId == currentUser.Id)
                      .ToListAsync();
                 if (FilterForDelete == "deleted")
@@ -167,6 +178,7 @@ namespace RewardsAndRecognitionSystem.Controllers
                     .Include(n => n.Nominator)
                     .ThenInclude(u => u.Team)
                     .Include(n => n.Category)
+                     .Where(n => n.YearQuarterId == activeQuarter.Id)
                     .ToListAsync();
             }
             var viewModelList = _mapper.Map<List<NominationViewModel>>(nominationsToShow);
@@ -204,11 +216,14 @@ namespace RewardsAndRecognitionSystem.Controllers
             ViewBag.Categories = new SelectList(await _context.Categories.ToListAsync(), "Id", "Name");
             var activeQuarter = _context.YearQuarters.FirstOrDefault(yq => yq.IsActive);
             Nomination nomination = new Nomination();
+
             if (activeQuarter != null)
             {
                 nomination.YearQuarterId = activeQuarter.Id;
             }
+
             var viewModel = _mapper.Map<NominationViewModel>(nomination);
+
             ViewData["ActiveQuarterDisplay"] = activeQuarter.Quarter + " - " + activeQuarter.Year;
             ViewBag.NominatorId = currentUser.Id;
             ViewBag.Status = NominationStatus.PendingManager;
