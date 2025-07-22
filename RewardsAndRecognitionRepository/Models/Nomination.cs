@@ -30,7 +30,7 @@ namespace RewardsAndRecognitionRepository.Models
         public YearQuarter? YearQuarter { get; set; }
 
         public ICollection<Approval>? Approvals { get; set; }
-        public bool IsDeleted { get; internal set; }
+        public bool IsDeleted { get; set; }
     }
 
 }

@@ -113,9 +113,9 @@
     <div class="d-flex align-items-center" style="gap: 12px;">
         <input type="text" id="liveSearchUsers" class="form-control" placeholder="🔍 Search by Name" style="max-width: 220px;" />
 
-        <button class="btn btn-success" onclick="exportTableToExcelusers('usersTable')" style="padding: 8px 14px;">
-            <i class="bi bi-file-earmark-excel-fill"></i> Download
-        </button>
+        <a asp-action="ExportAllUsersOpenXml" class="btn btn-success">
+            <i class="bi bi-file-earmark-excel"></i> Export
+        </a>
 
         <a asp-action="Create" class="btn btn-primary d-flex align-items-center" style="padding: 8px 14px; text-decoration: none;">
             <i class="bi bi-person-plus-fill me-1"></i> Create

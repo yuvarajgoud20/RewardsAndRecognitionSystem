@@ -1,4 +1,7 @@
 ﻿using AutoMapper;
+using DocumentFormat.OpenXml;
+using DocumentFormat.OpenXml.Packaging;
+using DocumentFormat.OpenXml.Spreadsheet;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
@@ -10,8 +13,9 @@ using RewardsAndRecognitionRepository;
 using RewardsAndRecognitionRepository.Interfaces;
 using RewardsAndRecognitionRepository.Models;
 using RewardsAndRecognitionRepository.Repos;
-using RewardsAndRecognitionSystem.ViewModels;
 using RewardsAndRecognitionRepository.Service;
+using RewardsAndRecognitionSystem.Utilities;
+using RewardsAndRecognitionSystem.ViewModels;
 
 namespace RewardsAndRecognitionSystem.Controllers
 {
@@ -310,6 +314,141 @@ namespace RewardsAndRecognitionSystem.Controllers
 
             var result = await _userManager.DeleteAsync(user);
             return RedirectToAction(nameof(Index));
+
+        }
+        [HttpGet]
+
+        public async Task<IActionResult> ExportAllUsersOpenXml()
+
+        {
+
+            var users = await _context.Users
+
+                .Include(u => u.Team)
+
+                .Include(u => u.Team.Manager)
+
+                .OrderBy(n => n.Name)
+
+                .ToListAsync();
+
+            var userRoles = new Dictionary<string, string>();
+
+            foreach (var user in users)
+
+            {
+
+                var roles = await _userManager.GetRolesAsync(user);
+
+                userRoles[user.Id] = roles.FirstOrDefault() ?? "Unknown";
+
+            }
+
+            using var memStream = new MemoryStream();
+
+            using (SpreadsheetDocument document = SpreadsheetDocument.Create(memStream, SpreadsheetDocumentType.Workbook))
+
+            {
+
+                // Workbook
+
+                var workbookPart = document.AddWorkbookPart();
+
+                workbookPart.Workbook = new Workbook();
+
+                // Worksheet
+
+                var worksheetPart = workbookPart.AddNewPart<WorksheetPart>();
+
+                var sheetData = new SheetData();
+
+                worksheetPart.Worksheet = new Worksheet(sheetData);
+
+                // Styles
+
+                var stylesPart = workbookPart.AddNewPart<WorkbookStylesPart>();
+
+                stylesPart.Stylesheet = SheetClassesStyles.CreateStylesheet();
+
+                stylesPart.Stylesheet.Save();
+
+                // Column headers
+
+                var headers = new[] { "Name", "Email", "Team", "Manager", "Role" };
+
+                var headerRow = new Row();
+
+                foreach (var header in headers)
+
+                {
+
+                    headerRow.Append(SheetClassesStyles.CreateStyledCell(header, 2)); // Header style
+
+                }
+
+                sheetData.Append(headerRow);
+
+                // Data rows
+
+                foreach (var user in users)
+
+                {
+
+                    var row = new Row();
+
+                    row.Append(SheetClassesStyles.CreateStyledCell(user.Name, 1));
+
+                    row.Append(SheetClassesStyles.CreateStyledCell(user.Email, 1));
+
+                    row.Append(SheetClassesStyles.CreateStyledCell(user.Team?.Name ?? "Not Assigned", 1));
+
+                    row.Append(SheetClassesStyles.CreateStyledCell(user.Team?.Manager?.Name ?? "No Manager", 1));
+
+                    row.Append(SheetClassesStyles.CreateStyledCell(userRoles.ContainsKey(user.Id) ? userRoles[user.Id] : "Unknown", 1));
+
+                    sheetData.Append(row);
+
+                }
+
+                // Column width
+
+                var columns = new Columns(
+
+                    new Column { Min = 1, Max = 5, Width = 25, CustomWidth = true }
+
+                );
+
+                worksheetPart.Worksheet.InsertAt(columns, 0);
+
+                // Sheets
+
+                Sheets sheets = workbookPart.Workbook.AppendChild(new Sheets());
+
+                Sheet sheet = new Sheet()
+
+                {
+
+                    Id = workbookPart.GetIdOfPart(worksheetPart),
+
+                    SheetId = 1,
+
+                    Name = "Users"
+
+                };
+
+                sheets.Append(sheet);
+
+                workbookPart.Workbook.Save();
+
+            }
+
+            memStream.Seek(0, SeekOrigin.Begin);
+
+            return File(memStream.ToArray(),
+
+                "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+
+                "Users.xlsx");
 
         }
 

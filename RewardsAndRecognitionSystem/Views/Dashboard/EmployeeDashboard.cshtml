@@ -4,18 +4,61 @@
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
-<h2>My Nominations</h2>
+<h2 class="d-flex justify-content-between align-items-center mb-3" style="font-size: 1.4rem; font-weight: 600;">
+    <span class="text-primary">Employee Dashboard</span>
+
+    <span class="quarter-card shadow-sm"
+          data-bs-toggle="tooltip"
+          data-bs-placement="left"
+          title="Closes At: @ViewBag.ActiveQuarterCloseDate">
+        <span>@ViewBag.ActiveQuarterName, @ViewBag.ActiveYearName</span>
+    </span>
+</h2>
+
+<style>
+    .quarter-card {
+        background-color: #eef4ff;
+        color: #0a3c8a;
+        border-radius: 10px;
+        padding: 6px 12px;
+        font-size: 0.85rem;
+        border-left: 4px solid #0d6efd;
+        transition: all 0.3s ease-in-out;
+        white-space: nowrap;
+    }
+
+        .quarter-card:hover {
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+        }
+
+    .table thead th {
+        background-color: #f8f9fa;
+        color: #333;
+        font-weight: 600;
+        border-bottom: 2px solid #dee2e6;
+    }
+
+    .table tbody tr:hover {
+        background-color: #f1f5ff;
+    }
+
+    .table td, .table th {
+        vertical-align: middle;
+    }
+</style>
 
 @if (!Model.Any())
 {
-    <p>You haven't submitted or received any nominations yet.</p>
+    <div class="alert alert-info mt-3">
+        You haven't submitted or received any nominations yet.
+    </div>
 }
 else
 {
-    <table class="table">
-        <thead>
+    <table class="table table-bordered table-hover mt-3">
+        <thead class="table-light">
             <tr>
-                <th>#</th>
+                <th style="width: 50px;">#</th>
                 <th>Nominee</th>
                 <th>Category</th>
                 <th>Status</th>
@@ -29,7 +72,9 @@ else
                     <td>@(i + 1)</td>
                     <td>@n.Nominee?.Name</td>
                     <td>@n.Category?.Name</td>
-                    <td>@n.Status</td>
+                    <td>
+                        <span class="badge bg-secondary">@n.Status</span>
+                    </td>
                 </tr>
             }
         </tbody>

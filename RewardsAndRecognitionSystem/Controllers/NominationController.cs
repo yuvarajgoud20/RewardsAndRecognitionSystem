@@ -1,5 +1,8 @@
 ﻿using System.Drawing.Printing;
 using AutoMapper;
+using DocumentFormat.OpenXml;
+using DocumentFormat.OpenXml.Packaging;
+using DocumentFormat.OpenXml.Spreadsheet;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -10,6 +13,7 @@ using RewardsAndRecognitionRepository.Interfaces;
 using RewardsAndRecognitionRepository.Models;
 using RewardsAndRecognitionRepository.Repos;
 using RewardsAndRecognitionRepository.Service;
+using RewardsAndRecognitionSystem.Utilities;
 using RewardsAndRecognitionSystem.ViewModels;
 
 namespace RewardsAndRecognitionSystem.Controllers
@@ -213,7 +217,7 @@ namespace RewardsAndRecognitionSystem.Controllers
 
             ViewBag.Nominees = new SelectList(nominees, "Id", "Name");
 
-            ViewBag.Categories = new SelectList(await _context.Categories.ToListAsync(), "Id", "Name");
+            ViewBag.Categories = new SelectList(await _context.Categories.Where(ct => ct.IsDeleted == false && ct.isActive == true).ToListAsync(), "Id", "Name");
             var activeQuarter = _context.YearQuarters.FirstOrDefault(yq => yq.IsActive);
             Nomination nomination = new Nomination();
 
@@ -252,7 +256,7 @@ namespace RewardsAndRecognitionSystem.Controllers
            .ToListAsync();
 
             ViewBag.Nominees = new SelectList(nominees, "Id", "Name");
-            ViewBag.Categories = new SelectList(await _context.Categories.ToListAsync(), "Id", "Name");
+            ViewBag.Categories = new SelectList(await _context.Categories.Where(ct => ct.IsDeleted==false && ct.isActive == true).ToListAsync(), "Id", "Name");
             var activeQuarter = _context.YearQuarters.FirstOrDefault(yq => yq.IsActive);
         
             if (activeQuarter != null)
@@ -275,7 +279,7 @@ namespace RewardsAndRecognitionSystem.Controllers
             if (nomination.Status != NominationStatus.PendingManager)
                 return Forbid(); // Disallow editing if not pending
 
-            ViewBag.Categories = new SelectList(await _context.Categories.ToListAsync(), "Id", "Name", nomination.CategoryId);
+            ViewBag.Categories = new SelectList(await _context.Categories.Where(ct => ct.IsDeleted == false && ct.isActive == true).ToListAsync(), "Id", "Name", nomination.CategoryId);
             ViewBag.YearQuarters = new SelectList(await _context.YearQuarters.ToListAsync(), "Id", "Quarter", nomination.YearQuarterId);
             var viewModel=_mapper.Map<NominationViewModel>(nomination); 
             return View(viewModel);
@@ -292,7 +296,7 @@ namespace RewardsAndRecognitionSystem.Controllers
             if (!ModelState.IsValid)
             {
                 ModelState.Clear();
-                ViewBag.Categories = new SelectList(await _context.Categories.ToListAsync(), "Id", "Name", existing.CategoryId);
+                ViewBag.Categories = new SelectList(await _context.Categories.Where(ct => ct.IsDeleted == false && ct.isActive == true).ToListAsync(), "Id", "Name", existing.CategoryId);
                 ViewBag.YearQuarters = new SelectList(await _context.YearQuarters.ToListAsync(), "Id", "Quarter", existing.YearQuarterId);
                 var existingViewModel= _mapper.Map<NominationViewModel>(existing);
                 return View(existingViewModel);
@@ -470,5 +474,144 @@ namespace RewardsAndRecognitionSystem.Controllers
 
             return RedirectToAction(nameof(Index));
         }
+        [HttpGet]
+        public async Task<IActionResult> ExportAllNominationsOpenXml()
+
+        {
+
+            var nominations = await _context.Nominations
+
+                .Include(n => n.Nominee)
+
+                .Include(n => n.Nominator)
+
+                .Include(n => n.Category)
+
+                .Include(n => n.YearQuarter)
+
+                .ToListAsync();
+
+            using var memStream = new MemoryStream();
+
+            using (SpreadsheetDocument document = SpreadsheetDocument.Create(memStream, SpreadsheetDocumentType.Workbook))
+
+            {
+
+                // Workbook
+
+                var workbookPart = document.AddWorkbookPart();
+
+                workbookPart.Workbook = new Workbook();
+
+                // Worksheet
+
+                var worksheetPart = workbookPart.AddNewPart<WorksheetPart>();
+
+                var sheetData = new SheetData();
+
+                worksheetPart.Worksheet = new Worksheet(sheetData);
+
+                // Styles
+
+                var stylesPart = workbookPart.AddNewPart<WorkbookStylesPart>();
+
+                stylesPart.Stylesheet = SheetClassesStyles.CreateStylesheet();
+
+                stylesPart.Stylesheet.Save();
+
+                // Headers for Nomination export
+
+                var headers = new[]
+
+                {
+
+     "Nominee Name", "Nominator Name", "Category", "Description",
+
+     "Achievements", "Status", "Quarter", "Created At"
+
+};
+
+                var headerRow = new Row();
+
+                foreach (var header in headers)
+
+                {
+
+                    headerRow.Append(SheetClassesStyles.CreateStyledCell(header, 2)); // Header style
+
+                }
+
+                sheetData.Append(headerRow);
+
+                // Data Rows
+
+                foreach (var nomination in nominations)
+
+                {
+
+                    var row = new Row();
+
+                    row.Append(SheetClassesStyles.CreateStyledCell(nomination.Nominee?.Name ?? "N/A", 1));
+
+                    row.Append(SheetClassesStyles.CreateStyledCell(nomination.Nominator?.Name ?? "N/A", 1));
+
+                    row.Append(SheetClassesStyles.CreateStyledCell(nomination.Category?.Name ?? "N/A", 1));
+
+                    row.Append(SheetClassesStyles.CreateStyledCell(nomination.Description, 1));
+
+                    row.Append(SheetClassesStyles.CreateStyledCell(nomination.Achievements, 1));
+
+                    row.Append(SheetClassesStyles.CreateStyledCell(nomination.Status.ToString(), 1));
+
+                    row.Append(SheetClassesStyles.CreateStyledCell(nomination.YearQuarter?.Quarter.ToString() ?? "N/A", 1));
+
+                    row.Append(SheetClassesStyles.CreateStyledCell(nomination.CreatedAt.ToString("dd-MM-yyyy"), 1));
+
+                    sheetData.Append(row);
+
+                }
+
+                // Column width
+
+                var columns = new Columns(
+
+                    new Column { Min = 1, Max = 8, Width = 25, CustomWidth = true }
+
+                );
+
+                worksheetPart.Worksheet.InsertAt(columns, 0);
+
+                // Sheets
+
+                Sheets sheets = workbookPart.Workbook.AppendChild(new Sheets());
+
+                Sheet sheet = new Sheet()
+
+                {
+
+                    Id = workbookPart.GetIdOfPart(worksheetPart),
+
+                    SheetId = 1,
+
+                    Name = "Nominations"
+
+                };
+
+                sheets.Append(sheet);
+
+                workbookPart.Workbook.Save();
+
+            }
+
+            memStream.Seek(0, SeekOrigin.Begin);
+
+            return File(memStream.ToArray(),
+
+                "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+
+                "Nominations.xlsx");
+
+        }
+
     }
 }

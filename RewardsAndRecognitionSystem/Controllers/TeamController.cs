@@ -1,4 +1,5 @@
-﻿using AutoMapper;
+﻿using System.IO;
+using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
 
 using Microsoft.AspNetCore.Identity;
@@ -34,7 +35,7 @@ namespace RewardsAndRecognitionSystem.Controllers
 
         private readonly UserManager<User> _userManager;
 
-        public TeamController(IMapper mapper,ITeamRepo teamRepo, IUserRepo userRepo, UserManager<User> userManager, ApplicationDbContext context)
+        public TeamController(IMapper mapper, ITeamRepo teamRepo, IUserRepo userRepo, UserManager<User> userManager, ApplicationDbContext context)
 
         {
             _mapper = mapper;
@@ -50,49 +51,55 @@ namespace RewardsAndRecognitionSystem.Controllers
 
         // GET: TeamController
 
-        public async Task<IActionResult> Index(int page=1)
+        public async Task<IActionResult> Index()
 
         {
 
-            int pageSize = 2;
             var teams = await _context.Teams
+
                 .Include(t => t.TeamLead)
+
                 .Include(t => t.Manager)
+
                 .Include(t => t.Director)
+
                 .Include(t => t.Users)
-                .OrderBy(t => t.Name)
+
                 .ToListAsync();
 
+            // Get roles for each user
+
             var userRoles = new Dictionary<string, string>();
+
             foreach (var team in teams)
+
             {
+
                 foreach (var user in team.Users)
+
                 {
+
                     var roles = await _userManager.GetRolesAsync(user);
+
                     userRoles[user.Id] = roles.FirstOrDefault() ?? "N/A";
+
                 }
+
             }
 
-            var paginatedTeams = teams
-                .Skip((page - 1) * pageSize)
-                .Take(pageSize)
-                .ToList();
+            // Prepare grouped data
 
-            var grouped = paginatedTeams.Select(team => new GroupedTeam
+            var grouped = teams.Select(team => new GroupedTeam
+
             {
+
                 Team = team,
+
                 Users = team.Users?.ToList() ?? new List<User>()
+
             }).ToList();
 
             ViewBag.UserRoles = userRoles;
-            ViewBag.CurrentPage = page;
-            ViewBag.TotalPages = (int)Math.Ceiling((double)teams.Count / pageSize);
-
-            // If AJAX, return partial view
-            if (Request.Headers["X-Requested-With"] == "XMLHttpRequest")
-            {
-                return PartialView("_TeamListPartial", grouped);
-            }
 
             return View(grouped);
 
@@ -107,15 +114,6 @@ namespace RewardsAndRecognitionSystem.Controllers
         public async Task<IActionResult> Create()
 
         {
-
-            //var managers = await _userRepo.GetAllManagersAsync();
-
-            //var leads = await _userRepo.GetLeadsAsync(); // ⬅️ Only unassigned team leads
-
-            //ViewBag.Managers = new SelectList(managers, "Id", "Name");
-
-            //ViewBag.TeamLeads = new SelectList(leads, "Id", "Name");
-
             await LoadDropdownsAsync();
 
             return View();
@@ -134,9 +132,8 @@ namespace RewardsAndRecognitionSystem.Controllers
             if (ModelState.IsValid)
 
             {
-                var team=_mapper.Map<Team>(viewModel);
+                var team = _mapper.Map<Team>(viewModel);
                 await _teamRepo.AddAsync(team);
-
                 return RedirectToAction(nameof(Index));
 
             }
@@ -152,45 +149,32 @@ namespace RewardsAndRecognitionSystem.Controllers
         public async Task<IActionResult> Edit(Guid id)
 
         {
-          
 
-           if(ModelState.IsValid)
+            var existingteam = await _teamRepo.GetByIdAsync(id);
+            var team = _mapper.Map<TeamViewModel>(existingteam);
+
+            if (team == null)
+
             {
-                var existingteam = await _teamRepo.GetByIdAsync(id);
-                var team = _mapper.Map<TeamViewModel>(existingteam);
 
-                if (team == null)
+                return NotFound();
 
-                {
-
-                    return NotFound();
-
-                }
-
-                var managers = await _userRepo.GetAllManagersAsync(); // ✅ Required
-
-                var leads = await _userRepo.GetLeadsAsync(team.TeamLeadId);
-
-                var directors = await _userRepo.GetAllDirectorsAsync();// ✅ Required
-
-                ViewBag.Managers = new SelectList(managers, "Id", "Name", team.ManagerId);
-
-                ViewBag.TeamLeads = new SelectList(leads, "Id", "Name", team.TeamLeadId);
-
-                ViewBag.Directors = new SelectList(directors, "Id", "Name", team.DirectorId);
-
-                if (Request.Headers["X-Requested-With"] == "XMLHttpRequest")
-
-                {
-
-                    return PartialView("Edit", team); // Use a partial view here
-
-                }
-
-                return View(team);
             }
-            else
-            {  return View(); }
+
+            var managers = await _userRepo.GetAllManagersAsync(); // ✅ Required
+
+            var leads = await _userRepo.GetLeadsAsync(team.TeamLeadId);
+
+            var directors = await _userRepo.GetAllDirectorsAsync();// ✅ Required
+
+            ViewBag.Managers = new SelectList(managers, "Id", "Name", team.ManagerId);
+
+            ViewBag.TeamLeads = new SelectList(leads, "Id", "Name", team.TeamLeadId);
+
+            ViewBag.Directors = new SelectList(directors, "Id", "Name", team.DirectorId);
+
+            return View(team);
+
         }
 
 
@@ -208,15 +192,19 @@ namespace RewardsAndRecognitionSystem.Controllers
             if (existingTeam == null)
                 return NotFound();
 
-            // ✅ Custom validation (example)
-            // You can add specific rules here if needed
 
             if (!ModelState.IsValid)
             {
-                await LoadDropdownsAsync(); 
-                //ModelState.Clear(); 
-                var teamViewModel=_mapper.Map<TeamViewModel>(existingTeam);
-                return View(teamViewModel); 
+                await LoadDropdownsAsync();
+                ModelState.Clear();
+                var teamViewModel = _mapper.Map<TeamViewModel>(existingTeam);
+                var managers = await _userRepo.GetAllManagersAsync(); // ✅ Required
+                var leads = await _userRepo.GetLeadsAsync(existingTeam.TeamLeadId);
+                var directors = await _userRepo.GetAllDirectorsAsync();// ✅ Required
+                ViewBag.Managers = new SelectList(managers, "Id", "Name", existingTeam.ManagerId);
+                ViewBag.TeamLeads = new SelectList(leads, "Id", "Name", existingTeam.TeamLeadId);
+                ViewBag.Directors = new SelectList(directors, "Id", "Name", existingTeam.DirectorId);
+                return View(teamViewModel);
             }
 
             // Check for team lead change

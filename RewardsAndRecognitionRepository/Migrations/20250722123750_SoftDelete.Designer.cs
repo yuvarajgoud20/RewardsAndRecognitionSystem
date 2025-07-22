@@ -12,8 +12,8 @@ using RewardsAndRecognitionRepository.Models;
 namespace RewardsAndRecognitionRepository.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20250722074225_Initials")]
-    partial class Initials
+    [Migration("20250722123750_SoftDelete")]
+    partial class SoftDelete
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
