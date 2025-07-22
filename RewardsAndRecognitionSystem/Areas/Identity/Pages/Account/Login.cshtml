@@ -1,4 +1,4 @@
-﻿@page
+﻿@page "/Login"
 @model LoginModel
 
 @{
@@ -78,6 +78,17 @@
     </div> *@
 </div>
 
+
 @section Scripts {
+    @if (User.Identity.IsAuthenticated)
+    {
+        <script>
+            // ⛔ Prevent rendering login if user already logged in (client-side fallback)
+            window.location.href = "/";
+        </script>
+    }
+
     <partial name="_ValidationScriptsPartial" />
 }
+
+
