@@ -3,6 +3,7 @@
     var userRoles = ViewBag.UserRoles as Dictionary<string, string>;
     ViewData["Title"] = "Users List";
     Layout = "~/Views/Shared/_Layout.cshtml";
+    ViewData["Title"] = "Users";
 }
 
 <style>
@@ -122,39 +123,23 @@
     </div>
 </div>
 
+<div id="userTableContainer">
+    @await Html.PartialAsync("_UserListPartial", Model)
+</div>
 
-<table class="users-table" id="usersTable">
-    <thead>
-        <tr>
-            <th><i class="bi bi-person-fill"></i> Name</th>
-            <th><i class="bi bi-envelope-fill"></i> Email</th>
-            <th><i class="bi bi-diagram-3-fill"></i> Team</th>
-            <th><i class="bi bi-person-badge-fill"></i> Manager</th>
-            <th><i class="bi bi-award-fill"></i> Role</th>
-            <th><i class="bi bi-tools"></i> Actions</th>
-        </tr>
-    </thead>
-    <tbody>
-        @foreach (var user in Model)
-        {
-            <tr data-name="@user.Name.ToLower()">
-                <td>@user.Name</td>
-                <td>@user.Email</td>
-                <td>@(user.Team?.Name ?? "Not Assigned")</td>
-                <td>@(user.Team?.Manager?.Name ?? "No Manager")</td>
-                <td>@userRoles[user.Id]</td>
-                <td>
-                    <a asp-action="Edit" asp-route-id="@user.Id" class="btn btn-edit">
-                        <i class="bi bi-pencil-square"></i> Edit
-                    </a>
-                    <button type="button" class="btn btn-danger" onclick="confirmDelete('@user.Id')">
-                        <i class="bi bi-trash-fill"></i> Delete
-                    </button>
-                </td>
-            </tr>
-        }
-    </tbody>
-</table>
+<div class="d-flex justify-content-center mt-4" id="paginationContainer">
+    <nav>
+        <ul class="pagination">
+            @for (int i = 1; i <= (int)ViewBag.TotalPages; i++)
+            {
+                <li class="page-item @(i == (int)ViewBag.CurrentPage ? "active" : "")">
+                    <a class="page-link pagination-link" href="@Url.Action("Index", new { page = i })">@i</a>
+                </li>
+            }
+        </ul>
+    </nav>
+</div>
+
 @section Scripts {
     <script>
         function confirmDelete(userId) {
@@ -192,5 +177,64 @@
     <script src="~/js/Nomination.js">
 
     </script>
-    <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+    <script>
+        document.addEventListener("click", function (e) {
+            if (e.target.classList.contains("pagination-link")) {
+                e.preventDefault();
+                const url = e.target.getAttribute("href");
+
+                fetch(url, {
+                    headers: {
+                        "X-Requested-With": "XMLHttpRequest"
+                    }
+                })
+                .then(response => response.text())
+                .then(html => {
+                    document.getElementById("userTableContainer").innerHTML = html;
+
+                    // reload pagination bar as well if needed
+                    return fetch(url + "&paginationOnly=true", {
+                        headers: {
+                            "X-Requested-With": "XMLHttpRequest"
+                        }
+                    });
+                })
+                .then(response => response.text())
+                .then(paginationHtml => {
+                    document.getElementById("paginationContainer").innerHTML = paginationHtml;
+                });
+            }
+        });
+    </script>
+    <script>
+            <div class="d-flex justify-content-center mt-4">
+            <nav>
+                <ul class="pagination">
+                    @if ((int)ViewBag.CurrentPage > 1)
+                    {
+                                <li class="page-item">
+                                    <a class="page-link" href="@Url.Action("Index", new { page = (int)ViewBag.CurrentPage - 1 })">
+                                        <i class="bi bi-chevron-left"></i>
+                                    </a>
+                                </li>
+                    }
+
+                    <li class="page-item active">
+                        <span class="page-link">
+                            Page @(ViewBag.CurrentPage) of @(ViewBag.TotalPages)
+                        </span>
+                    </li>
+
+                    @if ((int)ViewBag.CurrentPage < (int)ViewBag.TotalPages)
+                    {
+                                <li class="page-item">
+                                    <a class="page-link" href="@Url.Action("Index", new { page = (int)ViewBag.CurrentPage + 1 })">
+                                        <i class="bi bi-chevron-right"></i>
+                                    </a>
+                                </li>
+                    }
+                </ul>
+            </nav>
+        </div>
+    </script>
 }

@@ -26,11 +26,33 @@ namespace RewardsAndRecognitionSystem.Controllers
         }
 
         // GET: Category
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(int page = 1, bool showDeleted = false)
         {
-           // var categories = await _categoryRepo.GetAllAsync();
-           var categories=await _categoryService.GetAllAsync();
-            var viewModelList = _mapper.Map<List<CategoryViewModel>>(categories);
+            // var categories = await _categoryRepo.GetAllAsync();
+            int pageSize = 5;
+
+            // 🔁 Fetch all categories based on showDeleted flag
+            var allCategories = await _categoryRepo.GetAllAsync(showDeleted);
+            var usedCategoryIds = await _nominationRepo.GetUsedCategoryIdsAsync(); // NEW LINE ✅
+
+            int totalCategories = allCategories.Count();
+            int totalPages = (int)Math.Ceiling(totalCategories / (double)pageSize);
+
+            var paginatedCategories = allCategories
+                .Skip((page - 1) * pageSize)
+                .Take(pageSize)
+                .ToList();
+
+            ViewBag.CurrentPage = page;
+            ViewBag.TotalPages = totalPages;
+            ViewBag.ShowDeleted = showDeleted;
+            ViewBag.UsedCategoryIds = usedCategoryIds; // PASS TO VIEW ✅
+            var viewModelList = _mapper.Map<List<CategoryViewModel>>(paginatedCategories);
+
+            if (Request.Headers["X-Requested-With"] == "XMLHttpRequest")
+            {
+                return PartialView("_CategoryListPartial", viewModelList);
+            }
             return View(viewModelList);
         }
 
@@ -123,8 +145,19 @@ namespace RewardsAndRecognitionSystem.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(Guid id)
         {
-            await _categoryRepo.DeleteAsync(id);
+            var category = await _categoryRepo.GetByIdAsync(id);
+            if (category == null || category.IsDeleted)
+            {
+                return NotFound();
+            }
+
+            await _categoryRepo.SoftDeleteAsync(id); // ✅ Call soft delete
             return RedirectToAction(nameof(Index));
+        }
+        public async Task<IActionResult> Deleted()
+        {
+            var deletedCategories = await _categoryRepo.GetDeletedAsync();
+            return View(deletedCategories);
         }
     }
 }

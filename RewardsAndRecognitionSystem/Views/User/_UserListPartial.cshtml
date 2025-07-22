@@ -1,0 +1,37 @@
+﻿@model IEnumerable<RewardsAndRecognitionSystem.ViewModels.UserViewModel>
+@{
+    var userRoles = ViewBag.UserRoles as Dictionary<string, string>;
+}
+
+<table class="users-table" id="usersTable">
+    <thead>
+        <tr>
+            <th>Name</th>
+            <th>Email</th>
+            <th>Team</th>
+            <th>Manager</th>
+            <th>Role</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var user in Model)
+        {
+            string teamName = user.Team?.Name ?? "Not Assigned";
+            string managerName = user.Team?.Manager?.Name ?? "No Manager";
+            string role = userRoles.ContainsKey(user.Id) ? userRoles[user.Id] : "No Role";
+
+            <tr>
+                <td>@user.Name</td>
+                <td>@user.Email</td>
+                <td>@teamName</td>
+                <td>@managerName</td>
+                <td>@role</td>
+                <td>
+                    <a class="btn btn-edit" asp-action="Edit" asp-route-id="@user.Id"><i class="bi bi-pencil-square"></i> Edit</a>
+                    <button class="btn btn-delete" onclick="confirmDelete('@user.Id')"><i class="bi bi-trash-fill"></i> Delete</button>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

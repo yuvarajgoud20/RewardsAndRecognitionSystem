@@ -1,0 +1,388 @@
+﻿@using Microsoft.AspNetCore.Identity
+@using RewardsAndRecognitionRepository.Enums
+@model IEnumerable<RewardsAndRecognitionSystem.ViewModels.NominationViewModel>
+
+@{
+    ViewData["Title"] = "Nominations List";
+    // Layout = "~/Views/Shared/_Layout.cshtml";
+    //var selectedFilter = Context.Request.Query["filter"].ToString()?.ToLower() ?? "all";
+    var reviewedIds = ViewBag.ReviewedNominationIds as List<Guid> ?? new List<Guid>();
+    var nominationsList = Model.ToList();
+    var isManager = User.IsInRole("Manager");
+    var isDirector = User.IsInRole("Director");
+    var isTeamLead = User.IsInRole("TeamLead");
+    var selectedFilter = Context.Request.Query["filter"].ToString()?.ToLower() ?? "all";
+    var selectedFilter2 = ViewBag.FilterForDelete as string ?? "active";
+     var currentFilter = selectedFilter2;
+    //var selectedFilter = ViewBag.FilterForDelete as string ?? "active";
+    // var FilterDelete = Context.Request.Query["FilterForDelete"];
+    // var isActiveSelected = FilterDelete == "active" || string.IsNullOrEmpty(FilterDelete);
+    // var isDeletedSelected = FilterDelete == "deleted";
+    // var FilterDelete = Context.Request.Query["FilterForDelete"];
+}
+
+
+
+
+<div id="nominationListContainer">
+ @if (isTeamLead)
+{
+    <div class="filter-bar d-flex justify-content-between align-items-center mb-3">
+        <!-- Left: Search Input -->
+        <div style="flex: 1;">
+            <input type="text" id="liveSearch" class="form-control" placeholder="🔍 Search by Nominee" style="max-width: 300px;" />
+        </div>
+
+        <!-- Right: Excel, Filter, and Create Nomination -->
+        <div style="display: flex; gap: 10px; align-items: center;">
+            <button class="btn btn-success" onclick="exportTableToExcel('nominationsTable')" style="padding: 8px;">
+                <i class="bi bi-file-earmark-excel-fill"></i> Download
+            </button>
+            
+
+
+<select id="filterfordelete" class="form-select w-auto" onchange="submitWithFilter(1, this.value)">
+    <option value="active" selected="@(selectedFilter2 == "active" ? "selected" : null)">Active</option>
+    <option value="deleted" selected="@(selectedFilter2 == "deleted" ? "selected" : null)">Deleted</option>
+</select>
+
+         @if(selectedFilter2=="active"){
+           <select id="filterSelect" class="form-select" style="width: 150px;">
+                <option value="all">All</option>
+                <option value="pending">Pending</option>
+                <option value="reviewed">Reviewed</option>
+                <option value="directorapproved">Approved</option>
+                <option value="directorrejected">Rejected</option>
+           </select>
+         }
+
+            <a asp-action="Create" class="btn btn-indigo" style="white-space: nowrap;">
+                <i class="bi bi-plus-circle-fill"></i> Create Nomination
+            </a>
+        </div>
+    </div>
+
+
+    <table class="table-custom" id="nominationsTable">
+        <thead>
+            <tr>
+                <th>#</th>
+                <th>Nominee</th>
+                <th>Team</th>
+                <th>Category</th>
+                <th>Status</th>
+                <th>Created</th>
+                @if (selectedFilter2 == "active"){
+                 <th>Actions</th>
+                }
+            </tr>
+        </thead>
+        <tbody>
+            
+            @for (int i = 0; i < nominationsList.Count; i++)
+            {
+                var n = nominationsList[i];
+                <tr data-name="@n.Nominee?.Name?.ToLower()"
+                    data-status="@n.Status"
+                    class="@(ViewBag.ReviewedNominationIds.Contains(n.Id) ? "reviewed" : "pending")">
+                    <td>@(i + 1)</td>
+                    <td>@n.Nominee?.Name</td>
+                    <td>@n.Nominee?.Team?.Name</td>
+                    <td>@n.Category?.Name</td>
+                    <td>@n.Status</td>
+                    <td>@n.CreatedAt.ToString("dd/MM/yyyy")</td>
+                        @if (selectedFilter2 == "active")
+                        {
+                            <td>
+                                <a asp-action="Details" asp-route-id="@n.Id" class="btn btn-indigo btn-sm">
+                            <i class="bi bi-eye-fill"></i> Details
+                        </a>
+
+                        <a asp-action="Edit"
+                           asp-route-id="@n.Id"
+                           class="btn btn-indigo btn-sm @( (n.Status == NominationStatus.PendingManager) ? "" : "disabled no-click" )">
+                            <i class="bi bi-pencil-fill"></i> Edit
+                        </a>
+
+                        <button class="btn btn-danger btn-sm @( (n.Status == NominationStatus.PendingManager) ? "" : "disabled no-click" )"
+                             data-bs-toggle="modal"
+                             data-bs-target="#deleteModal"
+                             data-id="@n.Id">
+                            <i class="bi bi-trash-fill"></i> Delete
+                            </button>
+                    </td>
+                    }
+                </tr>
+
+            }
+        </tbody>
+    </table>
+//     @if (ViewBag.DeletedNominations != null && ((List<RewardsAndRecognitionRepository.Models.Nomination>)ViewBag.DeletedNominations).Any())
+// {
+//     <h4 class="mt-5">🗑️ Deleted Nominations</h4>
+
+//     <table class="table table-bordered table-striped mt-3">
+//         <thead>
+//             <tr>
+//                 <th>#</th>
+//                 <th>Nominee</th>
+//                 <th>Team</th>
+//                 <th>Category</th>
+//                 <th>Status</th>
+                
+//             </tr>
+//         </thead>
+//         <tbody>
+//             @foreach (var (item, index) in ((List<RewardsAndRecognitionRepository.Models.Nomination>)ViewBag.DeletedNominations).Select((value, i) => (value, i)))
+//             {
+//                 <tr class="text-muted bg-light">
+//                     <td>@(index + 1)</td>
+//                     <td>@item.Nominee?.Name</td>
+//                     <td>@item.Nominee?.Team?.Name</td>
+//                     <td>@item.Category?.Name</td>
+//                     <td>@item.Status</td>
+                   
+//                 </tr>
+//             }
+//         </tbody>
+//     </table>
+// }
+// else
+// {
+//     <p class="text-muted mt-4">No deleted nominations found.</p>
+// }
+
+ } 
+
+ @if (isManager || isDirector)
+{
+    <div class="filter-bar d-flex justify-content-between align-items-center mb-3">
+        <!-- Left: Search Input -->
+        <div style="flex: 1;">
+            <input type="text" id="liveSearch" class="form-control" placeholder="🔍 Search by Nominee" style="max-width: 300px;" />
+        </div>
+
+        <!-- Right: Excel, Filter, and Create Nomination -->
+        <div style="display: flex; gap: 10px; align-items: center;">
+            <button class="btn btn-success" onclick="exportTableToExcel('nominationsTable')" style="padding: 8px;">
+                <i class="bi bi-file-earmark-excel-fill"></i> Download
+            </button>
+            <select id="filterSelect" class="form-select" style="width: 150px;">
+                <option value="all">All</option>
+                <option value="pending">Pending</option>
+                <option value="reviewed">Reviewed</option>
+                <option value="directorapproved">Approved</option>
+                <option value="directorrejected">Rejected</option>
+            </select>
+        </div>
+    </div>
+
+    <table class="table-custom" id="nominationsTable">
+        <thead>
+            <tr>
+                <th>S.No</th>
+                <th>Nominee</th>
+                <th>Team</th>
+                <th>Category</th>
+                <th>Nominated By</th>
+                <th>Status</th>
+                <th>Created</th>
+                <th>Review</th>
+            </tr>
+        </thead>
+        <tbody>
+            @for (int i = 0; i < nominationsList.Count; i++)
+            {
+                var n = nominationsList[i];
+                var isReviewed = reviewedIds.Contains(n.Id);
+                var managerRemarks = "";
+                var directorRemarks = "";
+                var managerApprovalStatus = "";
+                if (isDirector)
+                {
+                    managerRemarks = n.Approvals?.FirstOrDefault(a => a.ApproverId != ViewBag.currentUser.Id)?.Remarks ?? "No Remarks";
+                    directorRemarks = n.Approvals?.FirstOrDefault(a => a.ApproverId == ViewBag.currentUser.Id)?.Remarks ?? "No Remarks";
+                    managerApprovalStatus = n.Approvals?.FirstOrDefault(a => a.ApproverId != ViewBag.currentUser.Id)?.Action.ToString() ?? "No Action Taken";
+                }
+                else
+                {
+                    managerRemarks = n.Approvals?.FirstOrDefault()?.Remarks ?? "No Remarks";
+                }
+
+
+
+                <tr class="@(isReviewed ? "reviewed" : "pending")"
+                    data-index="@i"
+                    data-id="@n.Id"
+                    data-name="@n.Nominee?.Name?.ToLower()"
+                    data-team="@n.Nominee?.Team?.Name"
+                    data-category="@n.Category?.Name"
+                    data-nominatedby="@n.Nominator?.Name"
+                    data-description="@n.Description"
+                    data-achievements="@n.Achievements"
+                    data-status="@n.Status"
+                    data-created="@n.CreatedAt.ToShortDateString()"
+                    data-reviewed="@isReviewed.ToString().ToLower()"
+                    data-director="@isDirector.ToString().ToLower()"
+                    data-approval_status="@managerApprovalStatus"
+                    data-director_remarks="@directorRemarks"
+                    data-manager_remarks="@managerRemarks">
+                    <td>@(i + 1)</td>
+                    <td>@n.Nominee?.Name</td>
+                    <td>@n.Nominee?.Team?.Name</td>
+                    <td>@n.Category?.Name</td>
+                    <td>@n.Nominator?.Name</td>
+                    <td>@n.Status</td>
+                    <td>@n.CreatedAt.ToString("dd/MM/yyyy")</td>
+                    <td>
+                        <button class="btn btn-indigo btn-sm open-popup" data-index="@i">
+                            <i class="bi bi-eye-fill"></i> @(isReviewed ? "View" : "Review")
+                        </button>
+                         <button type="button"
+                                class="btn btn-warning btn-sm"
+                                data-bs-toggle="modal"
+                                data-bs-target="#revertModal"
+                                data-nomination-id="@n.Id"
+                                @(isReviewed ? "disabled title='Already Reviewed'" : "")>
+                            ⏪ Revert
+                        </button>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table> 
+  <div class="modal fade" id="revertModal" tabindex="-1" aria-labelledby="revertModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <form asp-action="RevertBack" method="post">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="revertModalLabel">Revert Nomination</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <input type="hidden" id="nominationIdInput" name="id" />
+                    <div class="mb-3">
+                        <label for="reason" class="form-label">Reason for reverting:</label>
+                        <textarea class="form-control" name="reason" id="reason" rows="3" required></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="submit" class="btn btn-danger">Submit</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+    <!-- Popup for Review/View -->
+    <div class="popup-overlay" id="popupOverlay">
+        <div class="popup-card">
+            <div class="popup-header justify-content-end">
+                <button class="popup-close" onclick="closePopup()"><b>×</b></button>
+            </div>
+            <div id="popupContent"></div>
+        </div>
+    </div>
+
+    <!-- Hidden Review Form -->
+    <form id="reviewForm" method="post" asp-action="Review" asp-controller="Nomination">
+        @Html.AntiForgeryToken()
+        <input type="hidden" name="id" id="reviewId" />
+        <input type="hidden" name="action" id="reviewAction" />
+        <input type="hidden" name="remarks" id="reviewRemarks" />
+    </form>
+} 
+
+@if (ViewBag.TotalPages > 1)
+{
+    <nav aria-label="Page navigation" class="mt-4 d-flex justify-content-center">
+        <ul class="pagination">
+            @for (int i = 1; i <= ViewBag.TotalPages; i++)
+            {
+                <li class="page-item @(ViewBag.CurrentPage == i ? "active" : "")">
+                    <a class="page-link pagination-link" href="javascript:void(0);" data-page="@i" data-filter="@currentFilter">@i</a>
+                </li>
+            }
+        </ul>
+    </nav>
+}
+</div>
+
+<script>
+const IS_TEAMLEAD=(@User.IsInRole("TeamLead").ToString().ToLower())==="teamlead";
+console.log(IS_TEAMLEAD);
+
+    if(!IS_TEAMLEAD){
+                const revertModal = document.getElementById('revertModal');
+                console.log(revertModal);
+                if (revertModal) {
+                    revertModal.addEventListener('show.bs.modal', function (event) {
+                        const button = event.relatedTarget;
+                        const nominationId = button.dataset.nominationId;
+                        console.log(nominationId);
+                        const input = document.getElementById('nominationIdInput');
+                        input.value = nominationId;
+                    });
+                }
+            }
+</script>
+
+
+
+<script>
+
+  
+    
+
+       const IS_TEAMLEAD=@User.IsInRole("TeamLead").ToString().ToLower();
+        document.addEventListener("DOMContentLoaded", () => {
+
+        const preselectedFilter = "@selectedFilter";
+
+        const filterSelect = document.getElementById("filterSelect");
+
+        const liveSearchInput = document.getElementById("liveSearch");
+ 
+        if (filterSelect && preselectedFilter) {
+
+            filterSelect.value = preselectedFilter;
+
+        }
+
+ 
+        // Clear search box
+
+        if (liveSearchInput) liveSearchInput.value = "";
+ 
+        // Trigger the filtering logic
+
+        filterTable();
+
+
+
+    });
+</script>
+ <script src="~/js/Nomination.js"></script>
+ <script>
+   function submitWithFilter(page, filter) {
+    $.ajax({
+        url: '/Nomination/Index',
+        data: { FilterForDelete: filter, page: page },
+        success: function (result) {
+            $('#nominationListContainer').html(result);
+        }
+    });
+}
+        
+
+$(document).on("click", ".pagination-link", function () {
+    const page = $(this).data("page");
+    const filter = $("#filterfordelete").val(); // get value from dropdown
+    submitWithFilter(page, filter);
+});
+
+
+</script>
+
+

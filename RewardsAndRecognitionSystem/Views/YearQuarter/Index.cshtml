@@ -116,41 +116,9 @@
     </a>
 </div>
 
-<table class="yearquarter-table">
-    <thead>
-        <tr>
-            <th><i class="bi bi-calendar2"></i> Year</th>
-            <th><i class="bi bi-calendar3"></i> Quarter</th>
-            <th><i class="bi bi-calendar-event"></i> Start Date</th>
-            <th><i class="bi bi-calendar-check"></i> End Date</th>
-            <th><i class="bi bi-check2-circle"></i> Active</th>
-            <th><i class="bi bi-gear-fill"></i> Actions</th>
-        </tr>
-    </thead>
-    <tbody>
-        @foreach (var yq in Model)
-        {
-            <tr>
-                <td>@yq.Year</td>
-                <td>@yq.Quarter</td>
-                <td>@(yq.StartDate.HasValue? yq.StartDate.Value.ToShortDateString() : "")</td>
-                <td>@(yq.EndDate.HasValue? yq.EndDate.Value.ToShortDateString() : "")</td>
-                <td>@(yq.IsActive ? "✅ Yes" : "❌ No")</td>
-                <td>
-                    <a asp-action="Details" asp-route-id="@yq.Id" class="btn btn-secondary">
-                        <i class="bi bi-eye-fill"></i> View
-                    </a>
-                    <a asp-action="Edit" asp-route-id="@yq.Id" class="btn btn-primary">
-                        <i class="bi bi-pencil-square"></i> Edit
-                    </a>
-                    <button type="button" class="btn btn-danger" onclick="confirmDelete('@yq.Id')">
-                        <i class="bi bi-trash-fill"></i> Delete
-                    </button>
-                </td>
-            </tr>
-        }
-    </tbody>
-</table>
+<div id="yearQuarterContainer">
+    @Html.Partial("_YearQuarterListPartial", Model)
+</div>
 
 <script>
     function confirmDelete(userId) {
@@ -184,4 +152,23 @@
         }
       });
     }
+</script>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+    $(document).on("click", ".pagination-link", function (e) {
+        e.preventDefault();
+        var url = $(this).attr("href");
+
+        $.ajax({
+            url: url,
+            type: "GET",
+            headers: { "X-Requested-With": "XMLHttpRequest" },
+            success: function (result) {
+                $('#yearQuarterContainer').html(result);
+            },
+            error: function () {
+                alert("Failed to load year quarters.");
+            }
+        });
+    });
 </script>

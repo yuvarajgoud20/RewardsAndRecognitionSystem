@@ -15,7 +15,7 @@ using RewardsAndRecognitionRepository.Service;
 
 namespace RewardsAndRecognitionSystem.Controllers
 {
-    [Authorize(Roles = "Admin")]
+   // [Authorize(Roles = "Admin")]
     public class UserController : Controller
     {
         private readonly IMapper _mapper;
@@ -25,8 +25,9 @@ namespace RewardsAndRecognitionSystem.Controllers
         private readonly ApplicationDbContext _context;
         private readonly IEmailService _emailService;
 
+
         public UserController(
-            IMapper mapper
+            IMapper mapper,
             IUserRepo userRepo, 
             UserManager<User> userManager, 
             ITeamRepo teamRepo, 
@@ -42,7 +43,7 @@ namespace RewardsAndRecognitionSystem.Controllers
         }
 
         // GET: User
-        public async Task<IActionResult> Index()
+        /*public async Task<IActionResult> Index()
         {
             var users = await _context.Users
         .Include(u => u.Team)
@@ -59,7 +60,46 @@ namespace RewardsAndRecognitionSystem.Controllers
             ViewBag.UserRoles = userRoles;
             var usersList=_mapper.Map<List<UserViewModel>>(users);
             return View(usersList);
+        }*/
+        public async Task<IActionResult> Index(int page = 1)
+        {
+            int pageSize = 5;
+            var usersQuery = _context.Users
+                .Include(u => u.Team)
+                    .ThenInclude(t => t.Manager);
+
+            var totalRecords = await usersQuery.CountAsync();
+            var totalPages = (int)Math.Ceiling(totalRecords / (double)pageSize);
+
+            var users = await usersQuery
+                .Skip((page - 1) * pageSize)
+                .Take(pageSize)
+                .ToListAsync();
+
+            var userRoles = new Dictionary<string, string>();
+            foreach (var user in users)
+            {
+                var roles = await _userManager.GetRolesAsync(user);
+                userRoles[user.Id] = roles.FirstOrDefault() ?? "No Role";
+            }
+
+            ViewBag.UserRoles = userRoles;
+            ViewBag.CurrentPage = page;
+            ViewBag.TotalPages = totalPages;
+            var usersList = _mapper.Map<List<UserViewModel>>(users);
+            if (Request.Headers["X-Requested-With"] == "XMLHttpRequest")
+            {
+                if (Request.Query.ContainsKey("paginationOnly"))
+                {
+                    return PartialView("_PaginationPartial"); // you'll create this below
+                }
+                return PartialView("_UserListPartial", usersList);
+            }
+
+            
+             return View(usersList);
         }
+
 
         // GET: User/Create
         public async Task<IActionResult> Create()
@@ -123,7 +163,7 @@ namespace RewardsAndRecognitionSystem.Controllers
 
                             <p style=""font-size: 16px;"">
                               <strong>Email:</strong> {user.Email}<br>
-                              <strong>Temporary Password:</strong> <span style=""color: #black;"">{password}</span>
+                              <strong>Temporary Password:</strong> <span style=""color: #black;"">{viewModel.PasswordHash}</span>
                             </p>
 
                             <p>

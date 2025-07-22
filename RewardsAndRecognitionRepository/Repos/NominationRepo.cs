@@ -18,15 +18,22 @@ namespace RewardsAndRecognitionRepository.Repos
             _context = context;
         }
 
-        public async Task<IEnumerable<Nomination>> GetAllNominationsAsync()
+        public async Task<IEnumerable<Nomination>> GetAllNominationsAsync(bool includeDeleted = false)
         {
-            return await _context.Nominations
+            var query = _context.Nominations
                 .Include(n => n.Nominator)
                 .Include(n => n.Nominee)
                 .Include(n => n.Category)
                 .Include(n => n.YearQuarter)
                 .Include(n => n.Approvals)
-                .ToListAsync();
+                .AsQueryable();
+
+            if (!includeDeleted)
+            {
+                query = query.Where(n => !n.IsDeleted);
+            }
+
+            return await query.ToListAsync();
         }
 
         public async Task<Nomination?> GetNominationByIdAsync(Guid id)
@@ -72,6 +79,28 @@ namespace RewardsAndRecognitionRepository.Repos
                 .Select(n => n.Category!)        // project to Category entity
                 .Distinct()                      // remove duplicates (by key)
                 .ToListAsync();
+        }
+
+        
+
+        public async Task<List<Guid>> GetUsedCategoryIdsAsync()
+        {
+            return await _context.Nominations
+               .Where(n => !n.IsDeleted) // Only consider active nominations
+               .Select(n => n.CategoryId)
+               .Distinct()
+               .ToListAsync();
+        }
+
+        public async Task SoftDeleteNominationAsync(Guid id)
+        {
+            var nomination = await _context.Nominations.FindAsync(id);
+            if (nomination != null && !nomination.IsDeleted)
+            {
+                nomination.IsDeleted = true;
+                _context.Nominations.Update(nomination);
+                await _context.SaveChangesAsync();
+            }
         }
     }
 }

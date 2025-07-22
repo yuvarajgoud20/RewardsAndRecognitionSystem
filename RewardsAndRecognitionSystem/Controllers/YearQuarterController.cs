@@ -23,10 +23,30 @@ namespace RewardsAndRecognitionSystem.Controllers
         }
 
         // GET: /YearQuarter
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(int page=1)
         {
-            var quarters = await _yearQuarterRepo.GetAllAsync();
-            var qList= _mapper.Map<List<YearQuarterViewModel>>(quarters);   
+            int pageSize = 5;
+
+            var allQuarters = await _yearQuarterRepo.GetAllAsync();
+            var totalRecords = allQuarters.Count();
+            var totalPages = (int)Math.Ceiling(totalRecords / (double)pageSize);
+
+            var paginated = allQuarters
+                .Skip((page - 1) * pageSize)
+                .Take(pageSize)
+                .ToList();
+
+            ViewBag.CurrentPage = page;
+            ViewBag.TotalPages = totalPages;
+            var qList = _mapper.Map<List<YearQuarterViewModel>>(paginated);
+
+            // ✅ This handles AJAX pagination
+            if (Request.Headers["X-Requested-With"] == "XMLHttpRequest")
+            {
+                return PartialView("_YearQuarterListPartial", qList);
+            }
+           
+              
             return View(qList);
         }
 

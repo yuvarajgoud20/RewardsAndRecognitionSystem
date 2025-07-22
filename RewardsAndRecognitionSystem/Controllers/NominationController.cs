@@ -1,4 +1,5 @@
-﻿using AutoMapper;
+﻿using System.Drawing.Printing;
+using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -8,8 +9,8 @@ using RewardsAndRecognitionRepository.Enums;
 using RewardsAndRecognitionRepository.Interfaces;
 using RewardsAndRecognitionRepository.Models;
 using RewardsAndRecognitionRepository.Repos;
-using RewardsAndRecognitionSystem.ViewModels;
 using RewardsAndRecognitionRepository.Service;
+using RewardsAndRecognitionSystem.ViewModels;
 
 namespace RewardsAndRecognitionSystem.Controllers
 {
@@ -23,7 +24,7 @@ namespace RewardsAndRecognitionSystem.Controllers
         private readonly IEmailService _emailService;
 
         public NominationController(
-            IMapper mapper
+            IMapper mapper,
             INominationRepo nominationRepo, 
             ApplicationDbContext context,
             UserManager<User> userManager,
@@ -38,13 +39,16 @@ namespace RewardsAndRecognitionSystem.Controllers
         }
 
         // GET: Nomination
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(string FilterForDelete = "active", int page = 1)
         {
+            int pageSize = 2;
+            
             var currentUser = await _userManager.GetUserAsync(User);
             if (currentUser == null)
                 return RedirectToAction("Login", "Account", new { area = "Identity" });
 
-
+            List<Nomination> allNominations = new();
+            List<Nomination> deletednominations = new();
             ViewBag.currentUser = currentUser;
             var userRoles = await _userManager.GetRolesAsync(currentUser);
             List<Nomination> nominationsToShow = new();
@@ -69,7 +73,19 @@ namespace RewardsAndRecognitionSystem.Controllers
                     .ToList();
 
                 ViewBag.ReviewedNominationIds = alreadyReviewedIds;
-                var directorList = _mapper.Map<List<NominationViewModel>>(nominationsToShow);
+                ViewBag.TotalPages = (int)Math.Ceiling(nominationsToShow.Count / (double)pageSize);
+                ViewBag.CurrentPage = page;
+                ViewBag.ReviewedNominationIds = alreadyReviewedIds;
+                var pagedNominations = nominationsToShow
+                    .Skip((page - 1) * pageSize)
+                    .Take(pageSize)
+                    .ToList();
+                var directorList = _mapper.Map<List<NominationViewModel>>(pagedNominations);
+                if (Request.Headers["X-Requested-With"] == "XMLHttpRequest")
+                {
+                    return PartialView("_NominationListPartial", directorList);
+                }
+               
                 return View(directorList);
             }
 
@@ -91,7 +107,17 @@ namespace RewardsAndRecognitionSystem.Controllers
                     .ToList();
 
                 ViewBag.ReviewedNominationIds = alreadyReviewedIds;
-                var managerList = _mapper.Map<List<NominationViewModel>>(nominationsToShow);
+                ViewBag.TotalPages = (int)Math.Ceiling(nominationsToShow.Count / (double)pageSize);
+                ViewBag.CurrentPage = page;
+                var pagedNominations = nominationsToShow
+                    .Skip((page - 1) * pageSize)
+                    .Take(pageSize)
+                    .ToList();
+                var managerList = _mapper.Map<List<NominationViewModel>>(pagedNominations);
+                if (Request.Headers["X-Requested-With"] == "XMLHttpRequest")
+                {
+                    return PartialView("_NominationListPartial", managerList);
+                }
                 return View(managerList);
             }
             if (userRoles.Contains("TeamLead"))
@@ -105,14 +131,32 @@ namespace RewardsAndRecognitionSystem.Controllers
                      .Include(n => n.Nominator)
                      .Where(n => n.NominatorId == currentUser.Id)
                      .ToListAsync();
-                                var alreadyReviewedIds = nominationsToShow
+                if (FilterForDelete == "deleted")
+                {
+                    allNominations =  nominationsToShow.Where(n => n.IsDeleted).ToList();
+                }
+                else
+                {
+                    allNominations =  nominationsToShow.Where(n => !n.IsDeleted).ToList();
+                }
+                ViewBag.FilterForDelete = FilterForDelete;
+                var alreadyReviewedIds = nominationsToShow
                                     .Where(n => n.Approvals.Any(a => a.ApproverId == currentUser.Team.DirectorId))
                                     .Select(n => n.Id)
                                     .ToList();
-
                 ViewBag.ReviewedNominationIds = alreadyReviewedIds;
-
-                var teamList = _mapper.Map<List<NominationViewModel>>(nominationsToShow);
+                ViewBag.TotalPages = (int)Math.Ceiling(allNominations.Count / (double)pageSize);
+                ViewBag.CurrentPage = page;
+                ViewBag.ReviewedNominationIds = alreadyReviewedIds;
+                var pagedNominations = allNominations
+                    .Skip((page - 1) * pageSize)
+                    .Take(pageSize)
+                    .ToList();
+                var teamList = _mapper.Map<List<NominationViewModel>>(pagedNominations);
+                if (Request.Headers["X-Requested-With"] == "XMLHttpRequest")
+                {
+                    return PartialView("_NominationListPartial", teamList);
+                }
                 return View(teamList);
             }
 
@@ -160,11 +204,11 @@ namespace RewardsAndRecognitionSystem.Controllers
             ViewBag.Categories = new SelectList(await _context.Categories.ToListAsync(), "Id", "Name");
             var activeQuarter = _context.YearQuarters.FirstOrDefault(yq => yq.IsActive);
             Nomination nomination = new Nomination();
-            var viewModel = _mapper.Map<NominationViewModel>(nomination);
             if (activeQuarter != null)
             {
-                nomination.YearQuarterId= activeQuarter.Id;
+                nomination.YearQuarterId = activeQuarter.Id;
             }
+            var viewModel = _mapper.Map<NominationViewModel>(nomination);
             ViewData["ActiveQuarterDisplay"] = activeQuarter.Quarter + " - " + activeQuarter.Year;
             ViewBag.NominatorId = currentUser.Id;
             ViewBag.Status = NominationStatus.PendingManager;
@@ -261,7 +305,7 @@ namespace RewardsAndRecognitionSystem.Controllers
             if (nomination == null || nomination.Status != NominationStatus.PendingManager)
                 return Forbid();
 
-            await _nominationRepo.DeleteNominationAsync(id);
+            await _nominationRepo.SoftDeleteNominationAsync(id);
             return RedirectToAction(nameof(Index));
         }
 
@@ -273,6 +317,7 @@ namespace RewardsAndRecognitionSystem.Controllers
             var nomination = await _nominationRepo.GetNominationByIdAsync(id);
             if (nomination == null)
                 return NotFound();
+
 
             return View(nomination);
         }

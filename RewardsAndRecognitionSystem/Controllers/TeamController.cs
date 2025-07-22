@@ -50,55 +50,49 @@ namespace RewardsAndRecognitionSystem.Controllers
 
         // GET: TeamController
 
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(int page=1)
 
         {
 
+            int pageSize = 2;
             var teams = await _context.Teams
-
                 .Include(t => t.TeamLead)
-
                 .Include(t => t.Manager)
-
                 .Include(t => t.Director)
-
                 .Include(t => t.Users)
-
+                .OrderBy(t => t.Name)
                 .ToListAsync();
 
-            // Get roles for each user
-
             var userRoles = new Dictionary<string, string>();
-
             foreach (var team in teams)
-
             {
-
                 foreach (var user in team.Users)
-
                 {
-
                     var roles = await _userManager.GetRolesAsync(user);
-
                     userRoles[user.Id] = roles.FirstOrDefault() ?? "N/A";
-
                 }
-
             }
 
-            // Prepare grouped data
+            var paginatedTeams = teams
+                .Skip((page - 1) * pageSize)
+                .Take(pageSize)
+                .ToList();
 
-            var grouped = teams.Select(team => new GroupedTeam
-
+            var grouped = paginatedTeams.Select(team => new GroupedTeam
             {
-
                 Team = team,
-
                 Users = team.Users?.ToList() ?? new List<User>()
-
             }).ToList();
 
             ViewBag.UserRoles = userRoles;
+            ViewBag.CurrentPage = page;
+            ViewBag.TotalPages = (int)Math.Ceiling((double)teams.Count / pageSize);
+
+            // If AJAX, return partial view
+            if (Request.Headers["X-Requested-With"] == "XMLHttpRequest")
+            {
+                return PartialView("_TeamListPartial", grouped);
+            }
 
             return View(grouped);
 
