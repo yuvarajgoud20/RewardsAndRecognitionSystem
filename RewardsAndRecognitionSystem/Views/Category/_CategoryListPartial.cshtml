@@ -1,0 +1,106 @@
+﻿@model IEnumerable<RewardsAndRecognitionSystem.ViewModels.CategoryViewModel>
+@{
+    var usedCategoryIds = ViewBag.UsedCategoryIds as List<Guid> ?? new List<Guid>();
+    bool showDeleted = ViewBag.ShowDeleted ?? false;
+}
+
+<table class="table-custom">
+    <thead>
+        <tr>
+            <th><i class="bi bi-tag-fill"></i> Name</th>
+            <th class="desc-cell"><i class="bi bi-card-text"></i> Description</th>
+            <th><i class="bi bi-calendar-event"></i> Created Date</th>
+            <th><i class="bi bi-check-circle-fill"></i> Status</th>
+            <th><i class="bi bi-tools"></i> Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var category in Model)
+        {
+            <tr class="@(category.IsDeleted ? "table-danger" : "")">
+                <td>@category.Name</td>
+                <td class="desc-cell">@category.Description</td>
+                <td>@category.CreatedAt.ToShortDateString()</td>
+                <td>
+                    @if (category.IsDeleted)
+                    {
+                        <span class="badge bg-danger"><i class="bi bi-x-circle-fill"></i> Deleted</span>
+                    }
+                    else if (category.isActive)
+                    {
+                        <span class="badge bg-success"><i class="bi bi-check-circle-fill"></i> Active</span>
+                    }
+                    else
+                    {
+                        <span class="badge bg-secondary"><i class="bi bi-x-circle-fill"></i> Inactive</span>
+                    }
+                </td>
+                <td class="actions-cell">
+                    @if (category.IsDeleted)
+                    {
+                        <button type="button" class="btn btn-secondary btn-sm" disabled>
+                            <i class="bi bi-pencil-fill"></i> Edit
+                        </button>
+                        <button type="button" class="btn btn-danger btn-sm" disabled>
+                            <i class="bi bi-trash-fill"></i> Deleted
+                        </button>
+                    }
+                    else
+                    {
+                        <a asp-action="Edit" asp-route-id="@category.Id" class="btn btn-indigo btn-sm">
+                            <i class="bi bi-pencil-fill"></i> Edit
+                        </a>
+                        <a asp-action="Details" asp-route-id="@category.Id" class="btn btn-secondary btn-sm">
+                            <i class="bi bi-eye-fill"></i> Details
+                        </a>
+
+                        @if (usedCategoryIds.Contains(category.Id))
+                        {
+                            <button type="button" class="btn btn-danger btn-sm" disabled title="Cannot delete - used in nomination">
+                                <i class="bi bi-trash-fill"></i> Delete
+                            </button>
+                        }
+                        else
+                        {
+                            <button type="button" class="btn btn-danger btn-sm" onclick="confirmDelete('@category.Id')">
+                                <i class="bi bi-trash-fill"></i> Delete
+                            </button>
+                        }
+                    }
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+<div class="d-flex justify-content-between align-items-center mt-4">
+    <div>
+        Showing page @ViewBag.CurrentPage of @ViewBag.TotalPages
+    </div>
+    <nav>
+        <ul class="pagination mb-0">
+            <li class="page-item @(ViewBag.CurrentPage == 1 ? "disabled" : "")">
+                <a class="page-link pagination-link"
+                   asp-action="Index"
+                   asp-route-page="@(ViewBag.CurrentPage - 1)"
+                   asp-route-showDeleted="@showDeleted">Previous</a>
+            </li>
+            @for (int i = 1; i <= ViewBag.TotalPages; i++)
+            {
+                <li class="page-item @(i == ViewBag.CurrentPage ? "active" : "")">
+                    <a class="page-link pagination-link"
+                       asp-action="Index"
+                       asp-route-page="@i"
+                       asp-route-showDeleted="@showDeleted">@i</a>
+                </li>
+            }
+            <li class="page-item @(ViewBag.CurrentPage == ViewBag.TotalPages ? "disabled" : "")">
+                <a class="page-link pagination-link"
+                   asp-action="Index"
+                   asp-route-page="@(ViewBag.CurrentPage + 1)"
+                   asp-route-showDeleted="@showDeleted">Next</a>
+            </li>
+        </ul>
+    </nav>
+</div>
+

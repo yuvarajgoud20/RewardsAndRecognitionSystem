@@ -1,0 +1,99 @@
+﻿@model List<RewardsAndRecognitionRepository.Models.GroupedTeam>
+
+@{
+    var userRoles = ViewBag.UserRoles as Dictionary<string, string>;
+}
+
+@foreach (var group in Model)
+{
+    var team = group.Team;
+    var teamId = $"team_{team.Id}";
+    var iconId = $"icon_{team.Id}";
+
+    <div class="team-card">
+        <div class="team-header">
+            <h5 class="mb-0"><i class="bi bi-diagram-3-fill me-1"></i> @team.Name</h5>
+            <div class="team-actions-inline">
+                <span><strong>Lead:</strong> @(team.TeamLead?.Name ?? "Not Assigned")</span>
+                <a href="javascript:void(0);" class="btn-edit btn me-1" onclick="openEditModal('@team.Id')">
+                    <i class="bi bi-pencil-square"></i>
+                </a>
+                <a href="javascript:void(0);" onclick="confirmDelete('@team.Id')" class="btn-delete btn">
+                    <i class="bi bi-trash-fill"></i>
+                </a>
+                <i class="bi bi-chevron-right toggle-icon" id="@iconId" onclick="toggleTeam('@teamId', '@iconId')"></i>
+            </div>
+        </div>
+
+        <div class="team-body" id="@teamId">
+            <table class="users-table">
+                <thead>
+                    <tr>
+                        <th><i class="bi bi-person-fill"></i> Name</th>
+                        <th><i class="bi bi-envelope-fill"></i> Email</th>
+                        <th><i class="bi bi-shield-lock-fill"></i> Role</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (team.Director != null)
+                    {
+                        <tr class="table-info fw-semibold">
+                            <td>@team.Director.Name</td>
+                            <td>@team.Director.Email</td>
+                            <td>Director</td>
+                        </tr>
+                    }
+                    @if (team.Manager != null)
+                    {
+                        <tr class="table-success fw-semibold">
+                            <td>@team.Manager.Name</td>
+                            <td>@team.Manager.Email</td>
+                            <td>Manager</td>
+                        </tr>
+                    }
+
+                    @if (group.Users != null && group.Users.Any())
+                    {
+                        @foreach (var user in group.Users)
+                        {
+                            if (user.Id != team.Director?.Id && user.Id != team.Manager?.Id)
+                            {
+                                <tr>
+                                    <td>@user.Name</td>
+                                    <td>@user.Email</td>
+                                    <td>@(userRoles != null && userRoles.ContainsKey(user.Id) ? userRoles[user.Id] : "N/A")</td>
+                                </tr>
+                            }
+                        }
+                    }
+                    else
+                    {
+                        <tr>
+                            <td colspan="3" class="text-muted text-center">No users assigned to this team.</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+}
+
+<div class="d-flex justify-content-between align-items-center mt-4">
+    <span>Showing page @ViewBag.CurrentPage of @ViewBag.TotalPages</span>
+    <nav>
+        <ul class="pagination mb-0">
+            <li class="page-item @(ViewBag.CurrentPage == 1 ? "disabled" : "")">
+                <a class="page-link pagination-link" href="javascript:void(0);" data-page="@(@ViewBag.CurrentPage - 1)">Previous</a>
+            </li>
+            @for (int i = 1; i <= ViewBag.TotalPages; i++)
+            {
+                <li class="page-item @(i == ViewBag.CurrentPage ? "active" : "")">
+                    <a class="page-link pagination-link" href="javascript:void(0);" data-page="@i">@i</a>
+                </li>
+            }
+            <li class="page-item @(ViewBag.CurrentPage == ViewBag.TotalPages ? "disabled" : "")">
+                <a class="page-link pagination-link" href="javascript:void(0);" data-page="@(@ViewBag.CurrentPage + 1)">Next</a>
+            </li>
+        </ul>
+    </nav>
+</div>

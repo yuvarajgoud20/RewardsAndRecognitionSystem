@@ -26,6 +26,7 @@ namespace RewardsAndRecognitionSystem.ViewModels
         public YearQuarter? YearQuarter { get; set; }
 
         public ICollection<Approval>? Approvals { get; set; }
+        public bool IsDeleted { get; internal set; }
 
 
     }

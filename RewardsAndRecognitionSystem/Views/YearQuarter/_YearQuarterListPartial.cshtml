@@ -1,0 +1,64 @@
+﻿@model IEnumerable<RewardsAndRecognitionSystem.ViewModels.YearQuarterViewModel>
+<table class="yearquarter-table">
+    <thead>
+        <tr>
+            <th><i class="bi bi-calendar2"></i> Year</th>
+            <th><i class="bi bi-calendar3"></i> Quarter</th>
+            <th><i class="bi bi-calendar-event"></i> Start Date</th>
+            <th><i class="bi bi-calendar-check"></i> End Date</th>
+            <th><i class="bi bi-check2-circle"></i> Active</th>
+            <th><i class="bi bi-gear-fill"></i> Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var yq in Model)
+        {
+            <tr>
+                <td>@yq.Year</td>
+                <td>@yq.Quarter</td>
+                <td>@(yq.StartDate?.ToShortDateString() ?? "N/A")</td>
+                <td>@(yq.EndDate?.ToShortDateString() ?? "N/A")</td>
+                <td>@(yq.IsActive ? "✅ Yes" : "❌ No")</td>
+                <td>
+                    <a asp-action="Details" asp-route-id="@yq.Id" class="btn btn-secondary">
+                        <i class="bi bi-eye-fill"></i> View
+                    </a>
+                    <a asp-action="Edit" asp-route-id="@yq.Id" class="btn btn-primary">
+                        <i class="bi bi-pencil-square"></i> Edit
+                    </a>
+                    <button type="button" class="btn btn-danger" onclick="confirmDelete('@yq.Id')">
+                        <i class="bi bi-trash-fill"></i> Delete
+                    </button>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+<div class="d-flex justify-content-between align-items-center mt-4">
+    <span>Showing page @ViewBag.CurrentPage of @ViewBag.TotalPages</span>
+    <nav>
+        <ul class="pagination mb-0">
+            <li class="page-item @(ViewBag.CurrentPage == 1 ? "disabled" : "")">
+                <a class="page-link pagination-link"
+                   asp-action="Index"
+                   asp-route-page="@(ViewBag.CurrentPage - 1)">Previous</a>
+            </li>
+            @for (int i = 1; i <= ViewBag.TotalPages; i++)
+            {
+                <li class="page-item @(i == ViewBag.CurrentPage ? "active" : "")">
+                    <a class="page-link pagination-link"
+                       asp-action="Index"
+                       asp-route-page="@i">@i</a>
+                </li>
+            }
+            <li class="page-item @(ViewBag.CurrentPage == ViewBag.TotalPages ? "disabled" : "")">
+                <a class="page-link pagination-link"
+                   asp-action="Index"
+                   asp-route-page="@(ViewBag.CurrentPage + 1)">Next</a>
+            </li>
+        </ul>
+    </nav>
+</div>
+
+
+

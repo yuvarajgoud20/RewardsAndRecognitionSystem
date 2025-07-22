@@ -112,49 +112,25 @@
         <i class="bi bi-plus-circle-fill"></i> New Category
     </a>
 </div>
-
-<table class="table-custom">
-    <thead>
-        <tr>
-            <th><i class="bi bi-tag-fill"></i> Name</th>
-            <th class="desc-cell"><i class="bi bi-card-text"></i> Description</th>
-            <th><i class="bi bi-calendar-event"></i> Created Date</th>
-            <th><i class="bi bi-check-circle-fill"></i> Status</th>
-            <th><i class="bi bi-tools"></i> Actions</th>
-        </tr>
-    </thead>
-    <tbody>
-        @foreach (var category in Model)
-        {
-            <tr>
-                <td>@category.Name</td>
-                <td class="desc-cell">@category.Description</td>
-                <td>@category.CreatedAt.ToShortDateString()</td>
-                <td>
-                    @if (category.isActive)
-                    {
-                        <span class="badge bg-success"><i class="bi bi-check-circle-fill"></i> Active</span>
-                    }
-                    else
-                    {
-                        <span class="badge bg-secondary"><i class="bi bi-x-circle-fill"></i> Inactive</span>
-                    }
-                </td>
-                <td class="actions-cell">
-                    <a asp-action="Edit" asp-route-id="@category.Id" class="btn btn-indigo btn-sm">
-                        <i class="bi bi-pencil-fill"></i> Edit
-                    </a>
-                    <a asp-action="Details" asp-route-id="@category.Id" class="btn btn-secondary btn-sm">
-                        <i class="bi bi-eye-fill"></i> Details
-                    </a>
-                    <button type="button" class="btn btn-danger" onclick="confirmDelete('@category.Id')">
-                        <i class="bi bi-trash-fill"></i> Delete
-                    </button>
-                </td>
-            </tr>
-        }
-    </tbody>
-</table>
+<div class="mb-3 text-end">
+    @if (ViewBag.ShowDeleted)
+    {
+        <a class="btn btn-primary"
+           href="@Url.Action("Index", new { showDeleted = false })">
+            <i class="bi bi-eye-fill"></i> Show Active Categories
+        </a>
+    }
+    else
+    {
+        <a class="btn btn-danger"
+           href="@Url.Action("Index", new { showDeleted = true })">
+            <i class="bi bi-trash-fill"></i> Show Deleted Categories
+        </a>
+    }
+</div>
+<div id="categoryListContainer">
+    @Html.Partial("_CategoryListPartial", Model)
+</div>
 <script type="text/javascript">
     const categoriesInNominations = @Html.Raw(ViewBag.CategoryIdsJson);
 </script>
@@ -194,4 +170,23 @@
       });
     }
 
+</script>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+    $(document).on("click", ".pagination-link", function (e) {
+        e.preventDefault();
+        var url = $(this).attr("href");
+
+        $.ajax({
+            url: url,
+            type: "GET",
+            headers: { "X-Requested-With": "XMLHttpRequest" },
+            success: function (result) {
+                $('#categoryListContainer').html(result);
+            },
+            error: function () {
+                alert("Failed to load category data.");
+            }
+        });
+    });
 </script>
