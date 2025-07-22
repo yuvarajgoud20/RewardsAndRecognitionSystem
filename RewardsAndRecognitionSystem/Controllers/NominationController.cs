@@ -44,6 +44,12 @@ namespace RewardsAndRecognitionSystem.Controllers
             if (currentUser == null)
                 return RedirectToAction("Login", "Account", new { area = "Identity" });
 
+            var activeQuarter = await _context.YearQuarters.FirstOrDefaultAsync(yq => yq.IsActive);
+            if (activeQuarter == null)
+            {
+                TempData["Message"] = "❌ No active quarter is set.";
+                return View(new List<Nomination>());
+            }
 
             ViewBag.currentUser = currentUser;
             var userRoles = await _userManager.GetRolesAsync(currentUser);
@@ -57,6 +63,7 @@ namespace RewardsAndRecognitionSystem.Controllers
                     .Include(n => n.Category)
                     .Include(n => n.Approvals)
                     .Include(n => n.Nominator)
+                          .Where(n => n.YearQuarterId == activeQuarter.Id)
                     .Where(n => n.Nominee.Team.DirectorId == currentUser.Id)
                     .Where(n => n.Status != NominationStatus.PendingManager)
                     //.Where(n => n.Approvals != null)
@@ -81,6 +88,7 @@ namespace RewardsAndRecognitionSystem.Controllers
                     .Include(n => n.Category)
                     .Include(n => n.Approvals)
                     .Include(n => n.Nominator)
+                     .Where(n => n.YearQuarterId == activeQuarter.Id)
                     .Where(n => n.Nominee.Team.ManagerId == currentUser.Id)
                     .ToListAsync();
 
@@ -103,6 +111,7 @@ namespace RewardsAndRecognitionSystem.Controllers
                      .Include(n => n.Category)
                      .Include(n => n.Approvals)
                      .Include(n => n.Nominator)
+                      .Where(n => n.YearQuarterId == activeQuarter.Id)
                      .Where(n => n.NominatorId == currentUser.Id)
                      .ToListAsync();
                                 var alreadyReviewedIds = nominationsToShow
@@ -123,6 +132,7 @@ namespace RewardsAndRecognitionSystem.Controllers
                     .Include(n => n.Nominator)
                     .ThenInclude(u => u.Team)
                     .Include(n => n.Category)
+                     .Where(n => n.YearQuarterId == activeQuarter.Id)
                     .ToListAsync();
             }
             var viewModelList = _mapper.Map<List<NominationViewModel>>(nominationsToShow);

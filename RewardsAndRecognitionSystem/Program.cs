@@ -1,3 +1,4 @@
+//main code
 using FluentValidation;
 using FluentValidation.AspNetCore;
 using Microsoft.AspNetCore.Authentication;
@@ -113,7 +114,7 @@ internal class Program
     builder.Services.AddRazorPages();
     builder.Services.ConfigureApplicationCookie(options =>
     {
-        options.LoginPath = "/Identity/Account/Login";
+        options.LoginPath = "/Login";
         options.AccessDeniedPath = "/Identity/Account/AccessDenied";
     });
 
@@ -143,7 +144,7 @@ internal class Program
     builder.Services.AddScoped<ICategoryService, CategoryService>();
     builder.Services.ConfigureApplicationCookie(options =>
     {
-        options.LoginPath = "/Identity/Account/Login";
+        options.LoginPath = "/Login";
     });
 
     //CSRF Token
