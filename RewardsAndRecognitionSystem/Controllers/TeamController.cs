@@ -35,7 +35,7 @@ namespace RewardsAndRecognitionSystem.Controllers
 
         private readonly UserManager<User> _userManager;
 
-        public TeamController(IMapper mapper, ITeamRepo teamRepo, IUserRepo userRepo, UserManager<User> userManager, ApplicationDbContext context)
+        public TeamController(IMapper mapper,ITeamRepo teamRepo, IUserRepo userRepo, UserManager<User> userManager, ApplicationDbContext context)
 
         {
             _mapper = mapper;
@@ -132,7 +132,7 @@ namespace RewardsAndRecognitionSystem.Controllers
             if (ModelState.IsValid)
 
             {
-                var team = _mapper.Map<Team>(viewModel);
+                var team=_mapper.Map<Team>(viewModel);
                 await _teamRepo.AddAsync(team);
                 return RedirectToAction(nameof(Index));
 
@@ -149,32 +149,32 @@ namespace RewardsAndRecognitionSystem.Controllers
         public async Task<IActionResult> Edit(Guid id)
 
         {
+          
+                var existingteam = await _teamRepo.GetByIdAsync(id);
+                var team = _mapper.Map<TeamViewModel>(existingteam);
 
-            var existingteam = await _teamRepo.GetByIdAsync(id);
-            var team = _mapper.Map<TeamViewModel>(existingteam);
+                if (team == null)
 
-            if (team == null)
+                {
 
-            {
+                    return NotFound();
 
-                return NotFound();
+                }
 
-            }
+                var managers = await _userRepo.GetAllManagersAsync(); // ✅ Required
 
-            var managers = await _userRepo.GetAllManagersAsync(); // ✅ Required
+                var leads = await _userRepo.GetLeadsAsync(team.TeamLeadId);
 
-            var leads = await _userRepo.GetLeadsAsync(team.TeamLeadId);
+                var directors = await _userRepo.GetAllDirectorsAsync();// ✅ Required
 
-            var directors = await _userRepo.GetAllDirectorsAsync();// ✅ Required
+                ViewBag.Managers = new SelectList(managers, "Id", "Name", team.ManagerId);
 
-            ViewBag.Managers = new SelectList(managers, "Id", "Name", team.ManagerId);
+                ViewBag.TeamLeads = new SelectList(leads, "Id", "Name", team.TeamLeadId);
 
-            ViewBag.TeamLeads = new SelectList(leads, "Id", "Name", team.TeamLeadId);
+                ViewBag.Directors = new SelectList(directors, "Id", "Name", team.DirectorId);
 
-            ViewBag.Directors = new SelectList(directors, "Id", "Name", team.DirectorId);
-
-            return View(team);
-
+                return View(team);
+                     
         }
 
 
@@ -195,16 +195,16 @@ namespace RewardsAndRecognitionSystem.Controllers
 
             if (!ModelState.IsValid)
             {
-                await LoadDropdownsAsync();
-                ModelState.Clear();
-                var teamViewModel = _mapper.Map<TeamViewModel>(existingTeam);
+                await LoadDropdownsAsync(); 
+                ModelState.Clear(); 
+                var teamViewModel=_mapper.Map<TeamViewModel>(existingTeam);
                 var managers = await _userRepo.GetAllManagersAsync(); // ✅ Required
                 var leads = await _userRepo.GetLeadsAsync(existingTeam.TeamLeadId);
                 var directors = await _userRepo.GetAllDirectorsAsync();// ✅ Required
                 ViewBag.Managers = new SelectList(managers, "Id", "Name", existingTeam.ManagerId);
                 ViewBag.TeamLeads = new SelectList(leads, "Id", "Name", existingTeam.TeamLeadId);
                 ViewBag.Directors = new SelectList(directors, "Id", "Name", existingTeam.DirectorId);
-                return View(teamViewModel);
+                return View(teamViewModel); 
             }
 
             // Check for team lead change

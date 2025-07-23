@@ -185,6 +185,27 @@ internal class Program
 
             app.UseAuthorization();
 
+            app.Use(async (context, next) =>
+            {
+                var user = context.User;
+
+                if (context.Request.Path == "/" && user.Identity != null && user.Identity.IsAuthenticated)
+                {
+                    if (user.IsInRole("TeamLead") || user.IsInRole("Manager") || user.IsInRole("Director"))
+                    {
+                        context.Response.Redirect("/Dashboard/Index");
+                        return;
+                    }
+                    else
+                    {
+                        context.Response.Redirect("/Home/Index");
+                        return;
+                    }
+                }
+
+                await next();
+            });
+
             app.MapControllerRoute(
                 name: "default",
                 pattern: "{controller=Home}/{action=Index}/{id?}");

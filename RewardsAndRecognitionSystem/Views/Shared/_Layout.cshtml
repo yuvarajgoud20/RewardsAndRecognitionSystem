@@ -107,12 +107,16 @@
                 </button>
 
                 <div class="collapse navbar-collapse" id="mainNavbar">
+
                     <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-                        <li class="nav-item">
-                            <a class="nav-link" asp-controller="Home" asp-action="Index">
-                                <i class="bi bi-house-door"></i> Home
-                            </a>
-                        </li>
+                        @if (!SignInManager.IsSignedIn(User))
+                        {
+                            <li class="nav-item">
+                                <a class="nav-link" asp-controller="Home" asp-action="Index">
+                                    <i class="bi bi-house-door"></i> Home
+                                </a>
+                            </li>
+                        }
                         
                         @if (User.IsInRole("Manager") || User.IsInRole("TeamLead") || User.IsInRole("Director"))
                         {
