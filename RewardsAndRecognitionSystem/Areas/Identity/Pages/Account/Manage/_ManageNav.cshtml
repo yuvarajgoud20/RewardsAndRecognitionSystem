@@ -1,15 +1,42 @@
-﻿@inject SignInManager<IdentityUser> SignInManager
+﻿@using RewardsAndRecognitionRepository.Models
+@inject SignInManager<User> SignInManager
 @{
     var hasExternalLogins = (await SignInManager.GetExternalAuthenticationSchemesAsync()).Any();
 }
-<ul class="nav nav-pills flex-column">
-    <li class="nav-item"><a class="nav-link @ManageNavPages.IndexNavClass(ViewContext)" id="profile" asp-page="./Index">Profile</a></li>
-    <li class="nav-item"><a class="nav-link @ManageNavPages.EmailNavClass(ViewContext)" id="email" asp-page="./Email">Email</a></li>
-    <li class="nav-item"><a class="nav-link @ManageNavPages.ChangePasswordNavClass(ViewContext)" id="change-password" asp-page="./ChangePassword">Password</a></li>
+
+<style>
+    .custom-nav .nav-link {
+        color: #555 !important; /* Default text color */
+        background-color: transparent;
+        transition: color 0.3s, background-color 0.3s;
+        font-weight: 500;
+    }
+
+        .custom-nav .nav-link:hover {
+            color: black !important; /* Blue on hover */
+            background-color: #f0f0f0; /* Light background on hover */
+        }
+
+        .custom-nav .nav-link.active {
+            color: white !important;
+            background-color: #007bff !important; /* Bootstrap primary */
+            font-weight: bold;
+            box-shadow: 0 2px 8px rgba(0, 123, 255, 0.3);
+        }
+
+</style>
+
+<ul class="nav nav-pills justify-content-center mb-4 custom-nav" role="tablist">
+    <li class="nav-item" role="presentation">
+        <a class="nav-link @ManageNavPages.IndexNavClass(ViewContext)" id="profile-tab" asp-page="./Index">Profile</a>
+    </li>
+    <li class="nav-item" role="presentation">
+        <a class="nav-link @ManageNavPages.ChangePasswordNavClass(ViewContext)" id="password-tab" asp-page="./ChangePassword">Password</a>
+    </li>
     @if (hasExternalLogins)
     {
-        <li id="external-logins" class="nav-item"><a id="external-login" class="nav-link @ManageNavPages.ExternalLoginsNavClass(ViewContext)" asp-page="./ExternalLogins">External logins</a></li>
+        <li class="nav-item" role="presentation">
+            <a class="nav-link @ManageNavPages.ExternalLoginsNavClass(ViewContext)" id="external-login-tab" asp-page="./ExternalLogins">External Logins</a>
+        </li>
     }
-    <li class="nav-item"><a class="nav-link @ManageNavPages.TwoFactorAuthenticationNavClass(ViewContext)" id="two-factor" asp-page="./TwoFactorAuthentication">Two-factor authentication</a></li>
-    <li class="nav-item"><a class="nav-link @ManageNavPages.PersonalDataNavClass(ViewContext)" id="personal-data" asp-page="./PersonalData">Personal data</a></li>
 </ul>
