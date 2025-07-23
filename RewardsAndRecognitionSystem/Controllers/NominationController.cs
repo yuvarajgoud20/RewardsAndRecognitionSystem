@@ -43,9 +43,10 @@ namespace RewardsAndRecognitionSystem.Controllers
         }
 
         // GET: Nomination
-        public async Task<IActionResult> Index(string FilterForDelete = "active", int page = 1)
+        public async Task<IActionResult> Index(string filter = "all" ,string FilterForDelete = "active", int page = 1)
         {
             int pageSize = 2;
+            ViewBag.filter = filter;
             
             var currentUser = await _userManager.GetUserAsync(User);
             if (currentUser == null)
@@ -78,12 +79,24 @@ namespace RewardsAndRecognitionSystem.Controllers
                     .Where(n => n.Status != NominationStatus.PendingManager)
                     //.Where(n => n.Approvals != null)
                     .ToListAsync();
+                if (filter == "pending")
+                {
+                    nominationsToShow = nominationsToShow.Where(n => n.Status == NominationStatus.ManagerApproved || n.Status == NominationStatus.ManagerRejected).ToList();
+                }
 
+                if (filter == "directorapproved")
+                {
+                    nominationsToShow = nominationsToShow.Where(n => n.Status == NominationStatus.DirectorApproved).ToList();
+                }
+                if (filter == "directorrejected")
+                {
+                    nominationsToShow = nominationsToShow.Where(n => n.Status == NominationStatus.DirectorRejected).ToList();
+                }
                 // Track reviewed nominations
                 var alreadyReviewedIds = nominationsToShow
-                    .Where(n => n.Approvals.Any(a => a.ApproverId == currentUser.Id))
-                    .Select(n => n.Id)
-                    .ToList();
+                        .Where(n => n.Approvals.Any(a => a.ApproverId == currentUser.Id))
+                        .Select(n => n.Id)
+                        .ToList();
 
                 ViewBag.ReviewedNominationIds = alreadyReviewedIds;
                 ViewBag.TotalPages = (int)Math.Ceiling(nominationsToShow.Count / (double)pageSize);
@@ -113,7 +126,19 @@ namespace RewardsAndRecognitionSystem.Controllers
                      .Where(n => n.YearQuarterId == activeQuarter.Id)
                     .Where(n => n.Nominee.Team.ManagerId == currentUser.Id)
                     .ToListAsync();
+                if (filter == "pending")
+                {
+                    nominationsToShow = nominationsToShow.Where(n => n.Status == NominationStatus.PendingManager ).ToList();
+                }
 
+                if (filter == "directorapproved")
+                {
+                    nominationsToShow = nominationsToShow.Where(n => n.Status == NominationStatus.DirectorApproved).ToList();
+                }
+                if (filter == "directorrejected")
+                {
+                    nominationsToShow = nominationsToShow.Where(n => n.Status == NominationStatus.DirectorRejected).ToList();
+                }
                 // Track reviewed nominations
                 var alreadyReviewedIds = nominationsToShow
                     .Where(n => n.Approvals.Any(a => a.ApproverId == currentUser.Id))
@@ -146,6 +171,20 @@ namespace RewardsAndRecognitionSystem.Controllers
                       .Where(n => n.YearQuarterId == activeQuarter.Id)
                      .Where(n => n.NominatorId == currentUser.Id)
                      .ToListAsync();
+                if (filter == "pending")
+                {
+                    nominationsToShow = nominationsToShow.Where(n => n.Status == NominationStatus.PendingManager ||
+                                                 n.Status == NominationStatus.ManagerRejected ||
+                                                 n.Status == NominationStatus.ManagerApproved).ToList();
+                }
+                if (filter == "directorapproved")
+                {
+                    nominationsToShow = nominationsToShow.Where(n => n.Status == NominationStatus.DirectorApproved).ToList();
+                }
+                if (filter == "directorrejected")
+                {
+                    nominationsToShow = nominationsToShow.Where(n => n.Status == NominationStatus.DirectorRejected).ToList();
+                }
                 if (FilterForDelete == "deleted")
                 {
                     allNominations =  nominationsToShow.Where(n => n.IsDeleted).ToList();

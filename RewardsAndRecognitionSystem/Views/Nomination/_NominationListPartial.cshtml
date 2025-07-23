@@ -11,14 +11,17 @@
     var isManager = User.IsInRole("Manager");
     var isDirector = User.IsInRole("Director");
     var isTeamLead = User.IsInRole("TeamLead");
-    var selectedFilter = Context.Request.Query["filter"].ToString()?.ToLower() ?? "all";
+
     var selectedFilter2 = ViewBag.FilterForDelete as string ?? "active";
-     var currentFilter = selectedFilter2;
+    var currentFilter = selectedFilter2;
     //var selectedFilter = ViewBag.FilterForDelete as string ?? "active";
     // var FilterDelete = Context.Request.Query["FilterForDelete"];
     // var isActiveSelected = FilterDelete == "active" || string.IsNullOrEmpty(FilterDelete);
     // var isDeletedSelected = FilterDelete == "deleted";
     // var FilterDelete = Context.Request.Query["FilterForDelete"];
+
+    var dashboardFilter = ViewBag.filter;
+    var all = "all";
 }
 
 
@@ -41,20 +44,11 @@
             
 
 
-<select id="filterfordelete" class="form-select w-auto" onchange="submitWithFilter(1, this.value)">
+<select id="filterfordelete" class="form-select w-auto" onchange="submitWithFilter(1, this.value,all)">
     <option value="active" selected="@(selectedFilter2 == "active" ? "selected" : null)">Active</option>
     <option value="deleted" selected="@(selectedFilter2 == "deleted" ? "selected" : null)">Deleted</option>
 </select>
 
-         @if(selectedFilter2=="active"){
-           <select id="filterSelect" class="form-select" style="width: 150px;">
-                <option value="all">All</option>
-                <option value="pending">Pending</option>
-                <option value="reviewed">Reviewed</option>
-                <option value="directorapproved">Approved</option>
-                <option value="directorrejected">Rejected</option>
-           </select>
-         }
 
             <a asp-action="Create" class="btn btn-indigo" style="white-space: nowrap;">
                 <i class="bi bi-plus-circle-fill"></i> Create Nomination
@@ -117,40 +111,7 @@
             }
         </tbody>
     </table>
-//     @if (ViewBag.DeletedNominations != null && ((List<RewardsAndRecognitionRepository.Models.Nomination>)ViewBag.DeletedNominations).Any())
-// {
-//     <h4 class="mt-5">🗑️ Deleted Nominations</h4>
 
-//     <table class="table table-bordered table-striped mt-3">
-//         <thead>
-//             <tr>
-//                 <th>#</th>
-//                 <th>Nominee</th>
-//                 <th>Team</th>
-//                 <th>Category</th>
-//                 <th>Status</th>
-                
-//             </tr>
-//         </thead>
-//         <tbody>
-//             @foreach (var (item, index) in ((List<RewardsAndRecognitionRepository.Models.Nomination>)ViewBag.DeletedNominations).Select((value, i) => (value, i)))
-//             {
-//                 <tr class="text-muted bg-light">
-//                     <td>@(index + 1)</td>
-//                     <td>@item.Nominee?.Name</td>
-//                     <td>@item.Nominee?.Team?.Name</td>
-//                     <td>@item.Category?.Name</td>
-//                     <td>@item.Status</td>
-                   
-//                 </tr>
-//             }
-//         </tbody>
-//     </table>
-// }
-// else
-// {
-//     <p class="text-muted mt-4">No deleted nominations found.</p>
-// }
 
  } 
 
@@ -167,13 +128,6 @@
                 <a asp-action="ExportAllNominationsOpenXml" class="btn btn-success">
                     <i class="bi bi-file-earmark-excel"></i> Export
                 </a>
-            <select id="filterSelect" class="form-select" style="width: 150px;">
-                <option value="all">All</option>
-                <option value="pending">Pending</option>
-                <option value="reviewed">Reviewed</option>
-                <option value="directorapproved">Approved</option>
-                <option value="directorrejected">Rejected</option>
-            </select>
         </div>
     </div>
 
@@ -235,17 +189,22 @@
                     <td>@n.Status</td>
                     <td>@n.CreatedAt.ToString("dd/MM/yyyy")</td>
                     <td>
-                        <button class="btn btn-indigo btn-sm open-popup" data-index="@i">
-                            <i class="bi bi-eye-fill"></i> @(isReviewed ? "View" : "Review")
-                        </button>
-                         <button type="button"
-                                class="btn btn-warning btn-sm"
-                                data-bs-toggle="modal"
-                                data-bs-target="#revertModal"
-                                data-nomination-id="@n.Id"
-                                @(isReviewed ? "disabled title='Already Reviewed'" : "")>
-                            ⏪ Revert
-                        </button>
+                            <div class="d-flex justify-content-between align-items-center gap-2" style="width: 250px;">
+                                <button class="btn btn-indigo btn-sm w-100 fixed-btn open-popup" data-index="@i">
+                                    <i class="bi bi-eye-fill"></i> @(isReviewed ? "View" : "Review")
+                                </button>
+                                <button type="button"
+                                        class="btn btn-warning btn-sm w-100 fixed-btn"
+                                        data-bs-toggle="modal"
+                                        data-bs-target="#revertModal"
+                                        data-nomination-id="@n.Id"
+                                        @(isReviewed ? "disabled title='Already Reviewed'" : "")>
+                                    ⏪ Revert
+                                </button>
+                            </div>
+
+                            
+                         
                     </td>
                 </tr>
             }
@@ -301,7 +260,7 @@
             @for (int i = 1; i <= ViewBag.TotalPages; i++)
             {
                 <li class="page-item @(ViewBag.CurrentPage == i ? "active" : "")">
-                    <a class="page-link pagination-link" href="javascript:void(0);" data-page="@i" data-filter="@currentFilter">@i</a>
+                        <a class="page-link pagination-link" href="javascript:void(0);" data-page="@i" data-filter="@currentFilter" data-dashboard-filter="@dashboardFilter">@i</a>
                 </li>
             }
         </ul>
@@ -330,45 +289,13 @@ console.log(IS_TEAMLEAD);
 
 
 
-<script>
 
-  
-    
-
-       const IS_TEAMLEAD=@User.IsInRole("TeamLead").ToString().ToLower();
-        document.addEventListener("DOMContentLoaded", () => {
-
-        const preselectedFilter = "@selectedFilter";
-
-        const filterSelect = document.getElementById("filterSelect");
-
-        const liveSearchInput = document.getElementById("liveSearch");
- 
-        if (filterSelect && preselectedFilter) {
-
-            filterSelect.value = preselectedFilter;
-
-        }
-
- 
-        // Clear search box
-
-        if (liveSearchInput) liveSearchInput.value = "";
- 
-        // Trigger the filtering logic
-
-        filterTable();
-
-
-
-    });
-</script>
  <script src="~/js/Nomination.js"></script>
  <script>
-   function submitWithFilter(page, filter) {
+       function submitWithFilter(page, filter,dashboardFilter) {
     $.ajax({
         url: '/Nomination/Index',
-        data: { FilterForDelete: filter, page: page },
+            data: {filter :dashboardFilter, FilterForDelete: filter, page: page },
         success: function (result) {
             $('#nominationListContainer').html(result);
         }
@@ -379,7 +306,8 @@ console.log(IS_TEAMLEAD);
 $(document).on("click", ".pagination-link", function () {
     const page = $(this).data("page");
     const filter = $("#filterfordelete").val(); // get value from dropdown
-    submitWithFilter(page, filter);
+    const dashboardFilter =$(this).data("dashboardFilter");
+        submitWithFilter(page, filter,dashboardFilter);
 });
 
 
