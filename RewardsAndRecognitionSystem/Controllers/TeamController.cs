@@ -134,6 +134,9 @@ namespace RewardsAndRecognitionSystem.Controllers
             {
                 var team=_mapper.Map<Team>(viewModel);
                 await _teamRepo.AddAsync(team);
+                User user = await _userRepo.GetByIdAsync(team.TeamLeadId);
+                user.TeamId = team.Id;
+                await _userManager.UpdateAsync(user);
                 return RedirectToAction(nameof(Index));
 
             }

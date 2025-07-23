@@ -212,7 +212,7 @@ namespace RewardsAndRecognitionSystem.Controllers
 
      .FirstOrDefaultAsync(u => u.Id == user.Id);
 
-            var viewModel = new UserViewModel
+            var viewModel = new EditUserViewModel
 
             {
 
@@ -249,12 +249,12 @@ namespace RewardsAndRecognitionSystem.Controllers
         // POST: User/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(string id, UserViewModel updatedUserViewModel)
+        public async Task<IActionResult> Edit(string id, EditUserViewModel updatedUserViewModel)
         {
             if (!ModelState.IsValid)
             {
                 var usermodel = await _userManager.FindByIdAsync(id);
-                var userViewmodel = _mapper.Map<UserViewModel>(usermodel);
+                var userViewmodel = _mapper.Map<EditUserViewModel>(usermodel);
                 ModelState.Clear();
                 await PopulateDropDowns();
                 return View(userViewmodel);

@@ -38,7 +38,7 @@ internal class Program
     var builder = WebApplication.CreateBuilder(args);
 
     // Enable internal Serilog diagnostics (optional, helps debug filters)
-    Serilog.Debugging.SelfLog.Enable(Console.Error);
+    /*Serilog.Debugging.SelfLog.Enable(Console.Error);
     // Configure Serilog programmatically for fully separated logs
     Log.Logger = new LoggerConfiguration()
         .MinimumLevel.Verbose()
@@ -81,7 +81,7 @@ internal class Program
             )
         )
         .CreateLogger();
-    builder.Host.UseSerilog();
+    builder.Host.UseSerilog()*/
         
 
     // Add services to the container.
@@ -93,6 +93,7 @@ internal class Program
           builder.Services.AddAutoMapper(cfg =>
             {
                 cfg.AddProfile<UserMappingProfile>();
+                cfg.AddProfile<EditUserMappingProfile>();
                 cfg.AddProfile<CategoryMappingProfle>();
                 cfg.AddProfile<TeamViewMapperProfile>();
                 cfg.AddProfile<YearQuarterMappingProfile>();
@@ -106,6 +107,7 @@ internal class Program
             builder.Services.AddFluentValidationClientsideAdapters(); // For client-side validation
 
             builder.Services.AddTransient<IValidator<UserViewModel>, UserViewValidator>();
+            builder.Services.AddTransient<IValidator<EditUserViewModel>, EditUserViewValidator>();
             builder.Services.AddTransient<IValidator<TeamViewModel>, TeamViewValidator>();
             builder.Services.AddTransient<IValidator<CategoryViewModel>, CategoryViewValidator>();
             builder.Services.AddTransient<IValidator<YearQuarterViewModel>, YearQuarterViewValidator>();
