@@ -25,7 +25,7 @@ namespace RewardsAndRecognitionSystem.Controllers
         // GET: /YearQuarter
         public async Task<IActionResult> Index(int page=1)
         {
-            int pageSize = 5;
+            int pageSize = 10;
 
             var allQuarters = await _yearQuarterRepo.GetAllAsync();
             var totalRecords = allQuarters.Count();

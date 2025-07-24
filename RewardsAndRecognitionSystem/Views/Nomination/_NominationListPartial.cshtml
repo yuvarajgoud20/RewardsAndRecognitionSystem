@@ -60,7 +60,6 @@
     <table class="table-custom" id="nominationsTable">
         <thead>
             <tr>
-                <th>#</th>
                 <th>Nominee</th>
                 <th>Team</th>
                 <th>Category</th>
@@ -79,7 +78,6 @@
                 <tr data-name="@n.Nominee?.Name?.ToLower()"
                     data-status="@n.Status"
                     class="@(ViewBag.ReviewedNominationIds.Contains(n.Id) ? "reviewed" : "pending")">
-                    <td>@(i + 1)</td>
                     <td>@n.Nominee?.Name</td>
                     <td>@n.Nominee?.Team?.Name</td>
                     <td>@n.Category?.Name</td>
@@ -134,7 +132,6 @@
     <table class="table-custom" id="nominationsTable">
         <thead>
             <tr>
-                <th>S.No</th>
                 <th>Nominee</th>
                 <th>Team</th>
                 <th>Category</th>
@@ -181,7 +178,6 @@
                     data-approval_status="@managerApprovalStatus"
                     data-director_remarks="@directorRemarks"
                     data-manager_remarks="@managerRemarks">
-                    <td>@(i + 1)</td>
                     <td>@n.Nominee?.Name</td>
                     <td>@n.Nominee?.Team?.Name</td>
                     <td>@n.Category?.Name</td>

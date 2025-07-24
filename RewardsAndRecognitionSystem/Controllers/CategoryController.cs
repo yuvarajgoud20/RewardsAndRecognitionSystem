@@ -29,7 +29,7 @@ namespace RewardsAndRecognitionSystem.Controllers
         public async Task<IActionResult> Index(int page = 1, bool showDeleted = false)
         {
             // var categories = await _categoryRepo.GetAllAsync();
-            int pageSize = 5;
+            int pageSize = 10;
 
             // 🔁 Fetch all categories based on showDeleted flag
             var allCategories = await _categoryRepo.GetAllAsync(showDeleted);

@@ -46,28 +46,10 @@ namespace RewardsAndRecognitionSystem.Controllers
             _emailService = emailService;
         }
 
-        // GET: User
-        /*public async Task<IActionResult> Index()
-        {
-            var users = await _context.Users
-        .Include(u => u.Team)
-            .ThenInclude(t => t.Manager)
-        .ToListAsync();
-
-            var userRoles = new Dictionary<string, string>();
-
-            foreach (var user in users)
-            {
-                var roles = await _userManager.GetRolesAsync(user);
-                userRoles[user.Id] = roles.FirstOrDefault() ?? "No Role";
-            }
-            ViewBag.UserRoles = userRoles;
-            var usersList=_mapper.Map<List<UserViewModel>>(users);
-            return View(usersList);
-        }*/
+       
         public async Task<IActionResult> Index(int page = 1)
         {
-            int pageSize = 5;
+            int pageSize = 10;
             var usersQuery = _context.Users
                 .Include(u => u.Team)
                     .ThenInclude(t => t.Manager);

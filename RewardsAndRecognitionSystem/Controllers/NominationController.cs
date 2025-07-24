@@ -45,7 +45,7 @@ namespace RewardsAndRecognitionSystem.Controllers
         // GET: Nomination
         public async Task<IActionResult> Index(string filter = "all" ,string FilterForDelete = "active", int page = 1)
         {
-            int pageSize = 2;
+            int pageSize = 10;
             ViewBag.filter = filter;
             
             var currentUser = await _userManager.GetUserAsync(User);
