@@ -12,17 +12,17 @@
         <input type="hidden" asp-for="Id" />
 
         <div class="mb-3">
-            <label asp-for="Year" class="form-label">Year</label>
-            <input asp-for="Year" class="form-control" />
-            <span asp-validation-for="Year" class="text-danger"></span>
+            @* <label asp-for="Year" class="form-label">Year</label> *@
+            <input type="hidden" asp-for="Year" class="form-control" />
+            @* <span asp-validation-for="Year" class="text-danger"></span> *@
         </div>
 
         <div class="mb-3">
-            <label asp-for="Quarter" class="form-label">Quarter</label>
-            <select asp-for="Quarter" class="form-select" asp-items="ViewBag.Quarters">
+            @* <label asp-for="Quarter" class="form-label">Quarter</label> *@
+            <select  asp-for="Quarter" class="form-select" asp-items="ViewBag.Quarters" hidden>
                 <option value="">-- Select Quarter --</option>
             </select>
-            <span asp-validation-for="Quarter" class="text-danger"></span> 
+            @* <span asp-validation-for="Quarter" class="text-danger"></span>  *@
         </div>
 
         <div class="mb-3">

@@ -73,6 +73,11 @@ namespace RewardsAndRecognitionSystem.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(YearQuarterViewModel yq)
         {
+            var yqs = await _yearQuarterRepo.GetAllAsync();
+            if (yqs.Any(yearquarter => yearquarter.Year == yq.Year && yearquarter.Quarter == yq.Quarter))
+            {
+                ModelState.AddModelError("Quarter", " Year + Quarter Combination already Exists.please select another quarter");
+            }
             if (!ModelState.IsValid)
             {
                 

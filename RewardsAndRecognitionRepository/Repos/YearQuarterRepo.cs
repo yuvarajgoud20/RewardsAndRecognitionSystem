@@ -29,13 +29,25 @@ namespace RewardsAndRecognitionRepository.Repositories
         public async Task AddAsync(YearQuarter yq)
         {
                 _context.YearQuarters.Add(yq);
-                await _context.SaveChangesAsync();
+                if (yq.IsActive)
+                {
+                    await _context.YearQuarters
+                        .Where(x => x.IsActive)
+                        .ExecuteUpdateAsync(set => set.SetProperty(x => x.IsActive, false));
+                }
+                 await _context.SaveChangesAsync();
            
         }
 
         public async Task UpdateAsync(YearQuarter yq)
         {
             _context.YearQuarters.Update(yq);
+            if (yq.IsActive)
+            {
+                await _context.YearQuarters
+                    .Where(x => x.IsActive)
+                    .ExecuteUpdateAsync(set => set.SetProperty(x => x.IsActive, false));
+            }
             await _context.SaveChangesAsync();
         }
 
