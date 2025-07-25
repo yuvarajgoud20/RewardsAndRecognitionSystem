@@ -47,22 +47,19 @@
         margin: 20px 0;
     }
 
-    /* Centering the pie chart */
     #teamPieContainer {
         display: flex;
         justify-content: center;
         align-items: center;
-        height: 400px; /* You can adjust the height as needed */
+        height: 400px; 
         margin-top: 20px;
         width: 100%;
         margin-bottom: 20px;
     }
 
-    /* Ensuring the pie chart has the same size */
     #teamPieChart {
-        width: 400px !important; /* You can adjust the size as needed */
-        height: 400px !important; /* You can adjust the size as needed */
-        /* display:block; */
+        width: 400px !important; 
+        height: 400px !important; 
         margin: 0 auto;
     }
 
@@ -80,13 +77,10 @@
     #chartsContainer .col {
         margin-bottom: 20px;
     }
-
-    /* If needed, you can also add some space between the top row elements */
     .row.mb-4 {
         margin-bottom: 20px;
     }
-    /* All existing styles remain unchanged */
-    /* ... (keep your original CSS styles here) ... */
+  
 </style>
 
 <h2 class="mb-4">Analytics Dashboard</h2>
@@ -157,7 +151,7 @@
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body" id="teamModalBody">
-                <!-- Content inserted by JS -->
+                
             </div>
         </div>
     </div>
@@ -165,12 +159,12 @@
 
 
 <!-- Include existing modals -->
-<!-- ... modal HTML remains unchanged ... -->
 @section Scripts {
-    <script src=https://cdn.jsdelivr.net/npm/chart.js></script>
-    <script src=https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels></script>
-    <script src=https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js></script>
-    <script src=https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js></script>
+    <script src="~/lib/Charts/chart.js"></script>
+    <script src="~/lib/Charts/chartjs-plugin-datalabels.js"></script>
+    <script src="~/lib/Charts/html2canvas.min.js"></script>
+    <script src="~/lib/Charts/jspdf.umd.min.js"></script>
+
 
     <script>
                 const teamColors = {}, charts = [];
@@ -195,8 +189,8 @@
                         const year = $('#yearDropdown').val();
                         const quarterText = $('option:selected', this).text();
                         const id = $(this).val();
-                        resetQuarter();  // ✅ Destroy existing charts
-                        showLoading();   // ✅ Show loading indicator
+                        resetQuarter();  
+                        showLoading();  
 
                         if (id) {
                             $('#chartsHeader').text(`Analytics for ${year} ${quarterText}`);
@@ -207,21 +201,18 @@
                         }
                     });
                 });
-                                      function maximizeChart(category, data) {
+                function maximizeChart(category, data) {
                     const canvas = document.getElementById('fullscreenChartCanvas');
                     const ctx = canvas.getContext('2d');
-
-                    // Destroy previous chart instance if exists
                     if (fullscreenChartInstance) {
                         fullscreenChartInstance.destroy();
                         fullscreenChartInstance = null;
                     }
 
-                    // Set fixed canvas dimensions
+                  
                     canvas.width = 700;
                     canvas.height = 400;
 
-                    // Extract data
                     const labels = data.map(d => d.team);
                     const datasets = [
                         {
@@ -265,7 +256,7 @@
                                 datalabels: {
                                     anchor: 'center',
                                     align: 'center',
-                                    color: '#fff',
+                                    color: '#000',
                                     clamp: true,
                                     font: {
                                         weight: 'bold',
@@ -313,17 +304,16 @@
                 }
 
                 function resetQuarter() {
-                    // ✅ Destroy bar charts
                     charts.forEach(chart => chart.destroy());
                     charts.length = 0;
 
-                    // ✅ Destroy pie chart
+                 
                     if (teamPieChartInstance) {
                         teamPieChartInstance.destroy();
                         teamPieChartInstance = null;
                     }
 
-                    // ✅ Destroy fullscreen chart
+                 
                     if (fullscreenChartInstance) {
                         fullscreenChartInstance.destroy();
                         fullscreenChartInstance = null;
@@ -341,7 +331,7 @@
                 }
 
                 function hideLoading() {
-                    // You could hide a loading spinner here if you add one
+                    
                 }
 
                 function fetchYears() {
@@ -371,18 +361,12 @@
                             $('#quarterDropdown').prop('disabled', false);
                             $('#chartsHeader').text(`Analytics for ${year} ${match.name}`);
 
-                            resetQuarter();  // Clear any previous charts
-                            showLoading();   // Optional loading state
+                            resetQuarter();  
+                            showLoading();  
                                     Promise.all([
                     fetchAnalyticsData(id),
                     fetchTeamSummary(id)
                 ]);
-
-                // .finally(() => {
-                //     hideLoading();
-                //     $('#chartsHeader').text(`Analytics for ${year} ${quarter}`);
-                // });
-
                             hideLoading();
                             break;
                         }
@@ -454,123 +438,136 @@
                     });
                 }
 
-                       function renderCategoryTeamCharts(data) {
-                    const container = $('#chartsContainer');
-                    container.empty();
-                    charts.length = 0;
+                                      function renderCategoryTeamCharts(data) {
+            const container = $('#chartsContainer');
+            container.empty();
+            charts.length = 0;
 
-                    const grouped = data.reduce((acc, d) => {
-                        (acc[d.category] ||= []).push({
-                            team: d.team,
-                            approvedCount: d.approvedCount,
-                            pendingCount: d.pendingCount,
-                            rejectedCount: d.rejectedCount
-                        });
-                        return acc;
-                    }, {});
+            const grouped = data.reduce((acc, d) => {
+                (acc[d.category] ||= []).push({
+                    team: d.team,
+                    approvedCount: d.approvedCount,
+                    pendingCount: d.pendingCount,
+                    rejectedCount: d.rejectedCount
+                });
+                return acc;
+            }, {});
 
-                    Object.entries(grouped).forEach(([category, list], index) => {
-                        const canvasId = `categoryChart_${index}`;
+            Object.entries(grouped).forEach(([category, list], index) => {
+                const canvasId = `categoryChart_${index}`;
 
-                        container.append(`
-                            <div class="col">
-                                <div class="card shadow-sm h-100">
-                                    <div class="card-body">
-                                        <div class="d-flex justify-content-between align-items-center mb-2">
-                                            <h5 class="card-title">${category}</h5>
-                                            <div>
-                                                <button class="btn btn-sm btn-outline-secondary me-2" onclick="maximizeChart('${category}', ${JSON.stringify(list).replace(/"/g, '&quot;')})">🔍 Maximize</button>
-                                                <button class="btn btn-sm btn-outline-secondary" onclick="showTeamModal('${category}', ${JSON.stringify(list).replace(/"/g, '&quot;')})">📊 View More</button>
-                                            </div>
-                                        </div>
-                                        <div class="scroll-wrapper">
-                                            <canvas id="${canvasId}" height="320"></canvas>
-                                        </div>
+                container.append(`
+                    <div class="col">
+                        <div class="card shadow-sm h-100">
+                            <div class="card-body">
+                                <div class="d-flex justify-content-between align-items-center mb-2">
+                                    <h5 class="card-title">${category}</h5>
+                                    <div>
+                                        <button class="btn btn-sm btn-outline-secondary me-2" onclick="maximizeChart('${category}', ${JSON.stringify(list).replace(/"/g, '&quot;')})">🔍 Maximize</button>
+                                        <button class="btn btn-sm btn-outline-secondary" onclick="showTeamModal('${category}', ${JSON.stringify(list).replace(/"/g, '&quot;')})">📊 View More</button>
                                     </div>
                                 </div>
+                                <div class="scroll-wrapper">
+                                    <canvas id="${canvasId}" height="320"></canvas>
+                                </div>
                             </div>
-                        `);
+                        </div>
+                    </div>
+                `);
 
-                        // Prepare the data for the stacked bar chart
-                        const teams = list.map(d => d.team);
+                const teams = list.map(d => d.team);
+                const maxCount = Math.max(...list.map(d => d.approvedCount + d.pendingCount + d.rejectedCount), 1);
 
-                        // Get the maximum count for the chart Y-axis scale
-                        const maxCount = Math.max(...list.map(d => d.approvedCount + d.pendingCount + d.rejectedCount), 1);
+                const datasets = [
+                    {
+                        label: 'Approved',
+                        data: list.map(d => d.approvedCount),
+                        backgroundColor: '#4caf50',
+                        borderColor: '#4caf50',
+                        borderWidth: 1.5,
+                        stack: category,
+                        barThickness: 40
+                    },
+                    {
+                        label: 'Pending',
+                        data: list.map(d => d.pendingCount),
+                        backgroundColor: '#ffc107',
+                        borderColor: '#ffc107',
+                        borderWidth: 1.5,
+                        stack: category,
+                        barThickness: 40
+                    },
+                    {
+                        label: 'Rejected',
+                        data: list.map(d => d.rejectedCount),
+                        backgroundColor: '#f44336',
+                        borderColor: '#f44336',
+                        borderWidth: 1.5,
+                        stack: category,
+                        barThickness: 40
+                    }
+                ];
 
-                        const datasets = [
-                            {
-                                label: 'Approved',
-                                data: list.map(d => d.approvedCount),
-                                backgroundColor: '#4caf50', // Green for Approved
-                                borderColor: '#4caf50',
-                                borderWidth: 1.5,
-                                stack: category,
-                                barThickness: 40
-                            },
-                            {
-                                label: 'Pending',
-                                data: list.map(d => d.pendingCount),
-                                backgroundColor: '#ffc107', // Yellow for Pending
-                                borderColor: '#ffc107',
-                                borderWidth: 1.5,
-                                stack: category,
-                                barThickness: 40
-                            },
-                            {
-                                label: 'Rejected',
-                                data: list.map(d => d.rejectedCount),
-                                backgroundColor: '#f44336', // Red for Rejected
-                                borderColor: '#f44336',
-                                borderWidth: 1.5,
-                                stack: category,
-                                barThickness: 40
-                            }
-                        ];
+                const ctx = document.getElementById(canvasId).getContext('2d');
 
-                        // Create the stacked bar chart
-                        const ctx = document.getElementById(canvasId).getContext('2d');
+                // Plugin to draw total counts on top
+                const totalLabelPlugin = {
+                    id: 'totalLabelPlugin',
+                    afterDatasetsDraw(chart) {
+                        const {ctx, chartArea: {top}, scales: {x, y}} = chart;
+                        chart.data.labels.forEach((label, index) => {
+                            const total = chart.data.datasets.reduce((sum, ds) => sum + ds.data[index], 0);
+                            const xPos = x.getPixelForValue(index);
+                            const yPos = y.getPixelForValue(total);
 
-                        const chart = new Chart(ctx, {
-                            type: 'bar',
-                            data: {
-                                labels: list.map(d => d.team),
-                                datasets: datasets
-                            },
-                            options: {
-                                responsive: true,
-                                plugins: {
-                                    legend: { display: true },
-                                    datalabels: {
-                                        anchor: 'top',
-                                        align: 'center',
-                                        color: '#000',
-                                        font: { weight: 'bold', size: 14 },
-                                        formatter: value => value > 0 ? value : ''
-                                    }
-                                },
-                                scales: {
-                                    y: {
-                                        beginAtZero: true,
-                                        stacked: true, // Stack the bars
-                                        suggestedMax: maxCount + 1,
-                                        ticks: { stepSize: 1, color: '#000' },
-                                        grid: { color: '#eee' }
-                                    },
-                                    x: {
-                                        ticks: { color: '#000' },
-                                        grid: { display: false }
-                                    }
-                                }
-                            },
-                            plugins: [ChartDataLabels]
+                            ctx.save();
+                            ctx.font = 'bold 14px Arial';
+                            ctx.fillStyle = 'blue'; // blue color
+                            ctx.textAlign = 'center';
+                            ctx.fillText(total, xPos, yPos - 12); // 12px gap above bar
+                            ctx.restore();
                         });
+                    }
+                };
 
-                        charts.push(chart);
-                    });
-                }
+                const chart = new Chart(ctx, {
+                    type: 'bar',
+                    data: {
+                        labels: list.map(d => d.team),
+                        datasets: datasets
+                    },
+                    options: {
+                        responsive: true,
+                        plugins: {
+                            legend: { display: true },
+                            datalabels: {
+                                anchor: 'top',
+                                align: 'center',
+                                color: '#000',
+                                font: { weight: 'bold', size: 14 },
+                                formatter: value => value > 0 ? value : ''
+                            }
+                        },
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                stacked: true,
+                                suggestedMax: maxCount + 1,
+                                ticks: { stepSize: 1, color: '#000' },
+                                grid: { color: '#eee' }
+                            },
+                            x: {
+                                ticks: { color: '#000' },
+                                grid: { display: false }
+                            }
+                        }
+                    },
+                    plugins: [ChartDataLabels, totalLabelPlugin]
+                });
 
-
-
+                charts.push(chart);
+            });
+        }
 
                 function getTeamColor(name) {
                     if (!teamColors[name]) {
@@ -580,22 +577,22 @@
                 }
 
                 function exportAllCharts() {
-            const chartCanvases = document.querySelectorAll('#dashboardExportContent canvas');
+                    const chartCanvases = document.querySelectorAll('#dashboardExportContent canvas');
 
-            const images = Array.from(chartCanvases).map(canvas => {
-                return canvas.toDataURL('image/png');
-            });
+                    const images = Array.from(chartCanvases).map(canvas => {
+                     canvas.toDataURL('image/png');
+                });
 
-            $.ajax({
-                type: "POST",
-                url: "/Analytics/GenerateChartsPdf",
-                contentType: "application/json",
-                data: JSON.stringify(images),
-                success: function () {
-                    window.location.href = "/Analytics/DownloadChartsPdf";
+                    $.ajax({
+                        type: "POST",
+                        url: "/Analytics/GenerateChartsPdf",
+                        contentType: "application/json",
+                        data: JSON.stringify(images),
+                        success: function () {
+                            window.location.href = "/Analytics/DownloadChartsPdf";
+                        }
+                    });
                 }
-            });
-        }
 
 
                 function exportAllCharts() {
@@ -610,8 +607,6 @@
                         pdf.save('Analytics_Dashboard.pdf');
                     });
                 }
-
-
                 function showTeamModal(category, data) {
                     let html = `<h6>${category}</h6><table class="table table-bordered mt-2"><thead><tr><th>Team</th><th>Nominations</th></tr></thead><tbody>`;
                     data.forEach(d => {
@@ -641,52 +636,44 @@
                 }
 
 
-                     function showTeamModal(category, list) {
-                    const modal = $('#teamModal');
-                    modal.find('.modal-title').text(`Category: ${category}`);
-                    const modalBody = modal.find('.modal-body');
-                    modalBody.empty();  // Clear any previous content
+         function showTeamModal(category, list) {
+            const modal = $('#teamModal');
+            modal.find('.modal-title').text(`Category: ${category}`);
+            const modalBody = modal.find('.modal-body');
+            modalBody.empty();
 
-                    // Create a table to display team data
-                    let tableContent = `
-                        <table class="table table-striped">
-                            <thead>
-                                <tr>
-                                    <th scope="col">Team</th>
-                                    <th scope="col">Approved</th>
-                                    <th scope="col">Pending</th>
-                                    <th scope="col">Rejected</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                    `;
+            let tableContent = `
+                <table class="table table-striped">
+                    <thead style="background-color: #204080;">
+                        <tr>
+                            <th scope="col" style="color: white;">Team</th>
+                            <th scope="col" style="color: white;">Approved</th>
+                            <th scope="col" style="color: white;">Pending</th>
+                            <th scope="col" style="color: white;">Rejected</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+            `;
 
-                    // Loop through the list and add rows to the table
-                    list.forEach(item => {
-                        tableContent += `
-                            <tr>
-                                <td>${item.team}</td>
-                                <td>${item.approvedCount}</td>
-                                <td>${item.pendingCount}</td>
-                                <td>${item.rejectedCount}</td>
-                            </tr>
-                        `;
-                    });
+            list.forEach(item => {
+                tableContent += `
+                    <tr>
+                        <td>${item.team}</td>
+                        <td>${item.approvedCount}</td>
+                        <td>${item.pendingCount}</td>
+                        <td>${item.rejectedCount}</td>
+                    </tr>
+                `;
+            });
 
-                    // Close the table and append it to the modal
-                    tableContent += `
-                            </tbody>
-                        </table>
-                    `;
+            tableContent += `
+                    </tbody>
+                </table>
+            `;
 
-                    modalBody.append(tableContent);
-
-                    // Show the modal
-                    modal.modal('show');
-                }
-
-
-                    // new bootstrap.Modal($('#maximizeChartModal')[0]).show();
+            modalBody.append(tableContent);
+            modal.modal('show');
+        }
 
     </script>
 }

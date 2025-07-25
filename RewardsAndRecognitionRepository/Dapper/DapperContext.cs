@@ -14,9 +14,7 @@ namespace RewardsAndRecognitionRepository.Dapper
     {
 
         private readonly IConfiguration _configuration;
-
         private readonly string _connectionString;
-
         public DapperContext(IConfiguration configuration)
 
         {
@@ -26,7 +24,6 @@ namespace RewardsAndRecognitionRepository.Dapper
             _connectionString = _configuration.GetConnectionString("DapperConextConnectionString");
 
         }
-
         public IDbConnection CreateConnection() => new SqlConnection(_connectionString);
 
     }

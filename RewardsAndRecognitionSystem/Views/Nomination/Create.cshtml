@@ -112,11 +112,7 @@
 
             <div class="form-group">
                 <label>Quarter <span class="text-danger">*</span></label>
-
-                <!-- Display the active quarter -->
                 <input type="text" class="form-control" value="@ViewData["ActiveQuarterDisplay"]" disabled />
-
-                <!-- Hidden field to submit the ID -->
                 <input type="hidden" asp-for="YearQuarterId" />
 
                 <span asp-validation-for="YearQuarterId" class="text-danger"></span>

@@ -130,30 +130,30 @@
     var teamChartData = ViewBag.TeamStatusData;
 }
 <!-- Load Chart.js -->
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="~/lib/Charts/chart.js"></script>
 
 <h4 class="mt-5"><i class="bi bi-bar-chart-line-fill"></i> Team Wise Statistics </h4>
 
 <!--  CSS to enforce consistent size -->
 <style>
     .chart-wrapper {
-        height: 275px; /* Fixed height for all charts */
-        max-width: 250px; /* Limit chart width */
-        margin: 0 auto; /* Center the chart */
+        height: 275px; 
+        max-width: 250px; 
+        margin: 0 auto;
     }
 
         .chart-wrapper canvas {
-            width: 100% !important; /* Stretch to wrapper width */
-            height: 100% !important; /* Fill wrapper height */
+            width: 100% !important; 
+            height: 100% !important;
         }
 
     .card {
-        min-height: 300px; /* Slightly shorter card */
+        min-height: 300px;
         padding: 1rem;
         display: flex;
         flex-direction: column;
         justify-content: space-between;
-        align-items: center; /* Center chart and title */
+        align-items: center;
         text-align: center;
     }
 </style>
@@ -317,21 +317,17 @@
             const modalInstance = bootstrap.Modal.getInstance(modalElement);
             if (modalInstance) {
                 modalInstance.hide();
-
-                // Reset dropdown
                 const teamSelect = document.querySelector("select[name='teamId']");
                 if (teamSelect) {
                     teamSelect.selectedIndex = 0;
                 }
 
-                // Clean URL
+  
                 const url = new URL(window.location);
                 url.searchParams.delete("teamId");
                 window.history.replaceState({}, document.title, url);
             }
         }
-
-        // 🔍 Filter nominations table by nominee name
         function filterNominations() {
             const input = document.getElementById("searchInput");
             const filter = input.value.toLowerCase();

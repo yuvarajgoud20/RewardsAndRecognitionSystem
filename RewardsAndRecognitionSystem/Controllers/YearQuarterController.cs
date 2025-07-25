@@ -10,27 +10,24 @@ using RewardsAndRecognitionSystem.ViewModels;
 
 namespace RewardsAndRecognitionSystem.Controllers
 {
-    [Authorize(Roles = "Admin")]
+    [Authorize(Roles = nameof(Roles.Admin))]
     public class YearQuarterController : Controller
     {
         private readonly IYearQuarterRepo _yearQuarterRepo;
         private readonly IMapper _mapper;
 
-        public YearQuarterController(IMapper mapper,IYearQuarterRepo yearQuarterRepo)
+        public YearQuarterController(IMapper mapper, IYearQuarterRepo yearQuarterRepo)
         {
             _mapper = mapper;
             _yearQuarterRepo = yearQuarterRepo;
         }
 
-        // GET: /YearQuarter
-        public async Task<IActionResult> Index(int page=1)
+        public async Task<IActionResult> Index(int page = 1)
         {
             int pageSize = 5;
-
             var allQuarters = await _yearQuarterRepo.GetAllAsync();
             var totalRecords = allQuarters.Count();
             var totalPages = (int)Math.Ceiling(totalRecords / (double)pageSize);
-
             var paginated = allQuarters
                 .Skip((page - 1) * pageSize)
                 .Take(pageSize)
@@ -40,17 +37,14 @@ namespace RewardsAndRecognitionSystem.Controllers
             ViewBag.TotalPages = totalPages;
             var qList = _mapper.Map<List<YearQuarterViewModel>>(paginated);
 
-            // ✅ This handles AJAX pagination
             if (Request.Headers["X-Requested-With"] == "XMLHttpRequest")
             {
                 return PartialView("_YearQuarterListPartial", qList);
             }
-           
-              
+
             return View(qList);
         }
 
-        // GET: /YearQuarter/Details/5
         public async Task<IActionResult> Details(Guid id)
         {
             var quarter = await _yearQuarterRepo.GetByIdAsync(id);
@@ -60,33 +54,29 @@ namespace RewardsAndRecognitionSystem.Controllers
             return View(quarterView);
         }
 
-        // GET: /YearQuarter/Create
         public IActionResult Create()
         {
             ViewBag.Quarters = new SelectList(Enum.GetValues(typeof(Quarter)));
-
             return View();
         }
 
-        // POST: /YearQuarter/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(YearQuarterViewModel yq)
         {
             if (!ModelState.IsValid)
             {
-                
                 ViewBag.Quarters = new SelectList(Enum.GetValues(typeof(Quarter)));
                 ModelState.Remove("Year");
                 return View(yq);
             }
-                yq.Id = Guid.NewGuid();
-               var yearQuarter=_mapper.Map<YearQuarter>(yq); 
-                await _yearQuarterRepo.AddAsync(yearQuarter);
-                return RedirectToAction(nameof(Index));                
+
+            yq.Id = Guid.NewGuid();
+            var yearQuarter = _mapper.Map<YearQuarter>(yq);
+            await _yearQuarterRepo.AddAsync(yearQuarter);
+            return RedirectToAction(nameof(Index));
         }
 
-        // GET: /YearQuarter/Edit/5
         public async Task<IActionResult> Edit(Guid id)
         {
             var yq = await _yearQuarterRepo.GetByIdAsync(id);
@@ -98,8 +88,6 @@ namespace RewardsAndRecognitionSystem.Controllers
             return View(yearQuarter);
         }
 
-
-        // POST: /YearQuarter/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(Guid id, YearQuarterViewModel yq)
@@ -107,35 +95,27 @@ namespace RewardsAndRecognitionSystem.Controllers
             if (id != yq.Id)
                 return BadRequest();
 
-            // 🔒 Fetch existing record from DB
             var existing = await _yearQuarterRepo.GetByIdAsync(id);
-            
             if (existing == null)
                 return NotFound();
 
             if (!ModelState.IsValid)
             {
-                // Re-populate dropdown and return view with user input preserved
                 ViewBag.Quarters = new SelectList(Enum.GetValues(typeof(Quarter)));
-                // Clear ModelState entries for fields that were removed from the form
                 var existingYearQuarter = _mapper.Map<YearQuarterViewModel>(existing);
-                //ModelState.Clear();
                 return View(existingYearQuarter);
             }
 
-            // 🔐 Only update fields that are editable (never trust full model from form)
             existing.Quarter = yq.Quarter;
             existing.Year = yq.Year;
             existing.StartDate = yq.StartDate;
             existing.EndDate = yq.EndDate;
             existing.IsActive = yq.IsActive;
-            // ✅ Save updated data
+
             await _yearQuarterRepo.UpdateAsync(existing);
             return RedirectToAction(nameof(Index));
         }
 
-
-        // GET: /YearQuarter/Delete/5
         public async Task<IActionResult> Delete(Guid id)
         {
             var yq = await _yearQuarterRepo.GetByIdAsync(id);
@@ -145,7 +125,6 @@ namespace RewardsAndRecognitionSystem.Controllers
             return View(yq);
         }
 
-        // POST: /YearQuarter/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(Guid id)

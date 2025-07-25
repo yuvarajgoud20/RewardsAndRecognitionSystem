@@ -19,7 +19,7 @@ namespace RewardsAndRecognitionRepository.Service
 
         public async Task<IEnumerable<Category>> GetAllAsync()
         {
-           // throw new Exception("Excepton from Service Layer");
+          
             return await _categoryRepo.GetAllAsync();
         }
 
@@ -30,13 +30,13 @@ namespace RewardsAndRecognitionRepository.Service
 
         public async Task AddAsync(Category category)
         {
-            // Add business rules or validations here if needed
+            
             await _categoryRepo.AddAsync(category);
         }
 
         public async Task UpdateAsync(Category category)
         {
-            // Validate or business rules can go here
+           
             await _categoryRepo.UpdateAsync(category);
         }
 

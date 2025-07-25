@@ -1,4 +1,4 @@
-﻿@* @model IEnumerable<RewardsAndRecognitionRepository.Models.Nomination>
+﻿@model IEnumerable<RewardsAndRecognitionRepository.Models.Nomination>
 @using RewardsAndRecognitionRepository.Enums
 
 @{
@@ -6,7 +6,6 @@
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
-<!-- 🔄 Loading Spinner -->
 <div id="loadingSpinner" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%;
      background-color: rgba(255, 255, 255, 0.8); z-index: 9999; display: flex;
      justify-content: center; align-items: center;">
@@ -14,242 +13,9 @@
         <span class="visually-hidden">Loading...</span>
     </div>
 </div>
+
 <h2 class="d-flex justify-content-between align-items-center">
     <span class="text-primary fw-bold">TeamLead Dashboard</span>
-
-    <span class="ms-3 quarter-card shadow-sm"
-          data-bs-toggle="tooltip"
-          data-bs-placement="m"
-          title="Closes At: @ViewBag.ActiveQuarterCloseDate">
-        <span class="fw-semibold">@ViewBag.ActiveQuarterName, @ViewBag.ActiveYearName</span>
-    </span>
-</h2>
-
-
-<div class="d-flex justify-content-end mb-3">
-    <a asp-controller="Nomination" asp-action="Create" class="btn btn-primary">
-        <i class="bi bi-plus-circle"></i> Create Nomination
-    </a>
-</div>
-
-<style>
-    .quarter-card {
-        background-color: #f1f5ff;
-        color: #002c75;
-        border-radius: 0.75rem;
-        padding: 0.75rem 1rem;
-        font-size: 0.85rem;
-        width: 12rem;
-        text-align: left;
-        border-left: 4px solid #0d6efd;
-        transition: all 0.3s ease-in-out;
-    }
-
-        .quarter-card:hover {
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-        }
-    .dashboard-card {
-        background: white;
-        border-radius: 12px;
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
-        padding: 20px;
-        transition: transform 0.2s ease;
-        height: 100%;
-        text-decoration: none;
-    }
-        .dashboard-card:hover {
-            transform: translateY(-3px);
-            text-decoration: none;
-        }
-
-    .dashboard-title {
-        font-size: 1.1rem;
-        font-weight: 600;
-        margin-top: 10px;
-        color: #555;
-    }
-
-    .dashboard-value {
-        font-size: 1.75rem;
-        font-weight: bold;
-        margin-top: 5px;
-        color: #222;
-    }
-
-    
-    .clickable-card {
-        text-decoration: none;
-    }
-
-    .bar-container {
-        margin-top: 30px;
-    }
-
-    .bar {
-        height: 14px;
-        border-radius: 6px;
-        margin-bottom: 10px;
-        transition: width 0.3s ease;
-    }
-
-    .text-blue {
-        color: #2962FF;
-    }
-
-    .text-green {
-        color: #2E7D32;
-    }
-
-    .text-orange {
-        color: #F9A825;
-    }
-</style>
-<div class="row g-4 mb-4">
-    <div class="col-md-3">
-        <a href="@Url.Action("Index", "Nomination", new { filter = "all" })" class="clickable-card" class="dashboard-card text-blue d-block text-decoration-none">
-            <div class="dashboard-card">
-                <div class="dashboard-title">Total Nominations</div>
-                <div class="dashboard-value text-blue ">@ViewBag.TotalNominations</div>
-            </div>
-        </a>
-    </div>
-    <div class="col-md-3">
-        <a href="@Url.Action("Index", "Nomination", new { filter = "pending" })" class="clickable-card" class="dashboard-card text-orange d-block text-decoration-none">
-            <div class="dashboard-card">
-                <div class="dashboard-title">Pending Reviews</div>
-                <div class="dashboard-value text-orange">@ViewBag.PendingNominations</div>
-            </div>
-        </a>
-    </div>
-    <div class="col-md-3">
-        <a href="@Url.Action("Index", "Nomination", new { filter = "directorapproved" })" class="clickable-card" class="dashboard-card text-green d-block text-decoration-none">
-            <div class="dashboard-card">
-                <div class="dashboard-title">Final Approved</div>
-                <div class="dashboard-value text-green">@ViewBag.FinalApprovedNominations</div>
-            </div>
-        </a>
-    </div>
-    <div class="col-md-3">
-        <a href="@Url.Action("Index", "Nomination", new { filter = "directorrejected" })" class="clickable-card" class="dashboard-card text-red d-block text-decoration-none">
-            <div class="dashboard-card">
-                <div class="dashboard-title">Final Rejected</div>
-                <div class="dashboard-value text-danger">@ViewBag.RejectedNominations</div>
-            </div>
-        </a>
-    </div>
-</div>
-
-<!-- 🔽 Hide Spinner on Load -->
-<script>
-    window.addEventListener("load", function () {
-        const spinner = document.getElementById("loadingSpinner");
-        if (spinner) {
-            spinner.style.display = "none";
-        }
-    });
-</script>
-<!-- 🔽 Category-wise Bar Chart Section -->
-<div class="mt-5">
-    <h4 class="text-center mb-4">Category-wise Nomination Status</h4>
-    <canvas id="categoryBarChart" height="100"></canvas>
-</div>
-
-<!-- Chart.js + DataLabels plugin -->
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels"></script>
-
-<script>
-    document.addEventListener("DOMContentLoaded", function () {
-        fetch('/Dashboard/GetTeamLeadCategoryData?yearQuarterId=@ViewBag.ActiveYQId')  // Ensure ViewBag.ActiveYQId is set
-            .then(response => response.json())
-            .then(data => {
-                const labels = data.map(d => d.category);
-                const approved = data.map(d => d.approved);
-                const rejected = data.map(d => d.rejected);
-                const pending = data.map(d => d.pending);
-
-                const ctx = document.getElementById('categoryBarChart').getContext('2d');
-                new Chart(ctx, {
-                    type: 'bar',
-                    data: {
-                        labels: labels,
-                        datasets: [
-                            {
-                                label: 'Approved',
-                                data: approved,
-                                backgroundColor: '#2E7D32'
-                            },
-                            {
-                                label: 'Rejected',
-                                data: rejected,
-                                backgroundColor: '#D32F2F'
-                            },
-                            {
-                                label: 'Pending',
-                                data: pending,
-                                backgroundColor: '#FBC02D'
-                            }
-                        ]
-                    },
-                    options: {
-                        responsive: true,
-                        plugins: {
-                            datalabels: {
-                                anchor: 'center',
-                                align: 'center',
-                                color: '#fff',
-                                font: {
-                                    weight: 'bold'
-                                },
-                                formatter: value => value
-                            },
-                            legend: {
-                                position: 'top'
-                            },
-                            title: {
-                                display: false
-                            }
-                        },
-                        scales: {
-                            x: {
-                                stacked: true
-                            },
-                            y: {
-                                stacked: true,
-                                beginAtZero: true
-                            }
-                        }
-                    },
-                    plugins: [ChartDataLabels]
-                });
-            });
-    });
-</script> *@
-@model IEnumerable<RewardsAndRecognitionRepository.Models.Nomination>
-
-@using RewardsAndRecognitionRepository.Enums
-
-@{
-
-    ViewData["Title"] = "Team Lead Dashboard";
-
-    Layout = "~/Views/Shared/_Layout.cshtml";
-
-}
-
-<!-- 🔄 Loading Spinner -->
-<div id="loadingSpinner" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-
-     background-color: rgba(255, 255, 255, 0.8); z-index: 9999; display: flex;
-
-     justify-content: center; align-items: center;">
-    <div class="spinner-border text-primary" role="status" style="width: 3rem; height: 3rem;">
-        <span class="visually-hidden">Loading...</span>
-    </div>
-</div>
-<h2 class="d-flex justify-content-between align-items-center">
-    <span class="text-primary fw-bold">TeamLead Dashboard</span>
-
     <span class="ms-3 quarter-card shadow-sm"
           data-bs-toggle="tooltip"
           data-bs-placement="m"
@@ -265,7 +31,6 @@
 </div>
 
 <style>
-
     .quarter-card {
         background-color: #f1f5ff;
         color: #002c75;
@@ -352,174 +117,106 @@
 </div>
 
 <h4 class="mt-5 mb-3 text-primary">Category-wise Breakdown</h4>
-<div id="teamLeadChartsContainer" class="row row-cols-1 row-cols-md-2 g-4 mb-5">
-    <!-- Bar charts will be injected here -->
-</div>
 
-<!-- 🕽️ Scripts -->
+<div id="teamLeadChartsContainer" class="row row-cols-1 row-cols-md-2 g-4 mb-5"></div>
+
 @section Scripts {
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels"></script>
+    <script src="~/lib/Charts/chart.js"></script>
+    <script src="~/lib/Charts/chartjs-plugin-datalabels.js"></script>
 
     <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            var yearQuarterId = '@ViewBag.ActiveQuarterId.ToString()';
+            loadTeamLeadCategoryCharts(yearQuarterId);
+        });
 
-                document.addEventListener("DOMContentLoaded", function () {
+        function loadTeamLeadCategoryCharts(yearQuarterId) {
+            $.get(`/Analytics/GetTeamLeadCategoryAnalytics?yearQuarterId=${yearQuarterId}`, function (data) {
+                const container = $('#teamLeadChartsContainer');
+                container.empty();
+                const chartData = data.result || [];
 
-                            var yearQuarterId = '@ViewBag.ActiveQuarterId.ToString()';
-
-                    loadTeamLeadCategoryCharts(yearQuarterId);
-
-                });
-
-                               function loadTeamLeadCategoryCharts(yearQuarterId) {
-
-                    $.get(`/Analytics/GetTeamLeadCategoryAnalytics?yearQuarterId=${yearQuarterId}`, function (data) {
-
-                        const container = $('#teamLeadChartsContainer');
-
-                        container.empty();
-
-                        const chartData = data.result || [];
-
-                        if (!chartData.length) {
-
-                            container.append(`
-        <div class="col">
-        <div class="dashboard-card text-center p-4">
-        <h5 class="text-muted mb-2">📉 No Data Available</h5>
-        <p class="mb-0">No nominations found for the selected quarter.</p>
-        </div>
-        </div>
-
-                            `);
-
-                            return;
-
-                        }
-
-                        chartData.forEach((item, index) => {
-
-                            const canvasId = `barChart_${index}`;
-
-                            container.append(`
-        <div class="col">
-        <div class="card shadow-sm h-100">
-        <div class="card-body">
-        <div class="d-flex justify-content-between align-items-center mb-2">
-        <h5 class="card-title">${item.category}</h5>
-        </div>
-        <div class="scroll-wrapper">
-        <canvas id="${canvasId}" height="180"></canvas>
-        </div>
-        </div>
-        </div>
-        </div>
-
-                            `);
-
-                            const ctx = document.getElementById(canvasId).getContext('2d');
-
-                            new Chart(ctx, {
-
-                                type: 'bar',
-
-                                data: {
-
-                                    labels: ['Approved', 'Pending', 'Rejected'],
-
-                                    datasets: [{
-
-                                        label: item.category,
-
-                                        data: [item.approved, item.pending, item.rejected],
-
-                                        backgroundColor: ['#2E7D32', '#F9A825', '#D32F2F'],
-
-                                        borderRadius: 6,
-
-                                        barThickness: 40
-
-                                    }]
-
-                                },
-
-                                options: {
-
-                                    responsive: true,
-
-                                    plugins: {
-
-                                        legend: { display: false },
-
-                                        datalabels: {
-
-                                            anchor: 'end',
-
-                                            align: 'top',
-
-                                            font: { weight: 'bold', size: 14 },
-
-                                            color: '#333',
-
-                                            formatter: val => val > 0 ? val : ''
-
-                                        }
-
-                                    },
-
-                                    scales: {
-
-                                        y: {
-
-                                            beginAtZero: true,
-
-                                            suggestedMax: Math.max(item.approved, item.pending, item.rejected) + 1,
-
-                                            ticks: { stepSize: 1, color: '#333' },
-
-                                            grid: { color: '#eee' }
-
-                                        },
-
-                                        x: {
-
-                                            ticks: { color: '#333' },
-
-                                            grid: { display: false }
-
-                                        }
-
-                                    }
-
-                                },
-
-                                plugins: [ChartDataLabels]
-
-                            });
-
-                        });
-
-                    });
-
+                if (!chartData.length) {
+                    container.append(`
+                        <div class="col">
+                            <div class="dashboard-card text-center p-4">
+                                <h5 class="text-muted mb-2">📉 No Data Available</h5>
+                                <p class="mb-0">No nominations found for the selected quarter.</p>
+                            </div>
+                        </div>
+                    `);
+                    return;
                 }
 
+                chartData.forEach((item, index) => {
+                    const canvasId = `barChart_${index}`;
+                    container.append(`
+                        <div class="col">
+                            <div class="card shadow-sm h-100">
+                                <div class="card-body">
+                                    <div class="d-flex justify-content-between align-items-center mb-2">
+                                        <h5 class="card-title">${item.category}</h5>
+                                    </div>
+                                    <div class="scroll-wrapper">
+                                        <canvas id="${canvasId}" height="180"></canvas>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    `);
 
+                    const ctx = document.getElementById(canvasId).getContext('2d');
+
+                    new Chart(ctx, {
+                        type: 'bar',
+                        data: {
+                            labels: ['Approved', 'Pending', 'Rejected'],
+                            datasets: [{
+                                label: item.category,
+                                data: [item.approved, item.pending, item.rejected],
+                                backgroundColor: ['#2E7D32', '#F9A825', '#D32F2F'],
+                                borderRadius: 6,
+                                barThickness: 40
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            plugins: {
+                                legend: { display: false },
+                                datalabels: {
+                                    anchor: 'end',
+                                    align: 'top',
+                                    font: { weight: 'bold', size: 14 },
+                                    color: '#333',
+                                    formatter: val => val > 0 ? val : ''
+                                }
+                            },
+                            scales: {
+                                y: {
+                                    beginAtZero: true,
+                                    suggestedMax: Math.max(item.approved, item.pending, item.rejected) + 1,
+                                    ticks: { stepSize: 1, color: '#333' },
+                                    grid: { color: '#eee' }
+                                },
+                                x: {
+                                    ticks: { color: '#333' },
+                                    grid: { display: false }
+                                }
+                            }
+                        },
+                        plugins: [ChartDataLabels]
+                    });
+                });
+            });
+        }
     </script>
 
     <script>
-
         window.addEventListener("load", function () {
-
             const spinner = document.getElementById("loadingSpinner");
-
             if (spinner) {
-
                 spinner.style.display = "none";
-
             }
-
         });
     </script>
-
 }
-

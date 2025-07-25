@@ -153,12 +153,9 @@
             reverseButtons: true
           }).then((result) => {
             if (result.isConfirmed) {
-              // Create a form dynamically
               const form = document.createElement('form');
               form.method = 'POST';
               form.action = '/User/Delete/' + userId;
-
-              // Add anti-forgery token
               const token = document.querySelector('input[name="__RequestVerificationToken"]');
               if (token) {
                 const hiddenToken = document.createElement('input');
@@ -167,9 +164,8 @@
                 hiddenToken.value = token.value;
                 form.appendChild(hiddenToken);
               }
-
               document.body.appendChild(form);
-              form.submit(); // automatically execute your POST action
+              form.submit();
             }
           });
         }
@@ -191,8 +187,6 @@
                 .then(response => response.text())
                 .then(html => {
                     document.getElementById("userTableContainer").innerHTML = html;
-
-                    // reload pagination bar as well if needed
                     return fetch(url + "&paginationOnly=true", {
                         headers: {
                             "X-Requested-With": "XMLHttpRequest"
@@ -218,7 +212,6 @@
                                     </a>
                                 </li>
                     }
-
                     <li class="page-item active">
                         <span class="page-link">
                             Page @(ViewBag.CurrentPage) of @(ViewBag.TotalPages)

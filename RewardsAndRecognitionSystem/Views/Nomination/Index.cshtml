@@ -8,9 +8,9 @@
     var selectedFilter = Context.Request.Query["filter"].ToString()?.ToLower() ?? "all";
     var reviewedIds = ViewBag.ReviewedNominationIds as List<Guid> ?? new List<Guid>();
     var nominationsList = Model.ToList();
-    var isManager = User.IsInRole("Manager");
-    var isDirector = User.IsInRole("Director");
-    var isTeamLead = User.IsInRole("TeamLead");
+    var isManager = User.IsInRole(nameof(Roles.Manager));
+    var isDirector = User.IsInRole(nameof(Roles.Director));
+    var isTeamLead = User.IsInRole(nameof(Roles.TeamLead));
     var Filter2 = Context.Request.Query["filter2"];
 }
 
@@ -258,8 +258,8 @@
     <script src="~/js/Nomination.js">
 
     </script>
-    <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="~/lib/Nominations/xlsx.full.js"></script>
+    <script src="~/lib/nominations/sweetalert2.js"></script>
     <script>
         function confirmDelete(nominationId) {
           Swal.fire({
@@ -272,19 +272,14 @@
             reverseButtons: true
           }).then((result) => {
             if (result.isConfirmed) {
-              // Create form dynamically
               const form = document.createElement('form');
               form.method = 'POST';
-              form.action = '/Nomination/DeleteConfirmed'; // Change to your controller/action
-
-              // Add Nomination ID
+              form.action = '/Nomination/DeleteConfirmed';
               const idInput = document.createElement('input');
               idInput.type = 'hidden';
               idInput.name = 'id';
               idInput.value = nominationId;
               form.appendChild(idInput);
-
-              // Grab the anti-forgery token from hidden form
               const tokenInput = document.querySelector('#antiForgeryForm input[name="__RequestVerificationToken"]');
               if (tokenInput) {
                 const clone = tokenInput.cloneNode();
@@ -299,9 +294,10 @@
         }
     </script>
     <script>
-        const IS_MANAGER=@User.IsInRole("Manager").ToString().ToLower();
-        const IS_DIRECTOR=@User.IsInRole("Director").ToString().ToLower();
-        const IS_TEAMLEAD=@User.IsInRole("TeamLead").ToString().ToLower();
+           
+            const IS_MANAGER = @(isManager.ToString().ToLower());
+            const IS_DIRECTOR = @(isDirector.ToString().ToLower());
+            const IS_TEAMLEAD = @(isTeamLead.ToString().ToLower());
             document.addEventListener("DOMContentLoaded", () => {
             const preselectedFilter = "@selectedFilter";
             const filterSelect = document.getElementById("filterSelect");
@@ -310,16 +306,11 @@
             if (filterSelect && preselectedFilter) {
                 filterSelect.value = preselectedFilter;
             }
-            
-
-            // Clear search box
             if (liveSearchInput) liveSearchInput.value = "";
-
-            // Trigger the filtering logic
             filterTable();
         });
     </script>
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="~/lib/jquery/jquery.min.js"></script>
     <script>
         $(document).ready(function () {
             $(document).on("click", ".pagination-link", function () {

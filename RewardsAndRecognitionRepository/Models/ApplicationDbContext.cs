@@ -53,22 +53,22 @@ namespace RewardsAndRecognitionRepository.Models
                 .Property(a => a.Level)
                 .HasConversion<string>();
 
-            // Relationships
+           
             modelBuilder.Entity<Team>(entity =>
             {
-                // Team Lead relationship
+               
                 entity.HasOne(t => t.TeamLead)
                       .WithMany()
                       .HasForeignKey(t => t.TeamLeadId)
                       .OnDelete(DeleteBehavior.Restrict);
 
-                // ✅ Manager relationship
+               
                 entity.HasOne(t => t.Manager)
                       .WithMany()
                       .HasForeignKey(t => t.ManagerId)
                       .OnDelete(DeleteBehavior.Restrict);
 
-                // ✅ Director relationship
+              
                 entity.HasOne(t => t.Director)
                       .WithMany()
                       .HasForeignKey(t => t.DirectorId)

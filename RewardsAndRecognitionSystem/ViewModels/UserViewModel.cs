@@ -7,7 +7,7 @@ namespace RewardsAndRecognitionSystem.ViewModels
         public string Id { get; set; }
         public string Name { get; set; }
         public string Email { get; set; }
-        public string PasswordHash { get; set; } // Bound manually from "password" input
+        public string PasswordHash { get; set; } 
         public string SelectedRole { get; set; }
         public Guid? TeamId { get; set; }
         public Team? Team { get; set; }

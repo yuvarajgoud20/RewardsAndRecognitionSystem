@@ -4,43 +4,30 @@
 
 @{
     ViewData["Title"] = "Nominations List";
-    // Layout = "~/Views/Shared/_Layout.cshtml";
-    //var selectedFilter = Context.Request.Query["filter"].ToString()?.ToLower() ?? "all";
     var reviewedIds = ViewBag.ReviewedNominationIds as List<Guid> ?? new List<Guid>();
     var nominationsList = Model.ToList();
-    var isManager = User.IsInRole("Manager");
-    var isDirector = User.IsInRole("Director");
-    var isTeamLead = User.IsInRole("TeamLead");
+    var isManager = User.IsInRole(nameof(Roles.Manager));
+    var isDirector = User.IsInRole(nameof(Roles.Director));
+    var isTeamLead = User.IsInRole(nameof(Roles.TeamLead));
     var selectedFilter = Context.Request.Query["filter"].ToString()?.ToLower() ?? "all";
     var selectedFilter2 = ViewBag.FilterForDelete as string ?? "active";
      var currentFilter = selectedFilter2;
-    //var selectedFilter = ViewBag.FilterForDelete as string ?? "active";
-    // var FilterDelete = Context.Request.Query["FilterForDelete"];
-    // var isActiveSelected = FilterDelete == "active" || string.IsNullOrEmpty(FilterDelete);
-    // var isDeletedSelected = FilterDelete == "deleted";
-    // var FilterDelete = Context.Request.Query["FilterForDelete"];
+  
 }
-
-
-
 
 <div id="nominationListContainer">
  @if (isTeamLead)
 {
     <div class="filter-bar d-flex justify-content-between align-items-center mb-3">
-        <!-- Left: Search Input -->
+      
         <div style="flex: 1;">
             <input type="text" id="liveSearch" class="form-control" placeholder="🔍 Search by Nominee" style="max-width: 300px;" />
         </div>
-
-        <!-- Right: Excel, Filter, and Create Nomination -->
         <div style="display: flex; gap: 10px; align-items: center;">
                 <a asp-action="ExportAllNominationsOpenXml" class="btn btn-success">
                     <i class="bi bi-file-earmark-excel"></i> Export
                 </a>
             
-
-
 <select id="filterfordelete" class="form-select w-auto" onchange="submitWithFilter(1, this.value)">
     <option value="active" selected="@(selectedFilter2 == "active" ? "selected" : null)">Active</option>
     <option value="deleted" selected="@(selectedFilter2 == "deleted" ? "selected" : null)">Deleted</option>
@@ -117,40 +104,6 @@
             }
         </tbody>
     </table>
-//     @if (ViewBag.DeletedNominations != null && ((List<RewardsAndRecognitionRepository.Models.Nomination>)ViewBag.DeletedNominations).Any())
-// {
-//     <h4 class="mt-5">🗑️ Deleted Nominations</h4>
-
-//     <table class="table table-bordered table-striped mt-3">
-//         <thead>
-//             <tr>
-//                 <th>#</th>
-//                 <th>Nominee</th>
-//                 <th>Team</th>
-//                 <th>Category</th>
-//                 <th>Status</th>
-                
-//             </tr>
-//         </thead>
-//         <tbody>
-//             @foreach (var (item, index) in ((List<RewardsAndRecognitionRepository.Models.Nomination>)ViewBag.DeletedNominations).Select((value, i) => (value, i)))
-//             {
-//                 <tr class="text-muted bg-light">
-//                     <td>@(index + 1)</td>
-//                     <td>@item.Nominee?.Name</td>
-//                     <td>@item.Nominee?.Team?.Name</td>
-//                     <td>@item.Category?.Name</td>
-//                     <td>@item.Status</td>
-                   
-//                 </tr>
-//             }
-//         </tbody>
-//     </table>
-// }
-// else
-// {
-//     <p class="text-muted mt-4">No deleted nominations found.</p>
-// }
 
  } 
 
@@ -331,10 +284,6 @@ console.log(IS_TEAMLEAD);
 
 
 <script>
-
-  
-    
-
        const IS_TEAMLEAD=@User.IsInRole("TeamLead").ToString().ToLower();
         document.addEventListener("DOMContentLoaded", () => {
 
@@ -350,17 +299,9 @@ console.log(IS_TEAMLEAD);
 
         }
 
- 
-        // Clear search box
-
         if (liveSearchInput) liveSearchInput.value = "";
- 
-        // Trigger the filtering logic
 
         filterTable();
-
-
-
     });
 </script>
  <script src="~/js/Nomination.js"></script>
@@ -378,7 +319,7 @@ console.log(IS_TEAMLEAD);
 
 $(document).on("click", ".pagination-link", function () {
     const page = $(this).data("page");
-    const filter = $("#filterfordelete").val(); // get value from dropdown
+    const filter = $("#filterfordelete").val();
     submitWithFilter(page, filter);
 });
 

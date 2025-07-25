@@ -38,6 +38,9 @@
   <ItemGroup>
     <Folder Include="Areas\Identity\Data\" />
     <Folder Include="Data\" />
+    <Folder Include="wwwroot\lib\Charts\" />
+    <Folder Include="wwwroot\lib\ValidationScriptsPartial\" />
+    <Folder Include="wwwroot\lib\Nominations\" />
   </ItemGroup>
 
 </Project>

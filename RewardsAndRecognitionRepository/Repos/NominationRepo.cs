@@ -74,10 +74,10 @@ namespace RewardsAndRecognitionRepository.Repos
         public async Task<List<Category>> GetUniqueCategoriesAsync()
         {
             return await _context.Nominations
-                .Include(n => n.Category)        // ensure navigation is available
-                .Where(n => n.Category != null)  // optional filter if needed
-                .Select(n => n.Category!)        // project to Category entity
-                .Distinct()                      // remove duplicates (by key)
+                .Include(n => n.Category)        
+                .Where(n => n.Category != null)  
+                .Select(n => n.Category!)        
+                .Distinct()                      
                 .ToListAsync();
         }
 
@@ -86,7 +86,7 @@ namespace RewardsAndRecognitionRepository.Repos
         public async Task<List<Guid>> GetUsedCategoryIdsAsync()
         {
             return await _context.Nominations
-               .Where(n => !n.IsDeleted) // Only consider active nominations
+               .Where(n => !n.IsDeleted) 
                .Select(n => n.CategoryId)
                .Distinct()
                .ToListAsync();

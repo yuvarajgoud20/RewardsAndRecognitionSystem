@@ -147,14 +147,9 @@
         reverseButtons: true
       }).then((result) => {
         if (result.isConfirmed) {
-          
-
-          // Create a form dynamically for POST deletion
           const form = document.createElement('form');
           form.method = 'POST';
           form.action = '/Category/Delete/' + categoryId;
-
-          // Add anti-forgery token
           const token = document.querySelector('input[name="__RequestVerificationToken"]');
           if (token) {
             const hiddenToken = document.createElement('input');
@@ -165,13 +160,13 @@
           }
 
           document.body.appendChild(form);
-          form.submit(); // Execute POST
+          form.submit();
         }
       });
     }
 
 </script>
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="~/lib/ValidationScriptsPartial/jquery-3.6.4.min.js"></script>
 <script>
     $(document).on("click", ".pagination-link", function (e) {
         e.preventDefault();

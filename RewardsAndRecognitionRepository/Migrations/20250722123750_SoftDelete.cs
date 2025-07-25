@@ -4,10 +4,10 @@
 
 namespace RewardsAndRecognitionRepository.Migrations
 {
-    /// <inheritdoc />
+  
     public partial class SoftDelete : Migration
     {
-        /// <inheritdoc />
+
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.AddColumn<bool>(
@@ -23,7 +23,6 @@ namespace RewardsAndRecognitionRepository.Migrations
             defaultValue: false);
         }
 
-        /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropColumn(
