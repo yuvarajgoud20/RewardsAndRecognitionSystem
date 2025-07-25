@@ -4,8 +4,7 @@
 
 @{
     ViewData["Title"] = "Nominations List";
-    // Layout = "~/Views/Shared/_Layout.cshtml";
-    //var selectedFilter = Context.Request.Query["filter"].ToString()?.ToLower() ?? "all";
+ 
     var reviewedIds = ViewBag.ReviewedNominationIds as List<Guid> ?? new List<Guid>();
     var nominationsList = Model.ToList();
     var isManager = User.IsInRole("Manager");
@@ -14,11 +13,7 @@
 
     var selectedFilter2 = ViewBag.FilterForDelete as string ?? "active";
     var currentFilter = selectedFilter2;
-    //var selectedFilter = ViewBag.FilterForDelete as string ?? "active";
-    // var FilterDelete = Context.Request.Query["FilterForDelete"];
-    // var isActiveSelected = FilterDelete == "active" || string.IsNullOrEmpty(FilterDelete);
-    // var isDeletedSelected = FilterDelete == "deleted";
-    // var FilterDelete = Context.Request.Query["FilterForDelete"];
+   
 
     var dashboardFilter = ViewBag.filter;
     var all = "all";

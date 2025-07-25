@@ -1,0 +1,92 @@
+﻿@model IEnumerable<RewardsAndRecognitionRepository.Models.Nomination>
+
+<div class="modal-header">
+    <h5 class="modal-title fw-bold">Nominations from @ViewBag.TeamName</h5>
+    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+</div>
+
+<div class="modal-body">
+    @if (Model != null && Model.Any())
+    {
+        <div class="mb-3 d-flex justify-content-between align-items-center">
+            <input type="text" id="searchInput" onkeyup="filterNominations()" class="form-control w-50" placeholder="Search by Nominee Name..." />
+            <button class="btn btn-success ms-3" onclick="exportNominationsToExcel()">
+                <i class="bi bi-file-earmark-excel"></i> Export to Excel
+            </button>
+        </div>
+
+        <div class="table-responsive">
+            <table class="table table-bordered table-hover" id="nominationsTable">
+                <thead class="table-primary text-center">
+                    <tr>
+                        <th>#</th>
+                        <th>Nominee</th>
+                        <th>Category</th>
+                        <th>Description</th>
+                        <th>Achievements</th>
+                        <th>Status</th>
+                        <th>Date</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @{
+                        int i = 1;
+                        foreach (var nom in Model)
+                        {
+                            <tr>
+                                <td class="text-center">@i</td>
+                                <td>@nom.Nominee?.Name</td>
+                                <td>@nom.Category?.Name</td>
+                                <td>@nom.Description</td>
+                                <td>@nom.Achievements</td>
+                                <td>
+                                    @switch (nom.Status)
+                                    {
+                                        case RewardsAndRecognitionRepository.Enums.NominationStatus.DirectorApproved:
+                                            @:<span class="badge bg-success">DirectorApproved</span>
+                                            break;
+                                        case RewardsAndRecognitionRepository.Enums.NominationStatus.DirectorRejected:
+                                            @:<span class="badge bg-danger">DirectorRejected</span>
+                                            break;
+                                        default:
+                                            @:<span class="badge bg-secondary">@nom.Status</span>
+                                            break;
+                                    }
+                                </td>
+                                <td>@nom.CreatedAt.ToString("M/d/yyyy")</td>
+                            </tr>
+                            i++;
+                        }
+                    }
+                </tbody>
+            </table>
+        </div>
+    }
+    else
+    {
+        <div class="alert alert-info text-center mt-3">
+            <i class="bi bi-info-circle"></i> No nominations found.
+        </div>
+    }
+</div>
+
+<div class="modal-footer">
+    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+</div>
+
+<script>
+    function filterNominations() {
+        const input = document.getElementById("searchInput").value.toLowerCase();
+        const rows = document.querySelectorAll("#nominationsTable tbody tr");
+
+        rows.forEach(row => {
+            const nameCell = row.cells[1]?.textContent.toLowerCase();
+            row.style.display = nameCell.includes(input) ? "" : "none";
+        });
+    }
+
+    function exportNominationsToExcel() {
+        // Trigger Excel export via backend
+        window.location.href = '@Url.Action("ExportToExcel", "Nomination", new { teamName = ViewBag.TeamName })';
+    }
+</script>

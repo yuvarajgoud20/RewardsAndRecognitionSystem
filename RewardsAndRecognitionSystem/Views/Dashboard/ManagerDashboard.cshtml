@@ -1,12 +1,8 @@
 ﻿@using RewardsAndRecognitionRepository.Models
 @using RewardsAndRecognitionRepository.Enums
 @model IEnumerable<Nomination>
-
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels"></script>
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2"></script>
-
 
 
 
@@ -42,33 +38,26 @@
 }
 
 
-<h2 class="d-flex justify-content-between align-items-center">
-    <span class="text-primary fw-bold">Manager Dashboard</span>
+<div class="d-flex align-items-center justify-content-between mb-4 flex-wrap">
+    <h2 class="mb-0"><i class="bi bi-person-badge"></i> Manager Dashboard</h2>
+    <div class="d-flex align-items-center gap-3 flex-wrap">
+        <div>
+            <label for="yearDropdown" class="form-label mb-1">Select Year :</label>
+            <select id="yearDropdown" class="form-select form-select-sm">
+                <option value="">-- Select Year --</option>
+            </select>
+        </div>
+        <div>
+            <label for="quarterDropdown" class="form-label mb-1">Select Quarter :</label>
+            <select id="quarterDropdown" class="form-select form-select-sm" disabled>
+                <option value="">-- Select Quarter --</option>
+            </select>
+        </div>
+    </div>
+</div>
 
-    <span class="ms-3 quarter-card shadow-sm"
-          data-bs-toggle="tooltip"
-          data-bs-placement="left"
-          title="Closes At: @ViewBag.ActiveQuarterCloseDate">
-        <span class="fw-semibold">@ViewBag.ActiveQuarterName, @ViewBag.ActiveYearName</span>
-    </span>
-</h2>
 
 <style>
-    .quarter-card {
-        background-color: #f1f5ff;
-        color: #002c75;
-        border-radius: 0.75rem;
-        padding: 0.75rem 1rem;
-        font-size: 0.85rem;
-        width: 12rem;
-        text-align: left;
-        border-left: 4px solid #0d6efd;
-        transition: all 0.3s ease-in-out;
-    }
-
-        .quarter-card:hover {
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-        }
 
     .dashboard-card {
         background: white;
@@ -119,30 +108,71 @@
     .text-orange {
         color: #F9A825;
     }
+
+    .text-red {
+        color: #FF0000;
+    }
+
+    .analytics-btn {
+        font-weight: 600;
+        font-size: 1.1rem;
+        padding: 0.5rem 1.3rem;
+        border-radius: 0.5rem;
+        box-shadow: 0 4px 8px rgba(41, 98, 255, 0.3);
+        transition: background-color 0.3s ease, box-shadow 0.3s ease, transform 0.2s ease;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+        .analytics-btn:hover {
+            background-color: #1a53ff;
+            box-shadow: 0 6px 15px rgba(41, 98, 255, 0.6);
+            transform: translateY(-2px);
+            text-decoration: none;
+            color: white;
+        }
+
+        .analytics-btn i {
+            transition: transform 0.3s ease;
+        }
+
+        .analytics-btn:hover i {
+            transform: translateX(4px);
+        }
+
+
 </style>
 
 <!-- Summary Cards -->
 <div class="row g-4 mb-4">
     <div class="col-md-3">
-        <a asp-controller="Nomination" asp-action="Index" asp-route-filter="all" class="dashboard-card text-blue d-block text-decoration-none">
+       
+        <a href="#" onclick="navigateToNominations('all')" class="dashboard-card text-blue d-block text-decoration-none" ">
             <div class="dashboard-title">Total Nominations</div>
-            <div class="dashboard-value">@ViewBag.TotalNominations</div>
+            <div class="dashboard-value" style="color: #007bff;">@ViewBag.TotalNominations</div> <!-- Blue -->
         </a>
     </div>
     <div class="col-md-3">
-        <a asp-controller="Nomination" asp-action="Index" asp-route-filter="pending" class="dashboard-card text-orange d-block text-decoration-none">
+       
+        <a href="#" onclick="navigateToNominations('pending')" class="dashboard-card d-block text-decoration-none">
+
             <div class="dashboard-title">Pending Reviews</div>
-            <div class="dashboard-value">@ViewBag.PendingNominations</div>
+            <div class="dashboard-value" style="color: #fd7e14;">@ViewBag.PendingNominations</div> <!-- Orange -->
         </a>
     </div>
     <div class="col-md-3">
-        <a asp-controller="Nomination" asp-action="Index" asp-route-filter="directorapproved" class="dashboard-card text-green d-block text-decoration-none">
+    
+        <a href="#" onclick="navigateToNominations('directorapproved')" class="dashboard-card d-block text-decoration-none">
+
             <div class="dashboard-title">Final Approved</div>
-            <div class="dashboard-value">@ViewBag.FinalApprovedNominations</div>
+            <div class="dashboard-value" style="color: #28a745;">@ViewBag.FinalApprovedNominations</div> <!-- Green -->
         </a>
     </div>
     <div class="col-md-3">
-        <a asp-controller="Nomination" asp-action="Index" asp-route-filter="directorrejected" class="dashboard-card text-red d-block text-decoration-none">
+      
+        <a href="#" onclick="navigateToNominations('directorrejected')" class="dashboard-card d-block text-decoration-none">
+
             <div class="dashboard-title">Final Rejected</div>
             <div class="dashboard-value text-danger">@ViewBag.FinalRejectedNominations</div>
         </a>
@@ -150,39 +180,27 @@
 </div>
 
 
-<!-- Teams Accordion -->
-<h4 class="mt-5"><i class="bi bi-people-fill"></i> Teams Under You</h4>
-<div class="accordion mb-5" id="teamsAccordion">
-    @for (int i = 0; i < teams.Count; i++)
-    {
-        var team = teams[i];
-        var collapseId = $"collapseTeam{i}";
-        var headingId = $"headingTeam{i}";
-        <div class="accordion-item">
-            <h2 class="accordion-header" id="@headingId">
-                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#@collapseId" aria-expanded="false" aria-controls="@collapseId">
-                    @team.TeamName
-                </button>
-            </h2>
-            <div id="@collapseId" class="accordion-collapse collapse" aria-labelledby="@headingId" data-bs-parent="#teamsAccordion">
-                <div class="accordion-body">
-                    <p><strong>Team Lead:</strong> @team.TeamLeadName</p>
-                    <p><strong>Total number of nominations:</strong> @team.NominatedCount</p>
-                </div>
-            </div>
-        </div>
-    }
-</div>
 
 
 @{
     var chartIndex = 0;
     var teamChartData = ViewBag.TeamStatusData;
 }
-<h4 class="mt-5"><i class="bi bi-bar-chart-line-fill"></i> Team Wise Statistics </h4>
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h4 class="mt-5"><i class="bi bi-bar-chart-line-fill"></i> Team Wise Statistics</h4>
+    <a asp-controller="Analytics"
+       asp-action="Index"
+       asp-route-yearQuarterId="@ViewBag.CurrentQuarterId"
+       class="btn btn-info analytics-btn mt-5">
+        <i class="bi bi-graph-up-arrow"></i> View Analytics
+    </a>
+</div>
+
 
 <!-- Chart CSS -->
 <style>
+
     .chart-wrapper {
         height: 275px;
         max-width: 250px;
@@ -273,401 +291,68 @@
         }
     </div>
 </div>
+@* Enhanced Teams Accordion *@
+<h4 class="mt-5 mb-4 fw-bold text-dark">
+    <i class="bi bi-people-fill me-2"></i> Teams Under You
+</h4>
 
-<!-- Team Dropdown Selection -->
-<h4 class="mt-5"><i class="bi bi-info-circle-fill"></i> View Nominations by Team</h4>
-<form method="get" asp-action="Index" class="mb-4 d-flex align-items-center gap-3">
-    <label class="form-label mb-0"><strong>Select Team:</strong></label>
-    <select name="teamId" class="form-select w-auto" onchange="this.form.submit()">
-        <option value="">-- Choose a team --</option>
-        @foreach (var team in teams)
-        {
-            <option value="@team.TeamId" selected="@(team.TeamId.ToString() == selectedTeamId)">
-                @team.TeamName
-            </option>
-        }
-    </select>
-</form>
-
-@if (!string.IsNullOrEmpty(selectedTeamId))
-{
-    <div class="modal fade" id="teamNominationsModal" tabindex="-1" aria-labelledby="teamNominationsModalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-xl modal-dialog-centered">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="teamNominationsModalLabel">Nominations from @selectedTeamName</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" onclick="hideTeamModal()"></button>
-                </div>
-                <div class="modal-body">
-
-                    <!-- 🔍 Search Input + Export Button -->
-                    <div class="d-flex justify-content-between align-items-center mb-3">
-                        <input type="text" id="searchInput" class="form-control w-25" placeholder="Search by Nominee Name..." onkeyup="filterNominations()" />
-
-                        <a asp-controller="Nomination"
-                           asp-action="ExportTeamNominationsToExcel"
-                           asp-route-teamId="@selectedTeamId"
-                           class="btn btn-success ms-3">
-                            <i class="bi bi-file-earmark-excel-fill"></i> Export to Excel
-                        </a>
-                    </div>
-
-                    @if (selectedTeamNominations.Any())
-                    {
-                        <div class="table-responsive">
-                            <table class="table table-bordered table-striped shadow-sm" id="nominationsTable">
-                                <thead class="table-primary">
-                                    <tr>
-                                        <th>#</th>
-                                        <th>Nominee</th>
-                                        <th>Category</th>
-                                        <th>Description</th>
-                                        <th>Achievements</th>
-                                        <th>Status</th>
-                                        <th>Date</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    @for (int i = 0; i < selectedTeamNominations.Count; i++)
-                                    {
-                                        var n = selectedTeamNominations[i];
-                                        <tr>
-                                            <td>@(i + 1)</td>
-                                            <td>@n.Nominee?.Name</td>
-                                            <td>@n.Category?.Name</td>
-                                            <td>@n.Description</td>
-                                            <td>@n.Achievements</td>
-                                            <td>@n.Status</td>
-                                            <td>@n.CreatedAt.ToShortDateString()</td>
-                                        </tr>
-                                    }
-                                </tbody>
-                            </table>
-                        </div>
-                    }
-                    else
-                    {
-                        <div class="alert alert-info mb-0">
-                            No nominations yet for this team.
-                        </div>
-                    }
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" onclick="hideTeamModal()">Close</button>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Modal and Filtering Scripts -->
-    <script>
-        window.addEventListener('load', function () {
-            const modalElement = document.getElementById("teamNominationsModal");
-            if (modalElement) {
-                const modalInstance = new bootstrap.Modal(modalElement);
-                modalInstance.show();
-            }
-        });
-
-        function hideTeamModal() {
-            const modalElement = document.getElementById("teamNominationsModal");
-            const modalInstance = bootstrap.Modal.getInstance(modalElement);
-            if (modalInstance) {
-                modalInstance.hide();
-
-                // Reset dropdown
-                const teamSelect = document.querySelector("select[name='teamId']");
-                if (teamSelect) {
-                    teamSelect.selectedIndex = 0;
-                }
-
-                // Clean URL
-                const url = new URL(window.location);
-                url.searchParams.delete("teamId");
-                window.history.replaceState({}, document.title, url);
-            }
-        }
-
-        // 🔍 Filter nominations table by nominee name
-        function filterNominations() {
-            const input = document.getElementById("searchInput");
-            const filter = input.value.toLowerCase();
-            const table = document.getElementById("nominationsTable");
-            const rows = table.getElementsByTagName("tr");
-
-            for (let i = 1; i < rows.length; i++) {
-                const nomineeCell = rows[i].getElementsByTagName("td")[1];
-                if (nomineeCell) {
-                    const name = nomineeCell.textContent || nomineeCell.innerText;
-                    rows[i].style.display = name.toLowerCase().includes(filter) ? "" : "none";
-                }
-            }
-        }
-    </script>
-
-
-
-}
-
-
-
-@* 
- @using RewardsAndRecognitionRepository.Models
-@using RewardsAndRecognitionRepository.Enums
-@model IEnumerable<Nomination>
-
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-
-
-
-<script>
-    const viewCount = sessionStorage.getItem('viewCount');
-</script>
-
-@{
-    ViewData["Title"] = "Manager Dashboard";
-    Layout = "~/Views/Shared/_Layout.cshtml";
-
-    var total = ViewBag.TotalNominations;
-    var approved = ViewBag.FinalApprovedNominations;
-    var rejected = ViewBag.FinalRejectedNominations;
-    var pending = total - (approved + rejected);
-
-
-    var teams = ViewBag.TeamsUnderManager as List<dynamic>;
-    var selectedTeamId = ViewBag.SelectedTeamId as string;
-    var selectedTeamNominations = ViewBag.SelectedTeamNominations as List<Nomination> ?? new();
-    var selectedTeamName = teams?.FirstOrDefault(t => t.TeamId.ToString() == selectedTeamId)?.TeamName ?? "";
-
-    var leaderboard = teams
-        .Select(t => new
-        {
-            TeamName = t.TeamName,
-            Count = Model.Count(n => n.Status == NominationStatus.DirectorApproved && n.Nominee?.Team?.Name == t.TeamName)
-        })
-        .OrderByDescending(t => t.Count)
-        .ToList();
-
-    var maxCount = leaderboard.Any() ? leaderboard.Max(l => l.Count) : 1;
-}
-
-<h2 class="mb-4"><i class="bi bi-person-badge"></i> Manager Dashboard</h2>
-<div class="row mb-4">
-    <div class="col-md-3">
-        <label for="yearDropdown" class="form-label">Select Year:</label>
-        <select id="yearDropdown" class="form-select">
-            <option value="">-- Select Year --</option>
-        </select>
-    </div>
-    <div class="col-md-3">
-        <label for="quarterDropdown" class="form-label">Select Quarter:</label>
-        <select id="quarterDropdown" class="form-select" disabled>
-            <option value="">-- Select Quarter --</option>
-        </select>
-    </div>
-</div>
-
-
-<style>
-    .dashboard-card {
-        background: white;
-        border-radius: 12px;
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
-        padding: 20px;
-        transition: transform 0.2s ease;
-        height: 100%;
-        text-decoration: none;
-    }
-
-        .dashboard-card:hover {
-            transform: translateY(-3px);
-            text-decoration: none;
-        }
-
-    .dashboard-title {
-        font-size: 1rem;
-        font-weight: 600;
-        color: #555;
-    }
-
-    .dashboard-value {
-        font-size: 1.75rem;
-        font-weight: bold;
-        margin-top: 5px;
-    }
-
-    .bar-container {
-        margin-top: 30px;
-    }
-
-    .bar {
-        height: 14px;
-        border-radius: 6px;
-        margin-bottom: 10px;
-        transition: width 0.3s ease;
-    }
-
-    .text-blue {
-        color: #2962FF;
-    }
-
-    .text-green {
-        color: #2E7D32;
-    }
-
-    .text-orange {
-        color: #F9A825;
-    }
-</style>
-
-<!-- Summary Cards -->
-<div class="row g-4 mb-4">
-    <div class="col-md-3">
-        <a asp-controller="Nomination" asp-action="Index" asp-route-filter="all" class="dashboard-card text-blue d-block text-decoration-none">
-            <div class="dashboard-title">Total Nominations</div>
-            <div class="dashboard-value">@ViewBag.TotalNominations</div>
-        </a>
-    </div>
-    <div class="col-md-3">
-        <a asp-controller="Nomination" asp-action="Index" asp-route-filter="pending" class="dashboard-card text-orange d-block text-decoration-none">
-            <div class="dashboard-title">Pending Reviews</div>
-            <div class="dashboard-value">@ViewBag.PendingNominations</div>
-        </a>
-    </div>
-    <div class="col-md-3">
-        <a asp-controller="Nomination" asp-action="Index" asp-route-filter="directorapproved" class="dashboard-card text-green d-block text-decoration-none">
-            <div class="dashboard-title">Final Approved</div>
-            <div class="dashboard-value">@ViewBag.FinalApprovedNominations</div>
-        </a>
-    </div>
-    <div class="col-md-3">
-        <a asp-controller="Nomination" asp-action="Index" asp-route-filter="directorrejected" class="dashboard-card text-red d-block text-decoration-none">
-            <div class="dashboard-title">Final Rejected</div>
-            <div class="dashboard-value text-danger">@ViewBag.FinalRejectedNominations</div>
-        </a>
-    </div>
-</div>
-
-
-<!-- Teams Accordion -->
-<h4 class="mt-5"><i class="bi bi-people-fill"></i> Teams Under You</h4>
-<div class="accordion mb-5" id="teamsAccordion">
+<div class="accordion shadow-sm rounded" id="teamsAccordion">
     @for (int i = 0; i < teams.Count; i++)
     {
         var team = teams[i];
         var collapseId = $"collapseTeam{i}";
         var headingId = $"headingTeam{i}";
-        <div class="accordion-item">
+        <div class="accordion-item border-0 mb-2 shadow-sm rounded-3 overflow-hidden">
             <h2 class="accordion-header" id="@headingId">
-                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#@collapseId" aria-expanded="false" aria-controls="@collapseId">
-                    @team.TeamName
+                <button class="accordion-button collapsed bg-light fw-semibold" type="button" data-bs-toggle="collapse"
+                        data-bs-target="#@collapseId" aria-expanded="false" aria-controls="@collapseId">
+                   @team.TeamName
                 </button>
             </h2>
             <div id="@collapseId" class="accordion-collapse collapse" aria-labelledby="@headingId" data-bs-parent="#teamsAccordion">
-                <div class="accordion-body">
-                    <p><strong>Team Lead:</strong> @team.TeamLeadName</p>
-                    <p><strong>Total number of nominations:</strong> @team.NominatedCount</p>
+                <div class="accordion-body bg-white">
+                    <p class="mb-2"><strong class="text-secondary">Team Lead:</strong> @team.TeamLeadName</p>
+
+                    <p class="mb-2 fw-semibold text-secondary">Category-wise Nominations:</p>
+                    <ul class="list-group list-group-flush">
+                        @{
+                            var currentQuarterId = ViewBag.CurrentQuarterId as Guid?;
+                            var teamNominations = Model.Where(n =>
+                            n.Nominee?.Team?.Id == team.TeamId &&
+                            currentQuarterId.HasValue && n.YearQuarterId == currentQuarterId.Value);
+
+
+                            var categoryGroups = teamNominations
+                            .GroupBy(n => n.Category?.Name)
+                            .OrderBy(g => g.Key);
+                        }
+
+                        @if (categoryGroups.Any())
+                        {
+                            foreach (var categoryGroup in categoryGroups)
+                            {
+                                <li class="list-group-item d-flex justify-content-between align-items-center px-3">
+                                    <span class="text-capitalize">@categoryGroup.Key</span>
+                                    <span class="badge bg-gradient bg-primary px-3 py-1 fs-6 rounded-pill">@categoryGroup.Count()</span>
+                                </li>
+                            }
+                        }
+                        else
+                        {
+                            <p class="text-muted fst-italic text-center mb-0">
+                                <i class="bi bi-exclamation-circle me-1"></i> No nominations available.
+                            </p>
+                        }
+                    </ul>
                 </div>
             </div>
         </div>
     }
 </div>
 
-
-<!-- Graph representation for each team -->
-@{
-    var chartIndex = 0;
-    var teamChartData = ViewBag.TeamStatusData;
-}
-<!-- Load Chart.js -->
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-
-<h4 class="mt-5"><i class="bi bi-bar-chart-line-fill"></i> Team Wise Statistics </h4>
-
-<!--  CSS to enforce consistent size -->
-<style>
-    .chart-wrapper {
-        height: 275px; /* Fixed height for all charts */
-        max-width: 250px; /* Limit chart width */
-        margin: 0 auto; /* Center the chart */
-    }
-
-        .chart-wrapper canvas {
-            width: 100% !important; /* Stretch to wrapper width */
-            height: 100% !important; /* Fill wrapper height */
-        }
-
-    .card {
-        min-height: 300px; /* Slightly shorter card */
-        padding: 1rem;
-        display: flex;
-        flex-direction: column;
-        justify-content: space-between;
-        align-items: center; /* Center chart and title */
-        text-align: center;
-    }
-</style>
-
-
-<div class="container">
-    <div class="row">
-        @foreach (var team in teamChartData)
-        {
-            var chartId = $"barChart_{chartIndex}";
-            var approvedNominations = Convert.ToInt32(team.Approved);
-            var rejectedNominations = Convert.ToInt32(team.Rejected);
-            var pendingNominations = Convert.ToInt32(team.Pending);
-            <div class="col-md-4 mb-4">
-                <div class="card p-3 shadow-sm">
-                    <h6 class="text-center">
-                        @team.TeamName - @team.Total Nominations
-                    </h6>
-
-                    <div class="chart-wrapper">
-                        <canvas id="@chartId"></canvas>
-                    </div>
-                </div>
-            </div>
-            <script>
-                document.addEventListener('DOMContentLoaded', function () {
-                    const ctx = document.getElementById('@chartId').getContext('2d');
-                    new Chart(ctx, {
-                        type: 'bar',
-                        data: {
-                            labels: ['Approved', 'Rejected', 'Pending'],
-                            datasets: [{
-                                label: 'Nominations',
-                                data: [@approvedNominations, @rejectedNominations, @pendingNominations],
-                                backgroundColor: ['#4caf50', '#f44336', '#ffc107'],
-                                borderRadius: 5,
-                                borderWidth: 1
-                            }]
-                        },
-                        options: {
-                            responsive: true,
-                            maintainAspectRatio: false,
-                            scales: {
-                                y: {
-                                    beginAtZero: true,
-                                    precision: 0
-                                }
-                            },
-                            plugins: {
-                                legend: {
-                                    display: false
-                                }
-                            }
-                        }
-                    });
-                });
-            </script>
-            chartIndex++;
-        }
-    </div>
-</div>
-
 <!-- View Nominations by Team (AJAX) -->
 <h4 class="mt-5"><i class="bi bi-info-circle-fill"></i> View Nominations by Team</h4>
+
 <div class="mb-4 d-flex align-items-center gap-3">
     <label class="form-label mb-0"><strong>Select Team:</strong></label>
     <select id="teamSelect" class="form-select w-auto">
@@ -738,6 +423,20 @@
         }
     </script>
     <script>
+        function navigateToNominations(filter) {
+            const quarterId = document.getElementById("quarterDropdown")?.value;
+
+            if (!quarterId) {
+                alert("Please select a quarter.");
+                return;
+            }
+
+            const url = `/Nomination/Index?filter=${filter}&yearQuarterId=${quarterId}`;
+            window.location.href = url;
+        }
+    </script>
+
+    <script>
         function exportNominationsToExcel() {
             const table = document.getElementById("nominationsTable");
             if (!table) {
@@ -776,11 +475,17 @@
 
 
     <script>
-        document.getElementById("teamSelect").addEventListener("change", function () {
+           document.getElementById("teamSelect").addEventListener("change", function () {
             const teamId = this.value;
-            if (!teamId) return;
+            const year = document.getElementById("yearDropdown").value;
+            const quarterId = document.getElementById("quarterDropdown").value;
 
-            fetch(`/Dashboard/GetTeamNominations?teamId=${teamId}`)
+            if (!teamId || !year || !quarterId) {
+                alert("Please select year and quarter first");
+                return;
+            }
+
+            fetch(`/Dashboard/GetTeamNominations?teamId=${teamId}&year=${year}&quarterId=${quarterId}`)
                 .then(response => {
                     if (!response.ok) throw new Error("Failed to fetch nominations");
                     return response.text();
@@ -794,6 +499,7 @@
                     alert("Error loading nominations: " + error.message);
                 });
         });
+
     </script>
 
     @if (!string.IsNullOrEmpty(ViewBag.SelectedTeamId as string))
@@ -810,19 +516,19 @@
     }
 
     <script>
-        function hideTeamModal() {
+       function hideTeamModal() {
             const modalElement = document.getElementById("teamNominationsModal");
             const modalInstance = bootstrap.Modal.getInstance(modalElement);
             if (modalInstance) {
                 modalInstance.hide();
 
-                // Reset dropdown
-                const teamSelect = document.querySelector("select[name='teamId']");
+                // ✅ Correctly reset the dropdown by ID
+                const teamSelect = document.getElementById("teamSelect");
                 if (teamSelect) {
                     teamSelect.selectedIndex = 0;
                 }
 
-                // Clean URL
+                // ✅ Clean the URL
                 const url = new URL(window.location);
                 url.searchParams.delete("teamId");
                 window.history.replaceState({}, document.title, url);
@@ -847,6 +553,6 @@
     </script>
 }
 
-        *@
+
 
 

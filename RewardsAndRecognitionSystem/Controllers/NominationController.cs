@@ -43,42 +43,50 @@ namespace RewardsAndRecognitionSystem.Controllers
         }
 
         // GET: Nomination
-        public async Task<IActionResult> Index(string filter = "all" ,string FilterForDelete = "active", int page = 1)
+        public async Task<IActionResult> Index(Guid? yearQuarterId,string filter = "all" ,string FilterForDelete = "active", int page = 1)
         {
-            int pageSize = 10;
+         
             ViewBag.filter = filter;
-            
+
+
+            int pageSize = 10;
+
             var currentUser = await _userManager.GetUserAsync(User);
             if (currentUser == null)
                 return RedirectToAction("Login", "Account", new { area = "Identity" });
 
             List<Nomination> allNominations = new();
             List<Nomination> deletednominations = new();
+            var selectedQuarter = yearQuarterId.HasValue
+             ? await _context.YearQuarters.FirstOrDefaultAsync(yq => yq.Id == yearQuarterId.Value)
+             : await _context.YearQuarters.FirstOrDefaultAsync(yq => yq.IsActive);
 
-            var activeQuarter = await _context.YearQuarters.FirstOrDefaultAsync(yq => yq.IsActive);
-            if (activeQuarter == null)
+            if (selectedQuarter == null)
             {
-                TempData["Message"] = "❌ No active quarter is set.";
+                TempData["Message"] = "❌ No valid quarter found.";
                 return View(new List<Nomination>());
             }
 
             ViewBag.currentUser = currentUser;
+            ViewBag.SelectedYearQuarterId = selectedQuarter.Id;
             var userRoles = await _userManager.GetRolesAsync(currentUser);
             List<Nomination> nominationsToShow = new();
 
+
+
             if (userRoles.Contains("Director"))
             {
+               
                 nominationsToShow = await _context.Nominations
-                    .Include(n => n.Nominee)
-                        .ThenInclude(u => u.Team)
-                    .Include(n => n.Category)
-                    .Include(n => n.Approvals)
-                    .Include(n => n.Nominator)
-                          .Where(n => n.YearQuarterId == activeQuarter.Id)
-                    .Where(n => n.Nominee.Team.DirectorId == currentUser.Id)
-                    .Where(n => n.Status != NominationStatus.PendingManager)
-                    //.Where(n => n.Approvals != null)
-                    .ToListAsync();
+                 .Include(n => n.Nominee).ThenInclude(u => u.Team)
+                 .Include(n => n.Category)
+                 .Include(n => n.Approvals)
+                 .Include(n => n.Nominator)
+                 .Where(n => n.YearQuarterId == selectedQuarter.Id)
+                 .Where(n => n.Nominee.Team.DirectorId == currentUser.Id)
+                 .Where(n => n.Status != NominationStatus.PendingManager)
+                 .Where(n => n.Approvals != null)
+                 .ToListAsync();
                 if (filter == "pending")
                 {
                     nominationsToShow = nominationsToShow.Where(n => n.Status == NominationStatus.ManagerApproved || n.Status == NominationStatus.ManagerRejected).ToList();
@@ -117,15 +125,15 @@ namespace RewardsAndRecognitionSystem.Controllers
 
             if (userRoles.Contains("Manager"))
             {
+              
                 nominationsToShow = await _context.Nominations
-                    .Include(n => n.Nominee)
-                        .ThenInclude(u => u.Team)
-                    .Include(n => n.Category)
-                    .Include(n => n.Approvals)
-                    .Include(n => n.Nominator)
-                     .Where(n => n.YearQuarterId == activeQuarter.Id)
-                    .Where(n => n.Nominee.Team.ManagerId == currentUser.Id)
-                    .ToListAsync();
+                   .Include(n => n.Nominee).ThenInclude(u => u.Team)
+                   .Include(n => n.Category)
+                   .Include(n => n.Approvals)
+                   .Include(n => n.Nominator)
+                   .Where(n => n.YearQuarterId == selectedQuarter.Id)
+                   .Where(n => n.Nominee.Team.ManagerId == currentUser.Id)
+                   .ToListAsync();
                 if (filter == "pending")
                 {
                     nominationsToShow = nominationsToShow.Where(n => n.Status == NominationStatus.PendingManager ).ToList();
@@ -161,16 +169,15 @@ namespace RewardsAndRecognitionSystem.Controllers
             }
             if (userRoles.Contains("TeamLead"))
             {
-                // For TeamLead or others — show their own nominations
+
                 nominationsToShow = await _context.Nominations
-                     .Include(n => n.Nominee)
-                     .ThenInclude(u => u.Team)
-                     .Include(n => n.Category)
-                     .Include(n => n.Approvals)
-                     .Include(n => n.Nominator)
-                      .Where(n => n.YearQuarterId == activeQuarter.Id)
-                     .Where(n => n.NominatorId == currentUser.Id)
-                     .ToListAsync();
+                .Include(n => n.Nominee).ThenInclude(u => u.Team)
+                .Include(n => n.Category)
+                .Include(n => n.Approvals)
+                .Include(n => n.Nominator)
+                .Where(n => n.YearQuarterId == selectedQuarter.Id)
+                .Where(n => n.NominatorId == currentUser.Id)
+                .ToListAsync();
                 if (filter == "pending")
                 {
                     nominationsToShow = nominationsToShow.Where(n => n.Status == NominationStatus.PendingManager ||
@@ -217,12 +224,11 @@ namespace RewardsAndRecognitionSystem.Controllers
             if (userRoles.Contains("Admin"))
             {
                 nominationsToShow = await _context.Nominations
-                    .Include(n => n.Nominee)
-                    .Include(n => n.Nominator)
-                    .ThenInclude(u => u.Team)
-                    .Include(n => n.Category)
-                     .Where(n => n.YearQuarterId == activeQuarter.Id)
-                    .ToListAsync();
+                .Include(n => n.Nominee)
+                .Include(n => n.Nominator).ThenInclude(u => u.Team)
+                .Include(n => n.Category)
+                .Where(n => n.YearQuarterId == selectedQuarter.Id)
+                .ToListAsync();
             }
             var viewModelList = _mapper.Map<List<NominationViewModel>>(nominationsToShow);
             return View(viewModelList);
@@ -653,7 +659,7 @@ namespace RewardsAndRecognitionSystem.Controllers
         }
 
         [HttpGet]
-        [Route("Nomination/ ExportTeamNominationsToExcel/{teamId}")]
+        [Route("Nomination/ExportTeamNominationsToExcel/{teamId}")]
         public async Task<IActionResult> ExportTeamNominationsToExcel(Guid? teamId = null)
 
         {

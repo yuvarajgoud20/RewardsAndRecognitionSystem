@@ -81,32 +81,15 @@
         margin-bottom: 20px;
     }
 
-    /* If needed, you can also add some space between the top row elements */
+    
     .row.mb-4 {
         margin-bottom: 20px;
     }
-    /* All existing styles remain unchanged */
-    /* ... (keep your original CSS styles here) ... */
+   
 </style>
-
-<h2 class="mb-4">Analytics Dashboard</h2>
-
-<div class="row mb-4">
-    <div class="col-md-3">
-        <label for="yearDropdown" class="form-label">Select Year:</label>
-        <select id="yearDropdown" class="form-select">
-            <option value="">-- Select Year --</option>
-        </select>
-    </div>
-    <div class="col-md-3">
-        <label for="quarterDropdown" class="form-label">Select Quarter:</label>
-        <select id="quarterDropdown" class="form-select" disabled>
-            <option value="">-- Select Quarter --</option>
-        </select>
-    </div>
-    <div class="col-md-3 d-flex align-items-end">
-        <button class="btn btn-success" onclick="exportAllCharts()">📄 Export All Charts</button>
-    </div>
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2 class="mb-0">Analytics Dashboard</h2>
+    <button class="btn btn-success" onclick="exportAllCharts()">📄 Export All Charts</button>
 </div>
 
 <div id="dashboardExportContent">
