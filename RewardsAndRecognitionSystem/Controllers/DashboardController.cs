@@ -136,7 +136,7 @@ public class DashboardController : Controller
 
         var nominations = (await _nominationRepo.GetAllNominationsAsync()).ToList();
 
-        if (roles.Contains(nameof(Roles.Manager))
+        if (roles.Contains(nameof(Roles.Manager)))
         {
             // Get all teams under this manager
             var teams = await _context.Teams
