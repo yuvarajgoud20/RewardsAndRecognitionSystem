@@ -18,7 +18,16 @@
                 <td>@yq.Quarter</td>
                 <td>@(yq.StartDate?.ToShortDateString() ?? "N/A")</td>
                 <td>@(yq.EndDate?.ToShortDateString() ?? "N/A")</td>
-                <td>@(yq.IsActive ? "✅ Yes" : "❌ No")</td>
+                <td >
+                    @if (yq.IsActive)
+                    {
+                    <span class="badge bg-success"><i class="bi bi-check-circle-fill"></i> Active</span>
+                    }
+                    else
+                    {
+                    <span class="badge bg-secondary"><i class="bi bi-x-circle-fill"></i> Inactive</span>
+                    }
+                    </td>
                 <td>
                     <a asp-action="Details" asp-route-id="@yq.Id" class="btn btn-secondary">
                         <i class="bi bi-eye-fill"></i> View

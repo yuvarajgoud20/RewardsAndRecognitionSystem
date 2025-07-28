@@ -24,7 +24,8 @@ namespace RewardsAndRecognitionSystem.Controllers
 
         public async Task<IActionResult> Index(int page = 1)
         {
-            int pageSize = 5;
+
+            int pageSize = 10;
             var allQuarters = await _yearQuarterRepo.GetAllAsync();
             var totalRecords = allQuarters.Count();
             var totalPages = (int)Math.Ceiling(totalRecords / (double)pageSize);
@@ -64,6 +65,11 @@ namespace RewardsAndRecognitionSystem.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(YearQuarterViewModel yq)
         {
+            var yqs = await _yearQuarterRepo.GetAllAsync();
+            if (yqs.Any(yearquarter => yearquarter.Year == yq.Year && yearquarter.Quarter == yq.Quarter))
+            {
+                ModelState.AddModelError("Quarter", " Year + Quarter Combination already Exists.please select another quarter");
+            }
             if (!ModelState.IsValid)
             {
                 ViewBag.Quarters = new SelectList(Enum.GetValues(typeof(Quarter)));

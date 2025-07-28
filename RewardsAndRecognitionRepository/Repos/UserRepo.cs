@@ -23,7 +23,7 @@ namespace RewardsAndRecognitionRepository.Repos
 
         public async Task<IEnumerable<User>> GetAllAsync()
         {
-            return await _context.Users.Include(u => u.Team).ToListAsync();
+            return await _context.Users.Include(u => u.Team).ThenInclude(u => u.Manager).ToListAsync();
         }
 
         public async Task<User?> GetByIdAsync(string id)
@@ -38,6 +38,8 @@ namespace RewardsAndRecognitionRepository.Repos
         public async Task<IEnumerable<User>> GetActiveUsersAsync()
         {
             return await _context.Users
+                .Include(u => u.Team)                     // load the user's Team
+                .ThenInclude(u => u.Manager)
                 .Where(u => u.IsActive == true)
                 .ToListAsync();
         }

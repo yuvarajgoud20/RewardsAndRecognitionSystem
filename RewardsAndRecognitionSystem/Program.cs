@@ -85,6 +85,7 @@ internal class Program
             builder.Services.AddAutoMapper(cfg =>
             {
                 cfg.AddProfile<UserMappingProfile>();
+                cfg.AddProfile<EditUserMappingProfile>();
                 cfg.AddProfile<CategoryMappingProfle>();
                 cfg.AddProfile<TeamViewMapperProfile>();
                 cfg.AddProfile<YearQuarterMappingProfile>();
@@ -95,6 +96,7 @@ internal class Program
             builder.Services.AddFluentValidationClientsideAdapters();
 
             builder.Services.AddTransient<IValidator<UserViewModel>, UserViewValidator>();
+            builder.Services.AddTransient<IValidator<EditUserViewModel>, EditUserViewValidator>();
             builder.Services.AddTransient<IValidator<TeamViewModel>, TeamViewValidator>();
             builder.Services.AddTransient<IValidator<CategoryViewModel>, CategoryViewValidator>();
             builder.Services.AddTransient<IValidator<YearQuarterViewModel>, YearQuarterViewValidator>();
@@ -164,6 +166,27 @@ internal class Program
             app.UseRouting();
             app.UseAuthentication();
             app.UseAuthorization();
+
+            app.Use(async (context, next) =>
+            {
+                var user = context.User;
+
+                if (context.Request.Path == "/" && user.Identity != null && user.Identity.IsAuthenticated)
+                {
+                    if (user.IsInRole("TeamLead") || user.IsInRole("Manager") || user.IsInRole("Director"))
+                    {
+                        context.Response.Redirect("/Dashboard/Index");
+                        return;
+                    }
+                    else
+                    {
+                        context.Response.Redirect("/Home/Index");
+                        return;
+                    }
+                }
+
+                await next();
+            });
 
             app.MapControllerRoute(
                 name: "default",

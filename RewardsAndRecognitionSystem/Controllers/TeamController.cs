@@ -23,6 +23,7 @@ namespace RewardsAndRecognitionSystem.Controllers
         private readonly UserManager<User> _userManager;
 
         public TeamController(IMapper mapper, ITeamRepo teamRepo, IUserRepo userRepo, UserManager<User> userManager, ApplicationDbContext context)
+
         {
             _mapper = mapper;
             _teamRepo = teamRepo;
@@ -74,8 +75,11 @@ namespace RewardsAndRecognitionSystem.Controllers
         {
             if (ModelState.IsValid)
             {
-                var team = _mapper.Map<Team>(viewModel);
+                var team=_mapper.Map<Team>(viewModel);
                 await _teamRepo.AddAsync(team);
+                User user = await _userRepo.GetByIdAsync(team.TeamLeadId);
+                user.TeamId = team.Id;
+                await _userManager.UpdateAsync(user);
                 return RedirectToAction(nameof(Index));
             }
 
@@ -121,12 +125,13 @@ namespace RewardsAndRecognitionSystem.Controllers
                 ModelState.Clear();
                 var teamViewModel = _mapper.Map<TeamViewModel>(existingTeam);
                 var managers = await _userRepo.GetAllManagersAsync();
+
                 var leads = await _userRepo.GetLeadsAsync(existingTeam.TeamLeadId);
                 var directors = await _userRepo.GetAllDirectorsAsync();
                 ViewBag.Managers = new SelectList(managers, "Id", "Name", existingTeam.ManagerId);
                 ViewBag.TeamLeads = new SelectList(leads, "Id", "Name", existingTeam.TeamLeadId);
                 ViewBag.Directors = new SelectList(directors, "Id", "Name", existingTeam.DirectorId);
-                return View(teamViewModel);
+                return View(teamViewModel); 
             }
 
             if (existingTeam.TeamLeadId != updatedTeam.TeamLeadId)

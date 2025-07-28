@@ -28,7 +28,9 @@ namespace RewardsAndRecognitionSystem.Controllers
 
         public async Task<IActionResult> Index(int page = 1, bool showDeleted = false)
         {
-            int pageSize = 5;
+
+            // var categories = await _categoryRepo.GetAllAsync();
+            int pageSize = 10;
 
             var allCategories = await _categoryRepo.GetAllAsync(showDeleted);
             var usedCategoryIds = await _nominationRepo.GetUsedCategoryIdsAsync();

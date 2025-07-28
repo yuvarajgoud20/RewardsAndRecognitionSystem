@@ -1,13 +1,15 @@
 ﻿@model List<RewardsAndRecognitionRepository.Models.GroupedTeam>
 
+
+
 @{
     ViewData["Title"] = "Teams Overview";
     Layout = "~/Views/Shared/_Layout.cshtml";
     var userRoles = ViewBag.UserRoles as Dictionary<string, string>;
 }
 
-
 <link rel="stylesheet" href="~/lib/Layout/bootstrap-icons.css" />
+
 
 <style>
     .team-card {
@@ -99,12 +101,13 @@
         border-collapse: collapse;
         margin-top: 12px;
     }
-
         .users-table th {
             color: #3f51b5;
             padding: 12px 10px;
             border-bottom: 1px solid #eee;
         }
+
+
 
         .users-table td {
             padding: 12px 10px;
@@ -172,7 +175,6 @@
         .search-container input:not(:placeholder-shown) + .clear-icon {
             display: block;
         }
-
     .modal.top-centered .modal-dialog {
         position: fixed;
         top: 10%;
@@ -200,17 +202,18 @@
         }
     }
 </style>
-
+   
 <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
     <div class="search-container">
         <input type="text" id="searchBox" class="form-control form-control-sm pe-4" placeholder="Search teams..." oninput="filterTeams()" />
         <i class="bi bi-x-lg clear-icon" onclick="clearSearch()"></i>
     </div>
+
     <a asp-action="Create" class="create-btn d-inline-flex align-items-center gap-2">
         <i class="bi bi-plus-circle"></i> Create Team
     </a>
 </div>
-
+   
 @foreach (var group in Model)
 {
     var team = group.Team;
@@ -342,6 +345,7 @@
                     form.submit();
                 }
             });
+
         }
 
         function filterTeams() {
@@ -363,3 +367,4 @@
         }
     </script>
 }
+

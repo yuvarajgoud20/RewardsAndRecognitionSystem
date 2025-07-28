@@ -74,7 +74,7 @@ namespace RewardsAndRecognitionSystem.Areas.Identity.Pages.Account.Manage
             /// </summary>
             [DataType(DataType.Password)]
             [Display(Name = "Confirm new password")]
-            [Compare("NewPassword", ErrorMessage = "The new password and confirmation password do not match.")]
+            [Compare(nameof(NewPassword), ErrorMessage = "The new password and confirmation password do not match.")]
             public string ConfirmPassword { get; set; }
         }
 
@@ -99,6 +99,12 @@ namespace RewardsAndRecognitionSystem.Areas.Identity.Pages.Account.Manage
         {
             if (!ModelState.IsValid)
             {
+                return Page();
+            }
+
+            if (Input.NewPassword != Input.ConfirmPassword)
+            {
+                ModelState.AddModelError("Input.ConfirmPassword", "The new password and confirmation password do not match.");
                 return Page();
             }
 

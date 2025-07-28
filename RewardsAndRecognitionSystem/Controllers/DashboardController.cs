@@ -1,7 +1,10 @@
+
 ﻿using DocumentFormat.OpenXml.Vml.Office;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+
+using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using RewardsAndRecognitionRepository.Enums;
 using RewardsAndRecognitionRepository.Interfaces;
@@ -14,65 +17,151 @@ public class DashboardController : Controller
     private readonly UserManager<User> _userManager;
     private readonly INominationRepo _nominationRepo;
     private readonly ApplicationDbContext _context;
-    private readonly IYearQuarterRepo _yearQuarterRepo;
 
-    public DashboardController(UserManager<User> userManager, INominationRepo nominationRepo, ApplicationDbContext context, IYearQuarterRepo yearQuarterRepo)
+    public DashboardController(UserManager<User> userManager, INominationRepo nominationRepo, ApplicationDbContext context)
+
     {
+
         _userManager = userManager;
+
         _nominationRepo = nominationRepo;
+
         _context = context;
-        _yearQuarterRepo = yearQuarterRepo;
+
+    }
+    [HttpGet]
+    public IActionResult GetYears()
+    {
+        var years = _context.YearQuarters.Select(yq => yq.Year).Distinct().OrderByDescending(y => y).ToList();
+        return Json(years);
     }
 
-    public async Task<IActionResult> Index(Guid? teamId = null)
+    [HttpGet]
+    public IActionResult GetQuarters(int year)
+    {
+        var quarters = _context.YearQuarters
+            .Where(yq => yq.Year == year)
+            .Select(yq => new { id = yq.Id, name = $"Q{yq.Quarter}" })
+            .ToList();
+        return Json(quarters);
+    }
+    [HttpGet]
+    public async Task<IActionResult> GetTeamNominations(Guid teamId, int year, Guid quarterId)
     {
         var user = await _userManager.GetUserAsync(User);
+        if (user == null)
+            return Unauthorized();
+
+        // Determine user role
+        var roles = await _userManager.GetRolesAsync(user);
+        string role = roles.Contains("Director") ? "Director"
+                     : roles.Contains("Manager") ? "Manager"
+                     : string.Empty;
+
+        if (string.IsNullOrEmpty(role))
+            return Forbid();
+
+        // Get team based on role
+        IQueryable<Team> query = _context.Teams.Include(t => t.Users);
+        Team team = null;
+
+        if (role == "Manager")
+            team = await query.FirstOrDefaultAsync(t => t.Id == teamId && t.ManagerId == user.Id);
+        else if (role == "Director")
+            team = await query.FirstOrDefaultAsync(t => t.Id == teamId && t.DirectorId == user.Id);
+
+        if (team == null)
+            return NotFound();
+
+        // Filter nominations for team + year + quarter
+        var nomineeIds = team.Users.Select(u => u.Id).ToList();
+
+        var nominations = await _context.Nominations
+            .Include(n => n.Nominee)
+            .Include(n => n.Category)
+            .Include(n => n.Nominator)
+            .Include(n => n.YearQuarter)
+            .Where(n => nomineeIds.Contains(n.NomineeId)
+                        && n.YearQuarter.Year == year
+                        && n.YearQuarter.Id == quarterId)
+            .ToListAsync();
+
+        // Pass role to partial
+        ViewBag.Role = role;
+        ViewBag.TeamName = team.Name;
+
+        return PartialView("_TeamNominationsModal", nominations);
+    }
+
+    public async Task<IActionResult> Index(Guid? yearQuarterId = null, Guid? teamId = null)
+
+
+    {
+        if (yearQuarterId == null || yearQuarterId == Guid.Empty)
+        {
+            var currentYQ = await _context.YearQuarters
+                .Where(yq => yq.IsActive)
+                .OrderByDescending(yq => yq.Year)
+                .ThenByDescending(yq => yq.Quarter)
+                .FirstOrDefaultAsync();
+
+            if (currentYQ == null)
+            {
+                TempData["Error"] = "No active Year-Quarter found.";
+                return View(new List<int>()); // fallback just to load dropdowns
+            }
+
+            return RedirectToAction(nameof(Index), new { yearQuarterId = currentYQ.Id });
+        }
+        var selectedQuarter = await _context.YearQuarters.FindAsync(yearQuarterId);
+        if (selectedQuarter == null)
+        {
+            TempData["Error"] = "Selected Year-Quarter not found.";
+            return View(new List<int>());
+        }
+
+        int currentYear = selectedQuarter.Year;
+        var years = Enumerable.Range(currentYear - 10, 11).OrderByDescending(y => y).ToList();
+
+        ViewBag.CurrentYear = currentYear;
+        ViewBag.CurrentQuarterId = yearQuarterId;
+
+
+
+        var user = await _userManager.GetUserAsync(User);
+
         if (user == null) return RedirectToAction("Login", "Account");
 
         var roles = await _userManager.GetRolesAsync(user);
-        var activeYQ = (await _yearQuarterRepo.GetAllAsync()).FirstOrDefault(yq => yq.IsActive);
 
-        if (activeYQ != null)
+        var nominations = (await _nominationRepo.GetAllNominationsAsync()).ToList();
+
+        if (roles.Contains(nameof(Roles.Manager))
         {
-            ViewBag.ActiveQuarterName = activeYQ.Quarter.ToString();
-            ViewBag.ActiveYearName = activeYQ.Year.ToString();
-        }
-        else
-        {
-            ViewBag.ActiveQuarterName = GeneralMessages.NotAvailable_Error;
-            ViewBag.ActiveYearName = GeneralMessages.NotAvailable_Error;
-            ViewBag.ActiveQuarterCloseDate = GeneralMessages.NotAvailable_Error;
-        }
-
-        var startDate = activeYQ.StartDate;
-        var endDate = activeYQ.EndDate;
-
-        var nominations = (await _nominationRepo.GetAllNominationsAsync())
-            .Where(n => n.YearQuarterId == activeYQ.Id)
-            .ToList();
-
-        if (roles.Contains(nameof(Roles.Manager)))
-        {
+            // Get all teams under this manager
             var teams = await _context.Teams
                 .Include(t => t.Users)
                 .Include(t => t.TeamLead)
                 .Where(t => t.ManagerId == user.Id)
                 .ToListAsync();
 
+            // Flatten all user IDs under these teams
             var teamUserIds = teams.SelectMany(t => t.Users).Select(u => u.Id).ToList();
 
-            var NominationsList = await _context.Nominations
+            // Fetch nominations filtered by YearQuarterId where nominee belongs to these teams
+            var nominationsList = await _context.Nominations
                 .Include(n => n.Nominee)
                 .Include(n => n.Category)
                 .Include(n => n.Approvals)
                 .Include(n => n.Nominator)
-                .Where(n => teamUserIds.Contains(n.NomineeId) && n.YearQuarterId == activeYQ.Id)
+                .Where(n => teamUserIds.Contains(n.NomineeId) && n.YearQuarterId == yearQuarterId)
                 .ToListAsync();
 
+            // Breakdown nominations per team (for pie/bar chart)
             var teamStatusData = teams.Select(team =>
             {
                 var nomineeIds = (team.Users ?? new List<User>()).Select(u => u.Id).ToList();
-                var teamNoms = NominationsList.Where(n => nomineeIds.Contains(n.NomineeId)).ToList();
+                var teamNoms = nominationsList.Where(n => nomineeIds.Contains(n.NomineeId)).ToList();
                 var approved = teamNoms.Count(n => n.Status == NominationStatus.DirectorApproved);
                 var rejected = teamNoms.Count(n => n.Status == NominationStatus.DirectorRejected);
                 var total = teamNoms.Count;
@@ -88,29 +177,29 @@ public class DashboardController : Controller
                 };
             }).ToList();
 
+            // Summary: Team Lead + count of nominations they submitted
             var teamSummaries = teams.Select(t => new
             {
                 TeamId = t.Id,
                 TeamName = t.Name,
                 TeamLeadName = t.TeamLead?.Name ?? GeneralMessages.NotAvailable_Error,
-                NominatedCount = NominationsList.Count(n => n.NominatorId == t.TeamLeadId)
+                NominatedCount = nominationsList.Count(n => n.NominatorId == t.TeamLeadId)
             }).ToList<dynamic>();
 
+            // ViewBags
             ViewBag.TeamStatusData = teamStatusData;
             ViewBag.TeamsUnderManager = teamSummaries;
-            ViewBag.SelectedTeamId = teamId?.ToString();
-            ViewBag.SelectedTeamNominations = teamId != null && teamId != Guid.Empty
-                ? NominationsList.Where(n => n.Nominee?.TeamId == teamId).ToList()
+            ViewBag.SelectedQuarterId = yearQuarterId?.ToString();
+            ViewBag.SelectedQuarterNominations = yearQuarterId != null && yearQuarterId != Guid.Empty
+                ? nominationsList
                 : new List<Nomination>();
 
-            ViewBag.TotalNominations = NominationsList.Count;
-            ViewBag.PendingNominations = NominationsList.Count(n => n.Status == NominationStatus.PendingManager);
-            ViewBag.FinalApprovedNominations = NominationsList.Count(n => n.Status == NominationStatus.DirectorApproved);
-            ViewBag.FinalRejectedNominations = NominationsList.Count(n => n.Status == NominationStatus.DirectorRejected);
-            ViewBag.QuarterName = activeYQ.Quarter.ToString();
-            ViewBag.YearName = activeYQ.Year.ToString();
+            ViewBag.TotalNominations = nominationsList.Count;
+            ViewBag.PendingNominations = nominationsList.Count(n => n.Status == NominationStatus.PendingManager);
+            ViewBag.FinalApprovedNominations = nominationsList.Count(n => n.Status == NominationStatus.DirectorApproved);
+            ViewBag.FinalRejectedNominations = nominationsList.Count(n => n.Status == NominationStatus.DirectorRejected);
 
-            return View("ManagerDashboard", NominationsList);
+            return View("ManagerDashboard", nominations);
         }
 
         if (roles.Contains(nameof(Roles.Director)))
@@ -121,13 +210,19 @@ public class DashboardController : Controller
                 .Where(t => t.DirectorId == user.Id)
                 .ToListAsync();
 
+            //Fetch ALl Nominations for the Director
             var NominationsList = await _context.Nominations
                 .Include(n => n.Nominee)
                 .Include(n => n.Category)
                 .Include(n => n.Approvals)
                 .Include(n => n.Nominator)
-                .Where(n => n.Status != NominationStatus.PendingManager && n.YearQuarterId == activeYQ.Id)
+                .Where(n =>
+                    n.YearQuarterId == yearQuarterId     // ← filter by selected YearQuarter
+                    && n.Status != NominationStatus.PendingManager)
                 .ToListAsync();
+
+
+            // Breakdown nominations per team
 
             var teamStatusData = teams.Select(team =>
             {
@@ -171,10 +266,25 @@ public class DashboardController : Controller
             return View("DirectorDashboard", NominationsList);
         }
 
+        // For Team Lead Role
+
         if (roles.Contains(nameof(Roles.TeamLead)))
         {
+            // Get the team where this user is the team lead
+            var team = await _context.Teams
+                .Include(t => t.Users)
+                .FirstOrDefaultAsync(t => t.TeamLeadId == user.Id);
+
+            if (team == null)
+            {
+                TempData["Error"] = "No team assigned to you as Team Lead.";
+                return View("TeamLeadDashboard", new List<Nomination>());
+            }
+
+            var nomineeIds = team.Users.Select(u => u.Id).ToList();
+
             var teamLeadNominations = nominations
-                .Where(n => n.NominatorId == user.Id && n.YearQuarterId == activeYQ.Id)
+                .Where(n => nomineeIds.Contains(n.NomineeId) && n.YearQuarterId == yearQuarterId)
                 .ToList();
 
             ViewBag.TotalNominations = teamLeadNominations.Count;
@@ -184,28 +294,36 @@ public class DashboardController : Controller
                 n.Status == NominationStatus.ManagerRejected);
             ViewBag.FinalApprovedNominations = teamLeadNominations.Count(n => n.Status == NominationStatus.DirectorApproved);
             ViewBag.RejectedNominations = teamLeadNominations.Count(n => n.Status == NominationStatus.DirectorRejected);
-            ViewBag.ActiveQuarterId = activeYQ.Id;
+
+            ViewBag.ActiveQuarterId = yearQuarterId;
+            ViewBag.ActiveQuarterName = "Q" + selectedQuarter.Quarter;
+            ViewBag.ActiveYearName = selectedQuarter.Year;
 
             return View("TeamLeadDashboard", teamLeadNominations);
         }
 
+
+        // For Admin Role (Optional)
+
         if (roles.Contains(nameof(Roles.Admin)))
+
         {
-            var adminNominations = nominations
-                .Where(n => n.YearQuarterId == activeYQ.Id)
-                .ToList();
 
-            ViewBag.TotalNominations = adminNominations.Count;
-            ViewBag.PendingNominations = adminNominations.Count(n => n.Status == NominationStatus.PendingManager);
-            ViewBag.FinalApprovedNominations = adminNominations.Count(n => n.Status == NominationStatus.DirectorApproved);
+            ViewBag.TotalNominations = nominations.Count;
 
-            return View("AdminDashboard", adminNominations);
+            ViewBag.PendingNominations = nominations.Count(n => n.Status == NominationStatus.PendingManager);
+
+            ViewBag.FinalApprovedNominations = nominations.Count(n => n.Status == NominationStatus.DirectorApproved);
+
+            return View("AdminDashboard", nominations);
+
         }
 
-        var employeeNominations = nominations
-            .Where(n => n.YearQuarterId == activeYQ.Id)
-            .ToList();
+        // For Regular Employee
 
-        return View("EmployeeDashboard", employeeNominations);
+        return View("EmployeeDashboard", nominations);
+
     }
+
 }
+

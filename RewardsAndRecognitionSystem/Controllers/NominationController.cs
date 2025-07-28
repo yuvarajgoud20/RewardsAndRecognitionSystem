@@ -43,44 +43,73 @@ namespace RewardsAndRecognitionSystem.Controllers
             _emailService = emailService;
         }
 
-        public async Task<IActionResult> Index(string FilterForDelete = "active", int page = 1)
+        // GET: Nomination
+        public async Task<IActionResult> Index(Guid? yearQuarterId,string filter = "all" ,string FilterForDelete = "active", int page = 1)
         {
-            int pageSize = 2;
+         
+            ViewBag.filter = filter;
+
+
+            int pageSize = 10;
             var currentUser = await _userManager.GetUserAsync(User);
             if (currentUser == null)
                 return RedirectToAction("Login", "Account", new { area = "Identity" });
 
             List<Nomination> allNominations = new();
             List<Nomination> deletednominations = new();
+            var selectedQuarter = yearQuarterId.HasValue
+             ? await _context.YearQuarters.FirstOrDefaultAsync(yq => yq.Id == yearQuarterId.Value)
+             : await _context.YearQuarters.FirstOrDefaultAsync(yq => yq.IsActive);
 
-            var activeQuarter = await _context.YearQuarters.FirstOrDefaultAsync(yq => yq.IsActive);
-            if (activeQuarter == null)
+            if (selectedQuarter == null)
             {
                 TempData["Message"] = GeneralMessages.No_Active_Quarter;
+
                 return View(new List<Nomination>());
             }
 
             ViewBag.currentUser = currentUser;
+            ViewBag.SelectedYearQuarterId = selectedQuarter.Id;
             var userRoles = await _userManager.GetRolesAsync(currentUser);
             List<Nomination> nominationsToShow = new();
 
+
             if (userRoles.Contains(nameof(Roles.Director)))
+
             {
+               
                 nominationsToShow = await _context.Nominations
-                    .Include(n => n.Nominee)
-                        .ThenInclude(u => u.Team)
-                    .Include(n => n.Category)
-                    .Include(n => n.Approvals)
-                    .Include(n => n.Nominator)
-                    .Where(n => n.YearQuarterId == activeQuarter.Id)
-                    .Where(n => n.Nominee.Team.DirectorId == currentUser.Id)
-                    .Where(n => n.Status != NominationStatus.PendingManager)
-                    .ToListAsync();
+
+
+
+                 .Include(n => n.Nominee).ThenInclude(u => u.Team)
+                 .Include(n => n.Category)
+                 .Include(n => n.Approvals)
+                 .Include(n => n.Nominator)
+                 .Where(n => n.YearQuarterId == selectedQuarter.Id)
+                 .Where(n => n.Nominee.Team.DirectorId == currentUser.Id)
+                 .Where(n => n.Status != NominationStatus.PendingManager)
+                 .Where(n => n.Approvals != null)
+                 .ToListAsync();
+                if (filter == "pending")
+                {
+                    nominationsToShow = nominationsToShow.Where(n => n.Status == NominationStatus.ManagerApproved || n.Status == NominationStatus.ManagerRejected).ToList();
+                }
+
+                if (filter == "directorapproved")
+                {
+                    nominationsToShow = nominationsToShow.Where(n => n.Status == NominationStatus.DirectorApproved).ToList();
+                }
+                if (filter == "directorrejected")
+                {
+                    nominationsToShow = nominationsToShow.Where(n => n.Status == NominationStatus.DirectorRejected).ToList();
+                }
+                // Track reviewed nominations
 
                 var alreadyReviewedIds = nominationsToShow
-                    .Where(n => n.Approvals.Any(a => a.ApproverId == currentUser.Id))
-                    .Select(n => n.Id)
-                    .ToList();
+                        .Where(n => n.Approvals.Any(a => a.ApproverId == currentUser.Id))
+                        .Select(n => n.Id)
+                        .ToList();
 
                 ViewBag.ReviewedNominationIds = alreadyReviewedIds;
                 ViewBag.TotalPages = (int)Math.Ceiling(nominationsToShow.Count / (double)pageSize);
@@ -101,16 +130,30 @@ namespace RewardsAndRecognitionSystem.Controllers
 
             if (userRoles.Contains(nameof(Roles.Manager)))
             {
+              
                 nominationsToShow = await _context.Nominations
-                    .Include(n => n.Nominee)
-                        .ThenInclude(u => u.Team)
-                    .Include(n => n.Category)
-                    .Include(n => n.Approvals)
-                    .Include(n => n.Nominator)
-                    .Where(n => n.YearQuarterId == activeQuarter.Id)
-                    .Where(n => n.Nominee.Team.ManagerId == currentUser.Id)
-                    .ToListAsync();
 
+                   .Include(n => n.Nominee).ThenInclude(u => u.Team)
+                   .Include(n => n.Category)
+                   .Include(n => n.Approvals)
+                   .Include(n => n.Nominator)
+                   .Where(n => n.YearQuarterId == selectedQuarter.Id)
+                   .Where(n => n.Nominee.Team.ManagerId == currentUser.Id)
+                   .ToListAsync();
+                if (filter == "pending")
+                {
+                    nominationsToShow = nominationsToShow.Where(n => n.Status == NominationStatus.PendingManager ).ToList();
+                }
+
+                if (filter == "directorapproved")
+                {
+                    nominationsToShow = nominationsToShow.Where(n => n.Status == NominationStatus.DirectorApproved).ToList();
+                }
+                if (filter == "directorrejected")
+                {
+                    nominationsToShow = nominationsToShow.Where(n => n.Status == NominationStatus.DirectorRejected).ToList();
+                }
+                // Track reviewed nominations
                 var alreadyReviewedIds = nominationsToShow
                     .Where(n => n.Approvals.Any(a => a.ApproverId == currentUser.Id))
                     .Select(n => n.Id)
@@ -133,15 +176,29 @@ namespace RewardsAndRecognitionSystem.Controllers
 
             if (userRoles.Contains(nameof(Roles.TeamLead)))
             {
+
                 nominationsToShow = await _context.Nominations
-                    .Include(n => n.Nominee)
-                        .ThenInclude(u => u.Team)
-                    .Include(n => n.Category)
-                    .Include(n => n.Approvals)
-                    .Include(n => n.Nominator)
-                    .Where(n => n.YearQuarterId == activeQuarter.Id)
-                    .Where(n => n.NominatorId == currentUser.Id)
-                    .ToListAsync();
+                .Include(n => n.Nominee).ThenInclude(u => u.Team)
+                .Include(n => n.Category)
+                .Include(n => n.Approvals)
+                .Include(n => n.Nominator)
+                .Where(n => n.YearQuarterId == selectedQuarter.Id)
+                .Where(n => n.NominatorId == currentUser.Id)
+                .ToListAsync();
+                if (filter == "pending")
+                {
+                    nominationsToShow = nominationsToShow.Where(n => n.Status == NominationStatus.PendingManager ||
+                                                 n.Status == NominationStatus.ManagerRejected ||
+                                                 n.Status == NominationStatus.ManagerApproved).ToList();
+                }
+                if (filter == "directorapproved")
+                {
+                    nominationsToShow = nominationsToShow.Where(n => n.Status == NominationStatus.DirectorApproved).ToList();
+                }
+                if (filter == "directorrejected")
+                {
+                    nominationsToShow = nominationsToShow.Where(n => n.Status == NominationStatus.DirectorRejected).ToList();
+                }
 
                 if (FilterForDelete == "deleted")
                 {
@@ -176,12 +233,12 @@ namespace RewardsAndRecognitionSystem.Controllers
             if (userRoles.Contains(nameof(Roles.Admin)))
             {
                 nominationsToShow = await _context.Nominations
-                    .Include(n => n.Nominee)
-                    .Include(n => n.Nominator)
-                        .ThenInclude(u => u.Team)
-                    .Include(n => n.Category)
-                    .Where(n => n.YearQuarterId == activeQuarter.Id)
-                    .ToListAsync();
+
+                .Include(n => n.Nominee)
+                .Include(n => n.Nominator).ThenInclude(u => u.Team)
+                .Include(n => n.Category)
+                .Where(n => n.YearQuarterId == selectedQuarter.Id)
+                .ToListAsync();
             }
 
             var viewModelList = _mapper.Map<List<NominationViewModel>>(nominationsToShow);
@@ -518,6 +575,174 @@ namespace RewardsAndRecognitionSystem.Controllers
             return File(memStream.ToArray(),
                 "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
                 "Nominations.xlsx");
+        }
+
+        [HttpGet]
+        [Route("Nomination/ExportTeamNominationsToExcel/{teamId}")]
+        public async Task<IActionResult> ExportTeamNominationsToExcel(Guid? teamId = null)
+
+        {
+            var currentUser = await _userManager.GetUserAsync(User);
+            var userRoles = await _userManager.GetRolesAsync(currentUser);
+            var nominations = new List<Nomination>();
+            string teamName = await _context.Teams
+              .Where(t => t.Id == teamId)
+              .Select(t => t.Name)
+              .FirstOrDefaultAsync();
+            if (userRoles.Contains("Manager"))
+            {
+                nominations = await _context.Nominations
+
+                 .Include(n => n.Nominee)
+
+                 .Include(n => n.Nominator)
+                 .ThenInclude(n => n.Team)
+
+                 .Include(n => n.Category)
+
+                 .Include(n => n.YearQuarter)
+                 .Where(n => n.Nominator.Team.Manager.Id == currentUser.Id && n.Nominator.TeamId == teamId)
+                 .ToListAsync();
+
+            }
+            if (userRoles.Contains("Director"))
+            {
+                nominations = await _context.Nominations
+
+                  .Include(n => n.Nominee)
+
+                  .Include(n => n.Nominator)
+                  .ThenInclude(n => n.Team)
+
+                  .Include(n => n.Category)
+
+                  .Include(n => n.YearQuarter)
+                  .Where(n => n.Nominator.Team.Director.Id == currentUser.Id && n.Nominator.TeamId == teamId)
+                  .ToListAsync();
+                nominations = nominations.Where(n => n.Status != NominationStatus.PendingManager).ToList();
+
+            }
+
+
+            using var memStream = new MemoryStream();
+
+            using (SpreadsheetDocument document = SpreadsheetDocument.Create(memStream, SpreadsheetDocumentType.Workbook))
+
+            {
+
+                // Workbook
+
+                var workbookPart = document.AddWorkbookPart();
+
+                workbookPart.Workbook = new Workbook();
+
+                // Worksheet
+
+                var worksheetPart = workbookPart.AddNewPart<WorksheetPart>();
+
+                var sheetData = new SheetData();
+
+                worksheetPart.Worksheet = new Worksheet(sheetData);
+
+                // Styles
+
+                var stylesPart = workbookPart.AddNewPart<WorkbookStylesPart>();
+
+                stylesPart.Stylesheet = SheetClassesStyles.CreateStylesheet();
+
+                stylesPart.Stylesheet.Save();
+
+                // Headers for Nomination export
+
+                var headers = new[]
+
+                {
+
+     "Nominee Name","Nominated By", "Category", "Description",
+
+     "Achievements", "Status", "Created At"
+
+};
+
+                var headerRow = new Row();
+
+                foreach (var header in headers)
+
+                {
+
+                    headerRow.Append(SheetClassesStyles.CreateStyledCell(header, 2)); // Header style
+
+                }
+
+                sheetData.Append(headerRow);
+
+                // Data Rows
+
+                foreach (var nomination in nominations)
+
+                {
+
+                    var row = new Row();
+
+                    row.Append(SheetClassesStyles.CreateStyledCell(nomination.Nominee?.Name ?? "N/A", 1));
+
+                    row.Append(SheetClassesStyles.CreateStyledCell(nomination.Nominator?.Name ?? "N/A", 1));
+
+                    row.Append(SheetClassesStyles.CreateStyledCell(nomination.Category?.Name ?? "N/A", 1));
+
+                    row.Append(SheetClassesStyles.CreateStyledCell(nomination.Description, 1));
+
+                    row.Append(SheetClassesStyles.CreateStyledCell(nomination.Achievements, 1));
+
+                    row.Append(SheetClassesStyles.CreateStyledCell(nomination.Status.ToString(), 1));
+
+
+                    row.Append(SheetClassesStyles.CreateStyledCell(nomination.CreatedAt.ToString("dd-MM-yyyy"), 1));
+
+                    sheetData.Append(row);
+
+                }
+
+                // Column width
+
+                var columns = new Columns(
+
+                    new Column { Min = 1, Max = 8, Width = 25, CustomWidth = true }
+
+                );
+
+                worksheetPart.Worksheet.InsertAt(columns, 0);
+
+                // Sheets
+
+                Sheets sheets = workbookPart.Workbook.AppendChild(new Sheets());
+
+                Sheet sheet = new Sheet()
+
+                {
+
+                    Id = workbookPart.GetIdOfPart(worksheetPart),
+
+                    SheetId = 1,
+
+                    Name = "Nominations"
+
+                };
+
+                sheets.Append(sheet);
+
+                workbookPart.Workbook.Save();
+
+            }
+
+            memStream.Seek(0, SeekOrigin.Begin);
+
+            return File(memStream.ToArray(),
+
+                "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+
+                 $"{teamName}Nominations.xlsx");
+
         }
     }
 }

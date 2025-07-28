@@ -105,14 +105,19 @@
                 </button>
 
                 <div class="collapse navbar-collapse" id="mainNavbar">
-                    <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-                        <li class="nav-item">
-                            <a class="nav-link" asp-controller="Home" asp-action="Index">
-                                <i class="bi bi-house-door"></i> Home
-                            </a>
-                        </li>
 
+                    <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                        @if (!SignInManager.IsSignedIn(User))
+                        {
+                            <li class="nav-item">
+                                <a class="nav-link" asp-controller="Home" asp-action="Index">
+                                    <i class="bi bi-house-door"></i> Home
+                                </a>
+                            </li>
+                        }
+                        
                         @if (User.IsInRole(nameof(Roles.Manager)) || User.IsInRole(nameof(Roles.TeamLead)) || User.IsInRole(nameof(Roles.Director)))
+
                         {
                             <li class="nav-item">
                                 <a class="nav-link" asp-controller="Dashboard" asp-action="Index">
@@ -157,18 +162,7 @@
                                 </ul>
                             </li>
                         }
-                        @if (User.IsInRole("Manager") || User.IsInRole("Director"))
-                        {
-                            <li class="nav-item dropdown">
-                                <a class="nav-link" asp-controller="Analytics" asp-action="RedirectToCurrent">
-
-                                    <i class="bi bi-bar-chart"></i> Analytics
-                                </a>
-
-
-
-                            </li>
-                        }
+                    
                     </ul>
 
                     <partial name="_LoginPartial" />

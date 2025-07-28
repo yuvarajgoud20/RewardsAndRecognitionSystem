@@ -126,7 +126,6 @@ namespace RewardsAndRecognitionSystem.Controllers
 
             return Json(teamSummary);
         }
-
         [HttpGet]
         public async Task<IActionResult> GetAnalyticsData(Guid yearQuarterId)
         {

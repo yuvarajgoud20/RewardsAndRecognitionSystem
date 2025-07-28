@@ -4,15 +4,19 @@
 
 @{
     ViewData["Title"] = "Nominations List";
+ 
     var reviewedIds = ViewBag.ReviewedNominationIds as List<Guid> ?? new List<Guid>();
     var nominationsList = Model.ToList();
-    var isManager = User.IsInRole(nameof(Roles.Manager));
-    var isDirector = User.IsInRole(nameof(Roles.Director));
-    var isTeamLead = User.IsInRole(nameof(Roles.TeamLead));
-    var selectedFilter = Context.Request.Query["filter"].ToString()?.ToLower() ?? "all";
+    var isManager = User.IsInRole("Manager");
+    var isDirector = User.IsInRole("Director");
+    var isTeamLead = User.IsInRole("TeamLead");
+
     var selectedFilter2 = ViewBag.FilterForDelete as string ?? "active";
-     var currentFilter = selectedFilter2;
-  
+    var currentFilter = selectedFilter2;
+   
+
+    var dashboardFilter = ViewBag.filter;
+    var all = "all";
 }
 
 <div id="nominationListContainer">
@@ -28,20 +32,12 @@
                     <i class="bi bi-file-earmark-excel"></i> Export
                 </a>
             
-<select id="filterfordelete" class="form-select w-auto" onchange="submitWithFilter(1, this.value)">
+
+<select id="filterfordelete" class="form-select w-auto" onchange="submitWithFilter(1, this.value,all)">
     <option value="active" selected="@(selectedFilter2 == "active" ? "selected" : null)">Active</option>
     <option value="deleted" selected="@(selectedFilter2 == "deleted" ? "selected" : null)">Deleted</option>
 </select>
 
-         @if(selectedFilter2=="active"){
-           <select id="filterSelect" class="form-select" style="width: 150px;">
-                <option value="all">All</option>
-                <option value="pending">Pending</option>
-                <option value="reviewed">Reviewed</option>
-                <option value="directorapproved">Approved</option>
-                <option value="directorrejected">Rejected</option>
-           </select>
-         }
 
             <a asp-action="Create" class="btn btn-indigo" style="white-space: nowrap;">
                 <i class="bi bi-plus-circle-fill"></i> Create Nomination
@@ -53,7 +49,6 @@
     <table class="table-custom" id="nominationsTable">
         <thead>
             <tr>
-                <th>#</th>
                 <th>Nominee</th>
                 <th>Team</th>
                 <th>Category</th>
@@ -72,7 +67,6 @@
                 <tr data-name="@n.Nominee?.Name?.ToLower()"
                     data-status="@n.Status"
                     class="@(ViewBag.ReviewedNominationIds.Contains(n.Id) ? "reviewed" : "pending")">
-                    <td>@(i + 1)</td>
                     <td>@n.Nominee?.Name</td>
                     <td>@n.Nominee?.Team?.Name</td>
                     <td>@n.Category?.Name</td>
@@ -111,29 +105,21 @@
 {
     <div class="filter-bar d-flex justify-content-between align-items-center mb-3">
         <!-- Left: Search Input -->
-        <div style="flex: 1;">
-            <input type="text" id="liveSearch" class="form-control" placeholder="🔍 Search by Nominee" style="max-width: 300px;" />
-        </div>
+         <div style="flex: 1;">
+            <!-- <input type="text" id="liveSearch" class="form-control" placeholder="🔍 Search by Nominee" style="max-width: 300px;" /> -->
+            </div> 
 
         <!-- Right: Excel, Filter, and Create Nomination -->
         <div style="display: flex; gap: 10px; align-items: center;">
                 <a asp-action="ExportAllNominationsOpenXml" class="btn btn-success">
                     <i class="bi bi-file-earmark-excel"></i> Export
                 </a>
-            <select id="filterSelect" class="form-select" style="width: 150px;">
-                <option value="all">All</option>
-                <option value="pending">Pending</option>
-                <option value="reviewed">Reviewed</option>
-                <option value="directorapproved">Approved</option>
-                <option value="directorrejected">Rejected</option>
-            </select>
         </div>
     </div>
 
     <table class="table-custom" id="nominationsTable">
         <thead>
             <tr>
-                <th>S.No</th>
                 <th>Nominee</th>
                 <th>Team</th>
                 <th>Category</th>
@@ -180,7 +166,6 @@
                     data-approval_status="@managerApprovalStatus"
                     data-director_remarks="@directorRemarks"
                     data-manager_remarks="@managerRemarks">
-                    <td>@(i + 1)</td>
                     <td>@n.Nominee?.Name</td>
                     <td>@n.Nominee?.Team?.Name</td>
                     <td>@n.Category?.Name</td>
@@ -188,17 +173,22 @@
                     <td>@n.Status</td>
                     <td>@n.CreatedAt.ToString("dd/MM/yyyy")</td>
                     <td>
-                        <button class="btn btn-indigo btn-sm open-popup" data-index="@i">
-                            <i class="bi bi-eye-fill"></i> @(isReviewed ? "View" : "Review")
-                        </button>
-                         <button type="button"
-                                class="btn btn-warning btn-sm"
-                                data-bs-toggle="modal"
-                                data-bs-target="#revertModal"
-                                data-nomination-id="@n.Id"
-                                @(isReviewed ? "disabled title='Already Reviewed'" : "")>
-                            ⏪ Revert
-                        </button>
+                            <div class="d-flex justify-content-between align-items-center gap-2" style="width: 250px;">
+                                <button class="btn btn-indigo btn-sm w-100 fixed-btn open-popup" data-index="@i">
+                                    <i class="bi bi-eye-fill"></i> @(isReviewed ? "View" : "Review")
+                                </button>
+                                <button type="button"
+                                        class="btn btn-warning btn-sm w-100 fixed-btn"
+                                        data-bs-toggle="modal"
+                                        data-bs-target="#revertModal"
+                                        data-nomination-id="@n.Id"
+                                        @(isReviewed ? "disabled title='Already Reviewed'" : "")>
+                                    ⏪ Revert
+                                </button>
+                            </div>
+
+                            
+                         
                     </td>
                 </tr>
             }
@@ -254,7 +244,7 @@
             @for (int i = 1; i <= ViewBag.TotalPages; i++)
             {
                 <li class="page-item @(ViewBag.CurrentPage == i ? "active" : "")">
-                    <a class="page-link pagination-link" href="javascript:void(0);" data-page="@i" data-filter="@currentFilter">@i</a>
+                        <a class="page-link pagination-link" href="javascript:void(0);" data-page="@i" data-filter="@currentFilter" data-dashboard-filter="@dashboardFilter">@i</a>
                 </li>
             }
         </ul>
@@ -281,35 +271,12 @@ console.log(IS_TEAMLEAD);
             }
 </script>
 
-
-
-<script>
-       const IS_TEAMLEAD=@User.IsInRole("TeamLead").ToString().ToLower();
-        document.addEventListener("DOMContentLoaded", () => {
-
-        const preselectedFilter = "@selectedFilter";
-
-        const filterSelect = document.getElementById("filterSelect");
-
-        const liveSearchInput = document.getElementById("liveSearch");
- 
-        if (filterSelect && preselectedFilter) {
-
-            filterSelect.value = preselectedFilter;
-
-        }
-
-        if (liveSearchInput) liveSearchInput.value = "";
-
-        filterTable();
-    });
-</script>
  <script src="~/js/Nomination.js"></script>
  <script>
-   function submitWithFilter(page, filter) {
+       function submitWithFilter(page, filter,dashboardFilter) {
     $.ajax({
         url: '/Nomination/Index',
-        data: { FilterForDelete: filter, page: page },
+            data: {filter :dashboardFilter, FilterForDelete: filter, page: page },
         success: function (result) {
             $('#nominationListContainer').html(result);
         }
@@ -319,8 +286,10 @@ console.log(IS_TEAMLEAD);
 
 $(document).on("click", ".pagination-link", function () {
     const page = $(this).data("page");
-    const filter = $("#filterfordelete").val();
-    submitWithFilter(page, filter);
+
+    const filter = $("#filterfordelete").val(); // get value from dropdown
+    const dashboardFilter =$(this).data("dashboardFilter");
+        submitWithFilter(page, filter,dashboardFilter);
 });
 
 
