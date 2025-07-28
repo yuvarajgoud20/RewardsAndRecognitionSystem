@@ -1,6 +1,8 @@
 ﻿@using RewardsAndRecognitionRepository.Models
 @using RewardsAndRecognitionRepository.Enums
 @model IEnumerable<Nomination>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels"></script>
 
 @{
     ViewData["Title"] = "Director Dashboard";
@@ -16,9 +18,413 @@
     var selectedTeamNominations = ViewBag.SelectedTeamNominations as List<Nomination> ?? new();
     var selectedTeamName = teams?.FirstOrDefault(t => t.TeamId.ToString() == selectedTeamId)?.TeamName ?? "";
 }
-<h2 class="mb-4"><i class="bi bi-award"></i> Director Dashboard</h2>
 
-<!-- Styling Part-->
+
+
+<div class="d-flex align-items-center justify-content-between mb-4 flex-wrap">
+    <h2 class="modern-heading mb-0">
+        <i class="bi bi-person-badge"></i> Director Dashboard
+    </h2>
+
+    <div class="d-flex align-items-center gap-3 flex-wrap">
+        <div>
+            <label for="yearDropdown" class="form-label mb-1">Select Year :</label>
+            <select id="yearDropdown" class="form-select form-select-sm">
+                <option value="">-- Select Year --</option>
+            </select>
+        </div>
+        <div>
+            <label for="quarterDropdown" class="form-label mb-1">Select Quarter :</label>
+            <select id="quarterDropdown" class="form-select form-select-sm" disabled>
+                <option value="">-- Select Quarter --</option>
+            </select>
+        </div>
+    </div>
+</div>
+
+
+<div class="row g-4 mb-4">
+    <div class="col-md-3">
+
+        <a href="javascript:void(0)" onclick="goToNominations('all')" class="dashboard-card text-blue d-block text-decoration-none" ">
+            <div class="dashboard-title">Total Nominations</div>
+            <div class="dashboard-value" style="color: #007bff;">@total</div> <!-- Blue -->
+        </a>
+    </div>
+    <div class="col-md-3">
+        <a href="javascript:void(0)" onclick="goToNominations('pending')" class="dashboard-card d-block text-decoration-none">
+
+            <div class="dashboard-title">Pending Reviews</div>
+            <div class="dashboard-value" style="color: #fd7e14;">@pending</div> <!-- Orange -->
+        </a>
+    </div>
+    <div class="col-md-3">
+
+        <a href="javascript:void(0)" onclick="goToNominations('directorapproved')" class="dashboard-card d-block text-decoration-none">
+
+            <div class="dashboard-title">Final Approved</div>
+            <div class="dashboard-value" style="color: #28a745;">@approved</div> <!-- Green -->
+        </a>
+    </div>
+    <div class="col-md-3">
+
+        <a href="javascript:void(0)" onclick="goToNominations('directorrejected')" class="dashboard-card d-block text-decoration-none">
+
+            <div class="dashboard-title">Final Rejected</div>
+            <div class="dashboard-value text-danger">@rejected</div>
+        </a>
+    </div>
+</div>
+
+
+
+@{
+    var chartIndex = 0;
+    var teamChartData = ViewBag.TeamStatusData;
+}
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h4 class="mt-5"><i class="bi bi-bar-chart-line-fill"></i> Team Wise Statistics</h4>
+    <a asp-controller="Analytics"
+       asp-action="Index"
+       asp-route-yearQuarterId="@ViewBag.CurrentQuarterId"
+       class="btn btn-info analytics-btn mt-5">
+        <i class="bi bi-graph-up-arrow"></i> View Analytics
+    </a>
+</div>
+
+
+<!-- Chart CSS -->
+<style>
+
+    .analytics-btn {
+        font-weight: 600;
+        font-size: 1.1rem;
+        padding: 0.5rem 1.3rem;
+        border-radius: 0.5rem;
+        box-shadow: 0 4px 8px rgba(41, 98, 255, 0.3);
+        transition: background-color 0.3s ease, box-shadow 0.3s ease, transform 0.2s ease;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+        .analytics-btn:hover {
+            background-color: #1a53ff;
+            box-shadow: 0 6px 15px rgba(41, 98, 255, 0.6);
+            transform: translateY(-2px);
+            text-decoration: none;
+            color: white;
+        }
+
+        .analytics-btn i {
+            transition: transform 0.3s ease;
+        }
+
+        .analytics-btn:hover i {
+            transform: translateX(4px);
+        }
+    .chart-wrapper {
+        height: 275px;
+        max-width: 250px;
+        margin: 0 auto;
+    }
+
+        .chart-wrapper canvas {
+            width: 100% !important;
+            height: 100% !important;
+        }
+
+    .card {
+        min-height: 300px;
+        padding: 1rem;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        align-items: center;
+        text-align: center;
+    }
+</style>
+
+<div class="container">
+    <div class="row">
+        @foreach (var team in teamChartData)
+        {
+            var chartId = $"barChart_{chartIndex}";
+            var approvedNominations = Convert.ToInt32(team.Approved);
+            var rejectedNominations = Convert.ToInt32(team.Rejected);
+            var pendingNominations = Convert.ToInt32(team.Pending);
+            var totalNominations = approvedNominations + rejectedNominations + pendingNominations;
+
+            <div class="col-md-4 mb-4">
+                <div class="card p-3 shadow-sm">
+                    <h6 class="text-center mb-2">@team.TeamName - @totalNominations Nominations</h6>
+                    <div class="chart-wrapper">
+                        <canvas id="@chartId" width="300" height="250"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <script>
+                const ctx_@chartIndex = document.getElementById('@chartId').getContext('2d');
+
+                Chart.register(ChartDataLabels);
+
+                new Chart(ctx_@chartIndex, {
+                    type: 'bar',
+                    data: {
+                        labels: ['Approved', 'Rejected', 'Pending'],
+                        datasets: [{
+                            data: [@approvedNominations, @rejectedNominations, @pendingNominations],
+                            backgroundColor: ['#4caf50', '#f44336', '#ffeb3b'],  // Green for Approved, Red for Rejected, Yellow for Pending
+                            borderColor: ['#388e3c', '#d32f2f', '#fbc02d'],
+                            borderWidth: 1
+                        }]
+                    },
+                    options: {
+                        plugins: {
+                            legend: { display: false },
+                            datalabels: {
+                                color: 'black',
+                                anchor: 'center',
+                                align: 'center',
+                                font: {
+                                    weight: 'bold',
+                                    size: 14
+                                },
+                                formatter: function (value) {
+                                    return value > 0 ? value : ''; // Hide label if value is 0
+                                }
+                            },
+                            tooltip: { enabled: true },
+                            title: { display: false }
+                        },
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                ticks: { precision: 0 }
+                            }
+                        }
+                    },
+                    plugins: [ChartDataLabels]
+                });
+            </script>
+
+            chartIndex++;
+        }
+    </div>
+</div>
+<h4 class="mt-5 mb-3 text-primary fw-semibold">
+    <i class="bi bi-people-fill me-2"></i> Teams Under You
+</h4>
+
+<div class="accordion mb-5" id="teamsAccordion">
+    @for (int i = 0; i < teams.Count; i++)
+    {
+        var team = teams[i];
+        var collapseId = $"collapseTeam{i}";
+        var headingId = $"headingTeam{i}";
+        var teamNominations = Model.Where(n => n.Nominee?.Team?.Id == team.TeamId);
+        var categoryGroups = teamNominations.GroupBy(n => n.Category?.Name).OrderBy(g => g.Key);
+
+        <div class="accordion-item shadow-sm rounded mb-2">
+            <h2 class="accordion-header" id="@headingId">
+                <button class="accordion-button collapsed bg-light" type="button" data-bs-toggle="collapse" data-bs-target="#@collapseId">
+                   @team.TeamName
+                </button>
+            </h2>
+            <div id="@collapseId" class="accordion-collapse collapse" aria-labelledby="@headingId" data-bs-parent="#teamsAccordion">
+                <div class="accordion-body">
+                    <p class="mb-1"><strong>Team Lead:</strong> @team.TeamLeadName</p>
+                  
+
+                    <p class="fw-semibold text-muted mb-2">Category-wise Nominations:</p>
+
+                    @if (categoryGroups.Any())
+                    {
+                        <ul class="list-group list-group-flush">
+                            @foreach (var group in categoryGroups)
+                            {
+                                <li class="list-group-item d-flex justify-content-between align-items-center">
+                                    <span>@group.Key</span>
+                                    <span class="badge bg-primary rounded-pill">@group.Count()</span>
+                                </li>
+                            }
+                        </ul>
+                    }
+                    else
+                    {
+                        <p class="text-muted fst-italic text-center mb-0">
+                            <i class="bi bi-exclamation-circle me-1"></i> No nominations available.
+                        </p>
+                    }
+
+                </div>
+            </div>
+        </div>
+    }
+</div>
+
+<h4 class="mt-5"><i class="bi bi-info-circle-fill"></i> View Nominations by Team</h4>
+<div class="mb-4 d-flex align-items-center gap-3">
+    <label class="form-label mb-0"><strong>Select Team:</strong></label>
+    <select id="teamSelect" class="form-select w-auto">
+        <option value="">-- Choose a team --</option>
+        @foreach (var team in teams)
+        {
+            <option value="@team.TeamId">@team.TeamName</option>
+        }
+    </select>
+</div>
+
+<div class="modal fade" id="teamNominationsModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-xl modal-dialog-centered">
+        <div class="modal-content" id="teamModalContent">
+            <!-- Loaded dynamically -->
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+            function goToNominations(filter) {
+            const year = document.getElementById("yearDropdown").value;
+            const quarterId = document.getElementById("quarterDropdown").value;
+
+            if (!year || !quarterId) {
+                alert("Please select a year and quarter.");
+                return;
+            }
+
+
+              const url = `/Nomination/Index?filter=${filter}&yearQuarterId=${quarterId}`;
+            window.location.href = url;
+        }
+
+        $(document).ready(function () {
+            loadYears();
+
+            $('#yearDropdown').change(function () {
+                const year = $(this).val();
+                if (year) loadQuarters(year);
+                else $('#quarterDropdown').prop('disabled', true).html('<option>-- Select Quarter --</option>');
+            });
+
+            $('#quarterDropdown').change(function () {
+                const quarterId = $(this).val();
+                if (quarterId) {
+                    window.location.href = `/Dashboard/Index?yearQuarterId=${quarterId}`;
+                }
+            });
+
+            // Add this inside document.ready
+            var teamModalEl = document.getElementById('teamNominationsModal');
+            if (teamModalEl) {
+                teamModalEl.addEventListener('hidden.bs.modal', function () {
+                    var teamSelect = document.getElementById('teamSelect');
+                    if (teamSelect) {
+                        teamSelect.selectedIndex = 0; // Reset dropdown when modal closes
+                    }
+                });
+            }
+        });
+
+
+        function loadYears() {
+            $.get('/Dashboard/GetYears', function (years) {
+                let options = '<option value="">-- Select Year --</option>';
+                years.forEach(y => {
+                    options += `<option value="${y}">${y}</option>`;
+                });
+                $('#yearDropdown').html(options);
+
+                const currentYear = '@ViewBag.CurrentYear';
+                const currentQuarterId = '@ViewBag.CurrentQuarterId';
+                if (currentYear) {
+                    $('#yearDropdown').val(currentYear);
+                    loadQuarters(currentYear, currentQuarterId);
+                }
+            });
+        }
+
+        function loadQuarters(year, selectedId) {
+            $.get(`/Dashboard/GetQuarters?year=${year}`, function (quarters) {
+                let options = '<option value="">-- Select Quarter --</option>';
+                quarters.forEach(q => {
+                    const isSel = q.id.toLowerCase() === (selectedId || '').toLowerCase();
+                    options += `<option value="${q.id}" ${isSel ? 'selected' : ''}>${q.name}</option>`;
+                });
+                $('#quarterDropdown').prop('disabled', false).html(options);
+            });
+        }
+
+        document.getElementById("teamSelect").addEventListener("change", function () {
+            const teamId = this.value;
+            const year = document.getElementById("yearDropdown").value;
+            const quarterId = document.getElementById("quarterDropdown").value;
+
+            if (!teamId || !year || !quarterId) {
+                alert("Please select year and quarter first");
+                return;
+            }
+
+            fetch(`/Dashboard/GetTeamNominations?teamId=${teamId}&year=${year}&quarterId=${quarterId}`)
+                .then(res => res.ok ? res.text() : Promise.reject(res))
+                .then(html => {
+                    document.getElementById("teamModalContent").innerHTML = html;
+                    new bootstrap.Modal(document.getElementById("teamNominationsModal")).show();
+                })
+                .catch(() => alert("Error fetching nominations."));
+        });
+
+        function hideTeamModal() {
+            const modalInstance = bootstrap.Modal.getInstance(document.getElementById("teamNominationsModal"));
+            if (modalInstance) {
+                modalInstance.hide();
+                document.getElementById("teamSelect").selectedIndex = 0;
+            }
+        }
+
+        function filterNominations() {
+            const filter = document.getElementById("searchInput").value.toLowerCase();
+            const rows = document.querySelectorAll("#nominationsTable tbody tr");
+
+            rows.forEach(row => {
+                const name = row.cells[1]?.innerText.toLowerCase() || '';
+                row.style.display = name.includes(filter) ? "" : "none";
+            });
+        }
+
+        function exportNominationsToExcel() {
+            const table = document.getElementById("nominationsTable");
+            if (!table) {
+                alert("Nominations table not found.");
+                return;
+            }
+
+            let csv = [];
+            const headers = Array.from(table.querySelectorAll("thead th")).map(th => `"${th.innerText.trim()}"`).join(",");
+            csv.push(headers);
+
+            const rows = table.querySelectorAll("tbody tr");
+            rows.forEach(row => {
+                if (row.style.display === "none") return;
+                const rowData = Array.from(row.querySelectorAll("td")).map(td => `"${td.innerText.trim()}"`);
+                csv.push(rowData.join(","));
+            });
+
+            const blob = new Blob([csv.join("\n")], { type: "text/csv;charset=utf-8;" });
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement("a");
+            link.setAttribute("href", url);
+            link.setAttribute("download", "TeamNominations.csv");
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+    </script>
+}
+
 <style>
     .dashboard-card {
         background: white;
@@ -27,12 +433,10 @@
         padding: 20px;
         transition: transform 0.2s ease;
         height: 100%;
-        text-decoration: none;
     }
 
         .dashboard-card:hover {
             transform: translateY(-3px);
-            text-decoration: none;
         }
 
     .dashboard-title {
@@ -47,309 +451,23 @@
         margin-top: 5px;
     }
 
-    .bar-container {
-        margin-top: 30px;
-    }
-
-    .bar {
-        height: 14px;
-        border-radius: 6px;
-        margin-bottom: 10px;
-        transition: width 0.3s ease;
-    }
-
-    .text-blue {
-        color: #2962FF;
-    }
-
-    .text-green {
-        color: #2E7D32;
-    }
-
-    .text-orange {
-        color: #F9A825;
-    }
-</style>
-
-
-
-<div class="row g-4 mb-4">
-    <div class="col-md-3">
-        <a asp-controller="Nomination" asp-action="Index" asp-route-filter="all" class="dashboard-card text-blue d-block text-decoration-none">
-            <div class="dashboard-title">Total Nominations</div>
-            <div class="dashboard-value text-blue">@ViewBag.TotalNominations</div>
-        </a>
-    </div>
-    <div class="col-md-3">
-        <a asp-controller="Nomination" asp-action="Index" asp-route-filter="pending" class="dashboard-card text-orange d-block text-decoration-none">
-            <div class="dashboard-title">Pending Reviews</div>
-            <div class="dashboard-value text-orange">@ViewBag.PendingNominations</div>
-        </a>
-    </div>
-    <div class="col-md-3">
-        <a asp-controller="Nomination" asp-action="Index" asp-route-filter="directorapproved" class="dashboard-card text-green d-block text-decoration-none">
-            <div class="dashboard-title">Final Approved</div>
-            <div class="dashboard-value text-green">@ViewBag.FinalApprovedNominations</div>
-        </a>
-    </div>
-    <div class="col-md-3">
-        <a asp-controller="Nomination" asp-action="Index" asp-route-filter="directorrejected" class="dashboard-card text-red d-block text-decoration-none">
-            <div class="dashboard-title">Final Rejected</div>
-            <div class="dashboard-value text-danger">@ViewBag.FinalRejectedNominations</div>
-        </a>
-    </div>
-</div>
-
- 
-<h4 class="mt-5"><i class="bi bi-people-fill"></i> Teams Under You</h4>
-<div class="accordion mb-5" id="teamsAccordion">
-    @for (int i = 0; i < teams.Count; i++)
-    {
-        var team = teams[i];
-        var collapseId = $"collapseTeam{i}";
-        var headingId = $"headingTeam{i}";
-        <div class="accordion-item">
-            <h2 class="accordion-header" id="@headingId">
-                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#@collapseId">
-                    @team.TeamName
-                </button>
-            </h2>
-            <div id="@collapseId" class="accordion-collapse collapse" aria-labelledby="@headingId" data-bs-parent="#teamsAccordion">
-                <div class="accordion-body">
-                    <p><strong>Team Lead:</strong> @team.TeamLeadName</p>
-                    <p><strong>Total Nominations by Team Lead:</strong> @team.NominatedCount</p>
-                </div>
-            </div>
-        </div>
-    }
-</div>
-
-<!-- Graph representation for each team -->
-@{
-    var chartIndex = 0;
-    var teamChartData = ViewBag.TeamStatusData;
-}
-<!-- Load Chart.js -->
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-
-<h4 class="mt-5"><i class="bi bi-bar-chart-line-fill"></i> Team Wise Statistics </h4>
-
-<!--  CSS to enforce consistent size -->
-<style>
     .chart-wrapper {
-        height: 275px; /* Fixed height for all charts */
-        max-width: 250px; /* Limit chart width */
-        margin: 0 auto; /* Center the chart */
+        height: 275px;
+        max-width: 250px;
+        margin: 0 auto;
     }
 
         .chart-wrapper canvas {
-            width: 100% !important; /* Stretch to wrapper width */
-            height: 100% !important; /* Fill wrapper height */
+            width: 100% !important;
+            height: 100% !important;
         }
 
     .card {
-        min-height: 300px; /* Slightly shorter card */
-        padding: 1rem;
+        min-height: 300px;
         display: flex;
         flex-direction: column;
         justify-content: space-between;
-        align-items: center; /* Center chart and title */
+        align-items: center;
         text-align: center;
     }
 </style>
-
-
-<div class="container">
-    <div class="row">
-        @foreach (var team in teamChartData)
-        {
-            var chartId = $"barChart_{chartIndex}";
-            var approvedNominations = Convert.ToInt32(team.Approved);
-            var rejectedNominations = Convert.ToInt32(team.Rejected);
-            var pendingNominations = Convert.ToInt32(team.Pending);
-            <div class="col-md-4 mb-4">
-                <div class="card p-3 shadow-sm">
-                    <h6 class="text-center">
-                        @team.TeamName - @team.Total Nominations
-                    </h6>
-
-                    <div class="chart-wrapper">
-                        <canvas id="@chartId"></canvas>
-                    </div>
-                </div>
-            </div>
-            <script>
-                document.addEventListener('DOMContentLoaded', function () {
-                    const ctx = document.getElementById('@chartId').getContext('2d');
-                    new Chart(ctx, {
-                        type: 'bar',
-                        data: {
-                            labels: ['Approved', 'Rejected', 'Pending'],
-                            datasets: [{
-                                label: 'Nominations',
-                                data: [@approvedNominations, @rejectedNominations, @pendingNominations],
-                                backgroundColor: ['#4caf50', '#f44336', '#ffc107'],
-                                borderRadius: 5,
-                                borderWidth: 1
-                            }]
-                        },
-                        options: {
-                            responsive: true,
-                            maintainAspectRatio: false,
-                            scales: {
-                                y: {
-                                    beginAtZero: true,
-                                    precision: 0
-                                }
-                            },
-                            plugins: {
-                                legend: {
-                                    display: false
-                                }
-                            }
-                        }
-                    });
-                });
-            </script>
-            chartIndex++;
-        }
-    </div>
-</div>
-
-
-<!-- Team Dropdown Selection -->
-<h4 class="mt-5"><i class="bi bi-info-circle-fill"></i> View Nominations by Team</h4>
-<form method="get" asp-action="Index" class="mb-4 d-flex align-items-center gap-3">
-    <label class="form-label mb-0"><strong>Select Team:</strong></label>
-    <select name="teamId" class="form-select w-auto" onchange="this.form.submit()">
-        <option value="">-- Choose a team --</option>
-        @foreach (var team in teams)
-        {
-            <option value="@team.TeamId" selected="@(team.TeamId.ToString() == selectedTeamId)">
-                @team.TeamName
-            </option>
-        }
-    </select>
-</form>
-
-@if (!string.IsNullOrEmpty(selectedTeamId))
-{
-    <div class="modal fade" id="teamNominationsModal" tabindex="-1" aria-labelledby="teamNominationsModalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-xl modal-dialog-centered">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="teamNominationsModalLabel">Nominations from @selectedTeamName</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" onclick="hideTeamModal()"></button>
-                </div>
-                <div class="modal-body">
-
-                    <!-- 🔍 Search Input + Export Button -->
-                    <div class="d-flex justify-content-between align-items-center mb-3">
-                        <input type="text" id="searchInput" class="form-control w-25" placeholder="Search by Nominee Name..." onkeyup="filterNominations()" />
-
-                        <a asp-controller="Nomination"
-                           asp-action="ExportTeamNominationsToExcel"
-                           asp-route-teamId="@selectedTeamId"
-                           class="btn btn-success ms-3">
-                            <i class="bi bi-file-earmark-excel-fill"></i> Export to Excel
-                        </a>
-                    </div>
-
-                    @if (selectedTeamNominations.Any())
-                    {
-                        <div class="table-responsive">
-                            <table class="table table-bordered table-striped shadow-sm" id="nominationsTable">
-                                <thead class="table-primary">
-                                    <tr>
-                                        <th>#</th>
-                                        <th>Nominee</th>
-                                        <th>Category</th>
-                                        <th>Description</th>
-                                        <th>Achievements</th>
-                                        <th>Status</th>
-                                        <th>Date</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    @for (int i = 0; i < selectedTeamNominations.Count; i++)
-                                    {
-                                        var n = selectedTeamNominations[i];
-                                        <tr>
-                                            <td>@(i + 1)</td>
-                                            <td>@n.Nominee?.Name</td>
-                                            <td>@n.Category?.Name</td>
-                                            <td>@n.Description</td>
-                                            <td>@n.Achievements</td>
-                                            <td>@n.Status</td>
-                                            <td>@n.CreatedAt.ToShortDateString()</td>
-                                        </tr>
-                                    }
-                                </tbody>
-                            </table>
-                        </div>
-                    }
-                    else
-                    {
-                        <div class="alert alert-info mb-0">
-                            No nominations yet for this team.
-                        </div>
-                    }
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" onclick="hideTeamModal()">Close</button>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Modal and Filtering Scripts -->
-    <script>
-        window.addEventListener('load', function () {
-            const modalElement = document.getElementById("teamNominationsModal");
-            if (modalElement) {
-                const modalInstance = new bootstrap.Modal(modalElement);
-                modalInstance.show();
-            }
-        });
-
-        function hideTeamModal() {
-            const modalElement = document.getElementById("teamNominationsModal");
-            const modalInstance = bootstrap.Modal.getInstance(modalElement);
-            if (modalInstance) {
-                modalInstance.hide();
-
-                // Reset dropdown
-                const teamSelect = document.querySelector("select[name='teamId']");
-                if (teamSelect) {
-                    teamSelect.selectedIndex = 0;
-                }
-
-                // Clean URL
-                const url = new URL(window.location);
-                url.searchParams.delete("teamId");
-                window.history.replaceState({}, document.title, url);
-            }
-        }
-
-        // 🔍 Filter nominations table by nominee name
-        function filterNominations() {
-            const input = document.getElementById("searchInput");
-            const filter = input.value.toLowerCase();
-            const table = document.getElementById("nominationsTable");
-            const rows = table.getElementsByTagName("tr");
-
-            for (let i = 1; i < rows.length; i++) {
-                const nomineeCell = rows[i].getElementsByTagName("td")[1];
-                if (nomineeCell) {
-                    const name = nomineeCell.textContent || nomineeCell.innerText;
-                    rows[i].style.display = name.toLowerCase().includes(filter) ? "" : "none";
-                }
-            }
-        }
-    </script>
-
-
-
-}
-
-
