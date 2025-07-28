@@ -1,27 +1,21 @@
-﻿using Microsoft.AspNetCore.Authorization;
-//Merged Code with dashboards with analytics button and accordian moved for manager and director
-using Microsoft.AspNetCore.Identity;
 
+﻿using DocumentFormat.OpenXml.Vml.Office;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
-
 using RewardsAndRecognitionRepository.Enums;
-
 using RewardsAndRecognitionRepository.Interfaces;
-
 using RewardsAndRecognitionRepository.Models;
+using RewardsAndRecognitionSystem.Common;
 
 [Authorize]
-
 public class DashboardController : Controller
-
 {
-
     private readonly UserManager<User> _userManager;
-
     private readonly INominationRepo _nominationRepo;
-
     private readonly ApplicationDbContext _context;
 
     public DashboardController(UserManager<User> userManager, INominationRepo nominationRepo, ApplicationDbContext context)
@@ -142,7 +136,7 @@ public class DashboardController : Controller
 
         var nominations = (await _nominationRepo.GetAllNominationsAsync()).ToList();
 
-        if (roles.Contains("Manager"))
+        if (roles.Contains(nameof(Roles.Manager))
         {
             // Get all teams under this manager
             var teams = await _context.Teams
@@ -168,7 +162,6 @@ public class DashboardController : Controller
             {
                 var nomineeIds = (team.Users ?? new List<User>()).Select(u => u.Id).ToList();
                 var teamNoms = nominationsList.Where(n => nomineeIds.Contains(n.NomineeId)).ToList();
-
                 var approved = teamNoms.Count(n => n.Status == NominationStatus.DirectorApproved);
                 var rejected = teamNoms.Count(n => n.Status == NominationStatus.DirectorRejected);
                 var total = teamNoms.Count;
@@ -189,7 +182,7 @@ public class DashboardController : Controller
             {
                 TeamId = t.Id,
                 TeamName = t.Name,
-                TeamLeadName = t.TeamLead?.Name ?? "N/A",
+                TeamLeadName = t.TeamLead?.Name ?? GeneralMessages.NotAvailable_Error,
                 NominatedCount = nominationsList.Count(n => n.NominatorId == t.TeamLeadId)
             }).ToList<dynamic>();
 
@@ -209,20 +202,12 @@ public class DashboardController : Controller
             return View("ManagerDashboard", nominations);
         }
 
-        if (roles.Contains("Director"))
-
+        if (roles.Contains(nameof(Roles.Director)))
         {
-
-            // Get all teams under this Director
-
             var teams = await _context.Teams
-
                 .Include(t => t.Users)
-
                 .Include(t => t.TeamLead)
-
                 .Where(t => t.DirectorId == user.Id)
-
                 .ToListAsync();
 
             //Fetch ALl Nominations for the Director
@@ -240,87 +225,50 @@ public class DashboardController : Controller
             // Breakdown nominations per team
 
             var teamStatusData = teams.Select(team =>
-
             {
-
                 var nomineeIds = (team.Users ?? new List<User>()).Select(u => u.Id).ToList();
-
                 var teamNoms = NominationsList.Where(n => nomineeIds.Contains(n.NomineeId)).ToList();
-
                 var approved = teamNoms.Count(n => n.Status == NominationStatus.DirectorApproved);
-
                 var rejected = teamNoms.Count(n => n.Status == NominationStatus.DirectorRejected);
-
                 var total = teamNoms.Count;
-
                 var pending = total - approved - rejected;
 
                 return new
-
                 {
-
                     TeamName = team.Name,
-
                     Approved = approved,
-
                     Rejected = rejected,
-
                     Pending = pending,
-
                     Total = total
-
                 };
-
             }).ToList();
 
-            // Summary per team lead
-
             var teamSummaries = teams.Select(t => new
-
             {
-
                 TeamId = t.Id,
-
                 TeamName = t.Name,
-
-                TeamLeadName = t.TeamLead?.Name ?? "N/A",
-
+                TeamLeadName = t.TeamLead?.Name ?? GeneralMessages.NotAvailable_Error,
                 NominatedCount = NominationsList.Count(n => n.NominatorId == t.TeamLeadId)
-
             }).ToList<dynamic>();
 
-            // ViewBags
-
             ViewBag.TeamStatusData = teamStatusData;
-
             ViewBag.Teams = teamSummaries;
-
             ViewBag.SelectedTeamId = teamId?.ToString();
-
             ViewBag.SelectedTeamNominations = teamId != null && teamId != Guid.Empty
-
                 ? NominationsList.Where(n => n.Nominee?.TeamId == teamId).ToList()
-
                 : new List<Nomination>();
 
             ViewBag.TotalNominations = NominationsList.Count;
-
             ViewBag.PendingNominations = NominationsList.Count(n => n.Status == NominationStatus.ManagerApproved || n.Status == NominationStatus.ManagerRejected);
-
             ViewBag.FinalApprovedNominations = NominationsList.Count(n => n.Status == NominationStatus.DirectorApproved);
-
             ViewBag.FinalRejectedNominations = NominationsList.Count(n => n.Status == NominationStatus.DirectorRejected);
 
             return View("DirectorDashboard", NominationsList);
-
         }
-
-
-
 
         // For Team Lead Role
 
-        if (roles.Contains("TeamLead"))
+        if (roles.Contains(nameof(Roles.TeamLead)))
         {
             // Get the team where this user is the team lead
             var team = await _context.Teams
@@ -357,7 +305,7 @@ public class DashboardController : Controller
 
         // For Admin Role (Optional)
 
-        if (roles.Contains("Admin"))
+        if (roles.Contains(nameof(Roles.Admin)))
 
         {
 
@@ -378,8 +326,4 @@ public class DashboardController : Controller
     }
 
 }
-
-
-
-
 

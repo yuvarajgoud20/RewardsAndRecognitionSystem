@@ -29,8 +29,8 @@ namespace RewardsAndRecognitionRepository.Repos
         public async Task<User?> GetByIdAsync(string id)
         {
             return await _context.Users
-                .Include(u => u.Team)                     // load the user's Team
-                .ThenInclude(u => u.Manager)                  // load the user's Manager (if it's a navigation)
+                .Include(u => u.Team)                     
+                .ThenInclude(u => u.Manager)                  
                                                  
                 .FirstOrDefaultAsync(u => u.Id == id);
         }

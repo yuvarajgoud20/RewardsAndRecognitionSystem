@@ -22,32 +22,24 @@ public class EmailService : IEmailService
         using var message = new MailMessage();
         message.From = new MailAddress(_settings.From);
         message.Subject = subject;
-
-        // TO
         message.To.Add(to);
-
-        // CC
         if (!string.IsNullOrEmpty(cc ?? _settings.Cc))
         {
             foreach (var email in ParseEmails(cc ?? _settings.Cc))
                 message.CC.Add(email);
         }
-
-        // BCC
         if (!string.IsNullOrEmpty(bcc))
         {
             foreach (var email in ParseEmails(bcc))
                 message.Bcc.Add(email);
         }
-
-        // HTML with Embedded Image
         if (isHtml && !string.IsNullOrEmpty(imagePath) && File.Exists(imagePath))
         {
             var htmlView = AlternateView.CreateAlternateViewFromString(bodyHtml, null, "text/html");
 
             var linkedImage = new LinkedResource(imagePath, "image/png")
             {
-                ContentId = "bannerImage", // should match cid used in HTML
+                ContentId = "bannerImage",
                 TransferEncoding = System.Net.Mime.TransferEncoding.Base64,
                 ContentType = new System.Net.Mime.ContentType("image/png")
             };
@@ -61,8 +53,6 @@ public class EmailService : IEmailService
             message.Body = bodyHtml;
             message.IsBodyHtml = isHtml;
         }
-
-        // Attachments
         if (attachments != null)
         {
             foreach (var filePath in attachments)

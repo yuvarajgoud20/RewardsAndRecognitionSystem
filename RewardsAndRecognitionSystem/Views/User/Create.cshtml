@@ -81,7 +81,8 @@
     @await Html.PartialAsync("_ValidationScriptsPartial")
 }
 
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+ 
+ <script src="~/lib/jquery/dist/jquery.min.js"></script>
 <script>
     $(function () {
         function toggleTeam() {
@@ -90,7 +91,7 @@
             const $team = $("select[name='TeamId']");
 
             if (disable) {
-                $team.val("");       // Clear the value
+                $team.val("");
                 $team.prop("disabled", true);
             } else {
                 $team.prop("disabled", false);
@@ -98,7 +99,7 @@
         }
 
         $("#SelectedRole").change(toggleTeam);
-        toggleTeam(); // Initialize on page load
+        toggleTeam();
     });
 
     $("#myForm").on("submit", function (e) {

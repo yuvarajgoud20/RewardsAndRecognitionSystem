@@ -19,25 +19,19 @@
     var all = "all";
 }
 
-
-
-
 <div id="nominationListContainer">
  @if (isTeamLead)
 {
     <div class="filter-bar d-flex justify-content-between align-items-center mb-3">
-        <!-- Left: Search Input -->
+      
         <div style="flex: 1;">
             <input type="text" id="liveSearch" class="form-control" placeholder="🔍 Search by Nominee" style="max-width: 300px;" />
         </div>
-
-        <!-- Right: Excel, Filter, and Create Nomination -->
         <div style="display: flex; gap: 10px; align-items: center;">
                 <a asp-action="ExportAllNominationsOpenXml" class="btn btn-success">
                     <i class="bi bi-file-earmark-excel"></i> Export
                 </a>
             
-
 
 <select id="filterfordelete" class="form-select w-auto" onchange="submitWithFilter(1, this.value,all)">
     <option value="active" selected="@(selectedFilter2 == "active" ? "selected" : null)">Active</option>
@@ -104,7 +98,6 @@
             }
         </tbody>
     </table>
-
 
  } 
 
@@ -278,9 +271,6 @@ console.log(IS_TEAMLEAD);
             }
 </script>
 
-
-
-
  <script src="~/js/Nomination.js"></script>
  <script>
        function submitWithFilter(page, filter,dashboardFilter) {
@@ -296,6 +286,7 @@ console.log(IS_TEAMLEAD);
 
 $(document).on("click", ".pagination-link", function () {
     const page = $(this).data("page");
+
     const filter = $("#filterfordelete").val(); // get value from dropdown
     const dashboardFilter =$(this).data("dashboardFilter");
         submitWithFilter(page, filter,dashboardFilter);

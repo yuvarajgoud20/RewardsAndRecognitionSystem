@@ -118,6 +118,7 @@
 
 <div id="yearQuarterContainer">
     @Html.Partial("_YearQuarterListPartial", Model)
+
 </div>
 
 <script>
@@ -132,12 +133,10 @@
         reverseButtons: true
       }).then((result) => {
         if (result.isConfirmed) {
-          // Create a form dynamically
+         
           const form = document.createElement('form');
           form.method = 'POST';
           form.action = '/YearQuarter/Delete/' + userId;
-
-          // Add anti-forgery token
           const token = document.querySelector('input[name="__RequestVerificationToken"]');
           if (token) {
             const hiddenToken = document.createElement('input');
@@ -148,12 +147,12 @@
           }
 
           document.body.appendChild(form);
-          form.submit(); // automatically execute your POST action
+          form.submit();
         }
       });
     }
 </script>
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="~/lib/jquery/dist/jquery.min.js"></script>
 <script>
     $(document).on("click", ".pagination-link", function (e) {
         e.preventDefault();

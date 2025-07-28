@@ -82,6 +82,9 @@
     var chartIndex = 0;
     var teamChartData = ViewBag.TeamStatusData;
 }
+<!-- Load Chart.js -->
+<script src="~/lib/Charts/chart.js"></script>
+
 
 <div class="d-flex justify-content-between align-items-center mb-3">
     <h4 class="mt-5"><i class="bi bi-bar-chart-line-fill"></i> Team Wise Statistics</h4>
@@ -131,6 +134,7 @@
     }
 
         .chart-wrapper canvas {
+            width: 100% !important; 
             width: 100% !important;
             height: 100% !important;
         }
@@ -329,7 +333,6 @@
             }
         });
 
-
         function loadYears() {
             $.get('/Dashboard/GetYears', function (years) {
                 let options = '<option value="">-- Select Year --</option>';
@@ -346,6 +349,7 @@
                 }
             });
         }
+
 
         function loadQuarters(year, selectedId) {
             $.get(`/Dashboard/GetQuarters?year=${year}`, function (quarters) {
@@ -384,7 +388,6 @@
                 document.getElementById("teamSelect").selectedIndex = 0;
             }
         }
-
         function filterNominations() {
             const filter = document.getElementById("searchInput").value.toLowerCase();
             const rows = document.querySelectorAll("#nominationsTable tbody tr");

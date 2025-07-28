@@ -13,12 +13,14 @@ using RewardsAndRecognitionRepository.Interfaces;
 using RewardsAndRecognitionRepository.Models;
 using RewardsAndRecognitionRepository.Repos;
 using RewardsAndRecognitionRepository.Service;
+using RewardsAndRecognitionSystem.Common;
 using RewardsAndRecognitionSystem.Utilities;
 using RewardsAndRecognitionSystem.ViewModels;
+using RewardsAndRecognitionRepository.Enums;
 
 namespace RewardsAndRecognitionSystem.Controllers
 {
-    [Authorize(Roles = "Manager,TeamLead,Admin,Director")]
+    [Authorize(Roles = nameof(Roles.Manager) + "," + nameof(Roles.TeamLead) + "," + nameof(Roles.Director)+","+ nameof(Roles.Admin))]
     public class NominationController : Controller
     {
         private readonly IMapper _mapper;
@@ -29,11 +31,10 @@ namespace RewardsAndRecognitionSystem.Controllers
 
         public NominationController(
             IMapper mapper,
-            INominationRepo nominationRepo, 
+            INominationRepo nominationRepo,
             ApplicationDbContext context,
             UserManager<User> userManager,
             IEmailService emailService)
-
         {
             _nominationRepo = nominationRepo;
             _context = context;
@@ -50,7 +51,6 @@ namespace RewardsAndRecognitionSystem.Controllers
 
 
             int pageSize = 10;
-
             var currentUser = await _userManager.GetUserAsync(User);
             if (currentUser == null)
                 return RedirectToAction("Login", "Account", new { area = "Identity" });
@@ -63,7 +63,8 @@ namespace RewardsAndRecognitionSystem.Controllers
 
             if (selectedQuarter == null)
             {
-                TempData["Message"] = "❌ No valid quarter found.";
+                TempData["Message"] = GeneralMessages.No_Active_Quarter;
+
                 return View(new List<Nomination>());
             }
 
@@ -73,11 +74,14 @@ namespace RewardsAndRecognitionSystem.Controllers
             List<Nomination> nominationsToShow = new();
 
 
+            if (userRoles.Contains(nameof(Roles.Director)))
 
-            if (userRoles.Contains("Director"))
             {
                
                 nominationsToShow = await _context.Nominations
+
+
+
                  .Include(n => n.Nominee).ThenInclude(u => u.Team)
                  .Include(n => n.Category)
                  .Include(n => n.Approvals)
@@ -101,6 +105,7 @@ namespace RewardsAndRecognitionSystem.Controllers
                     nominationsToShow = nominationsToShow.Where(n => n.Status == NominationStatus.DirectorRejected).ToList();
                 }
                 // Track reviewed nominations
+
                 var alreadyReviewedIds = nominationsToShow
                         .Where(n => n.Approvals.Any(a => a.ApproverId == currentUser.Id))
                         .Select(n => n.Id)
@@ -119,14 +124,15 @@ namespace RewardsAndRecognitionSystem.Controllers
                 {
                     return PartialView("_NominationListPartial", directorList);
                 }
-               
+
                 return View(directorList);
             }
 
-            if (userRoles.Contains("Manager"))
+            if (userRoles.Contains(nameof(Roles.Manager)))
             {
               
                 nominationsToShow = await _context.Nominations
+
                    .Include(n => n.Nominee).ThenInclude(u => u.Team)
                    .Include(n => n.Category)
                    .Include(n => n.Approvals)
@@ -167,7 +173,8 @@ namespace RewardsAndRecognitionSystem.Controllers
                 }
                 return View(managerList);
             }
-            if (userRoles.Contains("TeamLead"))
+
+            if (userRoles.Contains(nameof(Roles.TeamLead)))
             {
 
                 nominationsToShow = await _context.Nominations
@@ -192,19 +199,21 @@ namespace RewardsAndRecognitionSystem.Controllers
                 {
                     nominationsToShow = nominationsToShow.Where(n => n.Status == NominationStatus.DirectorRejected).ToList();
                 }
+
                 if (FilterForDelete == "deleted")
                 {
-                    allNominations =  nominationsToShow.Where(n => n.IsDeleted).ToList();
+                    allNominations = nominationsToShow.Where(n => n.IsDeleted).ToList();
                 }
                 else
                 {
-                    allNominations =  nominationsToShow.Where(n => !n.IsDeleted).ToList();
+                    allNominations = nominationsToShow.Where(n => !n.IsDeleted).ToList();
                 }
+
                 ViewBag.FilterForDelete = FilterForDelete;
                 var alreadyReviewedIds = nominationsToShow
-                                    .Where(n => n.Approvals.Any(a => a.ApproverId == currentUser.Team.DirectorId))
-                                    .Select(n => n.Id)
-                                    .ToList();
+                    .Where(n => n.Approvals.Any(a => a.ApproverId == currentUser.Team.DirectorId))
+                    .Select(n => n.Id)
+                    .ToList();
                 ViewBag.ReviewedNominationIds = alreadyReviewedIds;
                 ViewBag.TotalPages = (int)Math.Ceiling(allNominations.Count / (double)pageSize);
                 ViewBag.CurrentPage = page;
@@ -221,21 +230,21 @@ namespace RewardsAndRecognitionSystem.Controllers
                 return View(teamList);
             }
 
-            if (userRoles.Contains("Admin"))
+            if (userRoles.Contains(nameof(Roles.Admin)))
             {
                 nominationsToShow = await _context.Nominations
+
                 .Include(n => n.Nominee)
                 .Include(n => n.Nominator).ThenInclude(u => u.Team)
                 .Include(n => n.Category)
                 .Where(n => n.YearQuarterId == selectedQuarter.Id)
                 .ToListAsync();
             }
+
             var viewModelList = _mapper.Map<List<NominationViewModel>>(nominationsToShow);
             return View(viewModelList);
         }
 
-
-        // GET: Nomination/Details/5
         public async Task<IActionResult> Details(Guid id)
         {
             var nomination = await _nominationRepo.GetNominationByIdAsync(id);
@@ -243,11 +252,10 @@ namespace RewardsAndRecognitionSystem.Controllers
             {
                 return NotFound();
             }
-            var viewModel=_mapper.Map<NominationViewModel>(nomination);
+            var viewModel = _mapper.Map<NominationViewModel>(nomination);
             return View(viewModel);
         }
 
-        // GET: Nomination/Create
         public async Task<IActionResult> Create()
         {
             if (!User.Identity.IsAuthenticated)
@@ -257,11 +265,10 @@ namespace RewardsAndRecognitionSystem.Controllers
             if (currentUser == null) return Unauthorized();
 
             var nominees = await _context.Users
-           .Where(u => u.TeamId == currentUser.TeamId && u.Id != currentUser.Id && u.Name != null)
-           .ToListAsync();
+                .Where(u => u.TeamId == currentUser.TeamId && u.Id != currentUser.Id && u.Name != null)
+                .ToListAsync();
 
             ViewBag.Nominees = new SelectList(nominees, "Id", "Name");
-
             ViewBag.Categories = new SelectList(await _context.Categories.Where(ct => ct.IsDeleted == false && ct.isActive == true).ToListAsync(), "Id", "Name");
             var activeQuarter = _context.YearQuarters.FirstOrDefault(yq => yq.IsActive);
             Nomination nomination = new Nomination();
@@ -272,19 +279,16 @@ namespace RewardsAndRecognitionSystem.Controllers
             }
 
             var viewModel = _mapper.Map<NominationViewModel>(nomination);
-
             ViewData["ActiveQuarterDisplay"] = activeQuarter.Quarter + " - " + activeQuarter.Year;
             ViewBag.NominatorId = currentUser.Id;
             ViewBag.Status = NominationStatus.PendingManager;
             return View(viewModel);
         }
 
-        // POST: Nomination/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(NominationViewModel viewModel)
         {
-
             if (ModelState.IsValid)
             {
                 var nomination = _mapper.Map<Nomination>(viewModel);
@@ -293,28 +297,29 @@ namespace RewardsAndRecognitionSystem.Controllers
                 await _nominationRepo.AddNominationAsync(nomination);
                 return RedirectToAction(nameof(Index));
             }
+
             var currentUser = await _userManager.GetUserAsync(User);
             if (currentUser == null) return Unauthorized();
 
             var nominees = await _context.Users
-           .Where(u => u.TeamId == currentUser.TeamId && u.Id != currentUser.Id && u.Name != null)
-           .ToListAsync();
+                .Where(u => u.TeamId == currentUser.TeamId && u.Id != currentUser.Id && u.Name != null)
+                .ToListAsync();
 
             ViewBag.Nominees = new SelectList(nominees, "Id", "Name");
-            ViewBag.Categories = new SelectList(await _context.Categories.Where(ct => ct.IsDeleted==false && ct.isActive == true).ToListAsync(), "Id", "Name");
+            ViewBag.Categories = new SelectList(await _context.Categories.Where(ct => ct.IsDeleted == false && ct.isActive == true).ToListAsync(), "Id", "Name");
             var activeQuarter = _context.YearQuarters.FirstOrDefault(yq => yq.IsActive);
-        
+
             if (activeQuarter != null)
             {
                 viewModel.YearQuarterId = activeQuarter.Id;
             }
+
             ViewData["ActiveQuarterDisplay"] = activeQuarter.Quarter + " - " + activeQuarter.Year;
             ViewBag.NominatorId = currentUser.Id;
             ViewBag.Status = NominationStatus.PendingManager;
             return View(viewModel);
         }
 
-        // GET: Nomination/Edit/5
         public async Task<IActionResult> Edit(Guid id)
         {
             var nomination = await _nominationRepo.GetNominationByIdAsync(id);
@@ -322,45 +327,40 @@ namespace RewardsAndRecognitionSystem.Controllers
                 return NotFound();
 
             if (nomination.Status != NominationStatus.PendingManager)
-                return Forbid(); // Disallow editing if not pending
+                return Forbid();
 
             ViewBag.Categories = new SelectList(await _context.Categories.Where(ct => ct.IsDeleted == false && ct.isActive == true).ToListAsync(), "Id", "Name", nomination.CategoryId);
             ViewBag.YearQuarters = new SelectList(await _context.YearQuarters.ToListAsync(), "Id", "Quarter", nomination.YearQuarterId);
-            var viewModel=_mapper.Map<NominationViewModel>(nomination); 
+            var viewModel = _mapper.Map<NominationViewModel>(nomination);
             return View(viewModel);
         }
-
-
-        // POST: Nomination/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(Guid id, NominationViewModel viewModel)
         {
             var existing = await _nominationRepo.GetNominationByIdAsync(id);
-          
+
             if (!ModelState.IsValid)
             {
                 ModelState.Clear();
                 ViewBag.Categories = new SelectList(await _context.Categories.Where(ct => ct.IsDeleted == false && ct.isActive == true).ToListAsync(), "Id", "Name", existing.CategoryId);
                 ViewBag.YearQuarters = new SelectList(await _context.YearQuarters.ToListAsync(), "Id", "Quarter", existing.YearQuarterId);
-                var existingViewModel= _mapper.Map<NominationViewModel>(existing);
+                var existingViewModel = _mapper.Map<NominationViewModel>(existing);
                 return View(existingViewModel);
             }
+
             existing.YearQuarterId = viewModel.YearQuarterId;
-            existing.NominatorId=viewModel.NominatorId;
-           
-            existing.Achievements=viewModel.Achievements;
-            existing.CategoryId=viewModel.CategoryId;
-            existing.Description=viewModel.Description;
-            existing.NomineeId=viewModel.NomineeId;
-            existing.Status=viewModel.Status;
-           
+            existing.NominatorId = viewModel.NominatorId;
+            existing.Achievements = viewModel.Achievements;
+            existing.CategoryId = viewModel.CategoryId;
+            existing.Description = viewModel.Description;
+            existing.NomineeId = viewModel.NomineeId;
+            existing.Status = viewModel.Status;
+
             await _nominationRepo.UpdateNominationAsync(existing);
             return RedirectToAction(nameof(Index));
         }
 
-
-        // GET: Nomination/Delete/5
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(Guid id)
@@ -373,39 +373,30 @@ namespace RewardsAndRecognitionSystem.Controllers
             return RedirectToAction(nameof(Index));
         }
 
-        // GET: Nomination/Review/{id}
-
-
         public async Task<IActionResult> Review(Guid id)
         {
             var nomination = await _nominationRepo.GetNominationByIdAsync(id);
             if (nomination == null)
                 return NotFound();
 
-
             return View(nomination);
         }
 
-        // POST: Nomination/Review/{id}
-        // POST: Nomination/Review/{id}
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Review(Guid id, string action, string remarks)
         {
             var nomination = await _nominationRepo.GetNominationByIdAsync(id);
             var currentUser = await _userManager.GetUserAsync(User);
-
-
             var userRole = await _userManager.GetRolesAsync(currentUser);
 
             if (nomination == null || currentUser == null)
                 return NotFound();
 
-            // Parse enum safely
             if (!Enum.TryParse<ApprovalAction>(action, out var parsedAction))
             {
                 ModelState.AddModelError("", "Invalid approval action.");
-                return View(nomination); // Or redirect back with error
+                return View(nomination);
             }
 
             nomination.Status = parsedAction == ApprovalAction.Approved
@@ -413,6 +404,7 @@ namespace RewardsAndRecognitionSystem.Controllers
                 : (userRole.Contains("Manager") ? NominationStatus.ManagerRejected : NominationStatus.DirectorRejected);
 
             await _nominationRepo.UpdateNominationAsync(nomination);
+
             var approval = new Approval
             {
                 Id = Guid.NewGuid(),
@@ -427,18 +419,15 @@ namespace RewardsAndRecognitionSystem.Controllers
             _context.Approvals.Add(approval);
             await _context.SaveChangesAsync();
 
-
-            // Fetch nominator and nominee
             var nominator = await _userManager.FindByIdAsync(nomination.NominatorId);
             var nominee = await _userManager.FindByIdAsync(nomination.NomineeId);
 
             if (nomination.Status == NominationStatus.DirectorApproved)
             {
-                // Notify the nominator
                 if (nominator != null)
                 {
                     await _emailService.SendEmailAsync(
-                        subject: "🎉 Your Nomination is Approved!",
+                        subject: GeneralMessages.Nomation_Approved,
                         isHtml: true,
                         body: $@"
                         <body style=""font-family: Arial, sans-serif; margin: 0; padding: 0; background-color: #ffffff;"">
@@ -448,18 +437,16 @@ namespace RewardsAndRecognitionSystem.Controllers
                             <p>Your nomination for <strong>{nominee?.Name}</strong> has been <strong>approved by the Director</strong>.</p>
                             <p>Thank you for recognizing great work on our Rewards and Recognition platform.</p>
                             <p style='color: gray;'>Regards,<br/>Rewards & Recognition Team</p>
-                            
                           </div>
                         </body>",
                         to: nominator.Email
                     );
                 }
 
-                // Notify the nominee
                 if (nominee != null)
                 {
                     await _emailService.SendEmailAsync(
-                        subject: "🎖️ You Have Been Selected for an Award!",
+                        subject: GeneralMessages.Selected_Award,
                         isHtml: true,
                         body: $@"<body style=""font-family: Arial, sans-serif; margin: 0; padding: 0; background-color: #ffffff;"">
                           <div style=""background-color: #ffffff; padding: 10px 20px; max-width: 600px; margin: auto; color: #000;"">
@@ -475,7 +462,6 @@ namespace RewardsAndRecognitionSystem.Controllers
                 }
             }
 
-
             return RedirectToAction(nameof(Index));
         }
 
@@ -488,22 +474,19 @@ namespace RewardsAndRecognitionSystem.Controllers
             if (nomination == null || currentUser == null)
                 return NotFound();
 
-            // Change status
             nomination.Status = NominationStatus.PendingManager;
             await _nominationRepo.UpdateNominationAsync(nomination);
 
-            // Delete existing approvals
             var approvals = _context.Approvals.Where(a => a.NominationId == id);
             _context.Approvals.RemoveRange(approvals);
             await _context.SaveChangesAsync();
 
-            // Get team lead
             var teamLead = await _userManager.FindByIdAsync(nomination.Nominator.Id);
             if (teamLead != null)
             {
                 await _emailService.SendEmailAsync(
-                    subject: "Nomination Reverted",
-                    isHtml:true,
+                    subject: GeneralMessages.Nomination_Reverted,
+                    isHtml: true,
                     body: $@"
                      <body style=""font-family: Arial, sans-serif; margin: 0; padding: 0; background-color: #ffffff;"">
                           <div style=""background-color: #ffffff; padding: 10px 20px; max-width: 600px; margin: auto; color: #000;"">
@@ -519,143 +502,79 @@ namespace RewardsAndRecognitionSystem.Controllers
 
             return RedirectToAction(nameof(Index));
         }
+
         [HttpGet]
         public async Task<IActionResult> ExportAllNominationsOpenXml()
-
         {
-
             var nominations = await _context.Nominations
-
                 .Include(n => n.Nominee)
-
                 .Include(n => n.Nominator)
-
                 .Include(n => n.Category)
-
                 .Include(n => n.YearQuarter)
-
                 .ToListAsync();
 
             using var memStream = new MemoryStream();
 
             using (SpreadsheetDocument document = SpreadsheetDocument.Create(memStream, SpreadsheetDocumentType.Workbook))
-
             {
-
-                // Workbook
-
                 var workbookPart = document.AddWorkbookPart();
-
                 workbookPart.Workbook = new Workbook();
 
-                // Worksheet
-
                 var worksheetPart = workbookPart.AddNewPart<WorksheetPart>();
-
                 var sheetData = new SheetData();
-
                 worksheetPart.Worksheet = new Worksheet(sheetData);
 
-                // Styles
-
                 var stylesPart = workbookPart.AddNewPart<WorkbookStylesPart>();
-
                 stylesPart.Stylesheet = SheetClassesStyles.CreateStylesheet();
-
                 stylesPart.Stylesheet.Save();
 
-                // Headers for Nomination export
-
                 var headers = new[]
-
                 {
-
-     "Nominee Name", "Nominator Name", "Category", "Description",
-
-     "Achievements", "Status", "Quarter", "Created At"
-
-};
-
-                var headerRow = new Row();
-
-                foreach (var header in headers)
-
-                {
-
-                    headerRow.Append(SheetClassesStyles.CreateStyledCell(header, 2)); // Header style
-
-                }
-
-                sheetData.Append(headerRow);
-
-                // Data Rows
-
-                foreach (var nomination in nominations)
-
-                {
-
-                    var row = new Row();
-
-                    row.Append(SheetClassesStyles.CreateStyledCell(nomination.Nominee?.Name ?? "N/A", 1));
-
-                    row.Append(SheetClassesStyles.CreateStyledCell(nomination.Nominator?.Name ?? "N/A", 1));
-
-                    row.Append(SheetClassesStyles.CreateStyledCell(nomination.Category?.Name ?? "N/A", 1));
-
-                    row.Append(SheetClassesStyles.CreateStyledCell(nomination.Description, 1));
-
-                    row.Append(SheetClassesStyles.CreateStyledCell(nomination.Achievements, 1));
-
-                    row.Append(SheetClassesStyles.CreateStyledCell(nomination.Status.ToString(), 1));
-
-                    row.Append(SheetClassesStyles.CreateStyledCell(nomination.YearQuarter?.Quarter.ToString() ?? "N/A", 1));
-
-                    row.Append(SheetClassesStyles.CreateStyledCell(nomination.CreatedAt.ToString("dd-MM-yyyy"), 1));
-
-                    sheetData.Append(row);
-
-                }
-
-                // Column width
-
-                var columns = new Columns(
-
-                    new Column { Min = 1, Max = 8, Width = 25, CustomWidth = true }
-
-                );
-
-                worksheetPart.Worksheet.InsertAt(columns, 0);
-
-                // Sheets
-
-                Sheets sheets = workbookPart.Workbook.AppendChild(new Sheets());
-
-                Sheet sheet = new Sheet()
-
-                {
-
-                    Id = workbookPart.GetIdOfPart(worksheetPart),
-
-                    SheetId = 1,
-
-                    Name = "Nominations"
-
+                    "Nominee Name", "Nominator Name", "Category", "Description",
+                    "Achievements", "Status", "Quarter", "Created At"
                 };
 
+                var headerRow = new Row();
+                foreach (var header in headers)
+                {
+                    headerRow.Append(SheetClassesStyles.CreateStyledCell(header, 2));
+                }
+                sheetData.Append(headerRow);
+
+                foreach (var nomination in nominations)
+                {
+                    var row = new Row();
+                    row.Append(SheetClassesStyles.CreateStyledCell(nomination.Nominee?.Name ?? GeneralMessages.NotAvailable_Error, 1));
+                    row.Append(SheetClassesStyles.CreateStyledCell(nomination.Nominator?.Name ?? GeneralMessages.NotAvailable_Error, 1));
+                    row.Append(SheetClassesStyles.CreateStyledCell(nomination.Category?.Name ?? GeneralMessages.NotAvailable_Error, 1));
+                    row.Append(SheetClassesStyles.CreateStyledCell(nomination.Description, 1));
+                    row.Append(SheetClassesStyles.CreateStyledCell(nomination.Achievements, 1));
+                    row.Append(SheetClassesStyles.CreateStyledCell(nomination.Status.ToString(), 1));
+                    row.Append(SheetClassesStyles.CreateStyledCell(nomination.YearQuarter?.Quarter.ToString() ?? GeneralMessages.NotAvailable_Error, 1));
+                    row.Append(SheetClassesStyles.CreateStyledCell(nomination.CreatedAt.ToString("dd-MM-yyyy"), 1));
+                    sheetData.Append(row);
+                }
+
+                var columns = new Columns(
+                    new Column { Min = 1, Max = 8, Width = 25, CustomWidth = true }
+                );
+                worksheetPart.Worksheet.InsertAt(columns, 0);
+
+                Sheets sheets = workbookPart.Workbook.AppendChild(new Sheets());
+                Sheet sheet = new Sheet()
+                {
+                    Id = workbookPart.GetIdOfPart(worksheetPart),
+                    SheetId = 1,
+                    Name = "Nominations"
+                };
                 sheets.Append(sheet);
-
                 workbookPart.Workbook.Save();
-
             }
 
             memStream.Seek(0, SeekOrigin.Begin);
-
             return File(memStream.ToArray(),
-
                 "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-
                 "Nominations.xlsx");
-
         }
 
         [HttpGet]
@@ -825,6 +744,5 @@ namespace RewardsAndRecognitionSystem.Controllers
                  $"{teamName}Nominations.xlsx");
 
         }
-
     }
 }

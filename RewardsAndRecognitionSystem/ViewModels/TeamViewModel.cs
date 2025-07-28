@@ -10,12 +10,9 @@ namespace RewardsAndRecognitionSystem.ViewModels
 
         public string TeamLeadId { get; set; }
       
-
         public string ManagerId { get; set; }
        
         public string DirectorId { get; set; }
-       
-
 
     }
 }

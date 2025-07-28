@@ -9,10 +9,6 @@ namespace RewardsAndRecognitionSystem.Utilities
             using var stream = new MemoryStream();
             using (var archive = new System.IO.Compression.ZipArchive(stream, System.IO.Compression.ZipArchiveMode.Create, true))
             {
-                // Same XML parts as your original ExportAllUsers method
-                // You can copy most from your code: [Content_Types].xml, _rels/.rels, xl/_rels/workbook.xml.rels, xl/styles.xml, etc.
-
-                // [Content_Types].xml
                 var contentTypes = archive.CreateEntry("[Content_Types].xml");
                 using (var writer = new StreamWriter(contentTypes.Open()))
                 {

@@ -1,8 +1,10 @@
 ﻿@using RewardsAndRecognitionRepository.Models
 @using RewardsAndRecognitionRepository.Enums
 @model IEnumerable<Nomination>
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels"></script>
+
+<script src="~/lib/Charts/chart.js"></script>
+ <script src="~/lib/Charts/chartjs-plugin-datalabels.js"></script>
+
 
 
 
@@ -143,8 +145,6 @@
 
 
 </style>
-
-<!-- Summary Cards -->
 <div class="row g-4 mb-4">
     <div class="col-md-3">
        
@@ -178,8 +178,6 @@
         </a>
     </div>
 </div>
-
-
 
 
 @{
@@ -253,7 +251,7 @@
                         labels: ['Approved', 'Rejected', 'Pending'],
                         datasets: [{
                             data: [@approvedNominations, @rejectedNominations, @pendingNominations],
-                            backgroundColor: ['#4caf50', '#f44336', '#ffeb3b'],  // Green for Approved, Red for Rejected, Yellow for Pending
+                            backgroundColor: ['#4caf50', '#f44336', '#ffeb3b'], 
                             borderColor: ['#388e3c', '#d32f2f', '#fbc02d'],
                             borderWidth: 1
                         }]
@@ -270,7 +268,7 @@
                                     size: 14
                                 },
                                 formatter: function (value) {
-                                    return value > 0 ? value : ''; // Hide label if value is 0
+                                    return value > 0 ? value : ''; 
                                 }
                             },
                             tooltip: { enabled: true },
@@ -295,6 +293,7 @@
 <h4 class="mt-5 mb-4 fw-bold text-dark">
     <i class="bi bi-people-fill me-2"></i> Teams Under You
 </h4>
+
 
 <div class="accordion shadow-sm rounded" id="teamsAccordion">
     @for (int i = 0; i < teams.Count; i++)
@@ -521,14 +520,10 @@
             const modalInstance = bootstrap.Modal.getInstance(modalElement);
             if (modalInstance) {
                 modalInstance.hide();
-
-                // ✅ Correctly reset the dropdown by ID
-                const teamSelect = document.getElementById("teamSelect");
+                const teamSelect = document.querySelector("select[name='teamId']");
                 if (teamSelect) {
                     teamSelect.selectedIndex = 0;
                 }
-
-                // ✅ Clean the URL
                 const url = new URL(window.location);
                 url.searchParams.delete("teamId");
                 window.history.replaceState({}, document.title, url);
@@ -552,7 +547,4 @@
         }
     </script>
 }
-
-
-
 

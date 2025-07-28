@@ -77,7 +77,7 @@ namespace RewardsAndRecognitionRepository.Repositories
         public async Task<List<Guid>> GetUsedCategoryIdsAsync()
         {
             return await _context.Nominations
-               .Where(n => !n.IsDeleted) // Only count active nominations
+               .Where(n => !n.IsDeleted) 
                .Select(n => n.CategoryId)
                .Distinct()
                .ToListAsync();
