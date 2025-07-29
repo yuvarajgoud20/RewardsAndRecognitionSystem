@@ -537,11 +537,13 @@ namespace RewardsAndRecognitionSystem.Controllers
             else if (User.IsInRole("Director"))
             {
                 query = query.Where(n =>
-                     n.Status == NominationStatus.DirectorApproved ||
-                      n.Status == NominationStatus.DirectorRejected ||
-                    n.Status == NominationStatus.ManagerApproved ||
-                    n.Status == NominationStatus.ManagerRejected);
+                    (n.Nominator.Team.DirectorId == user.Id || n.Nominee.Team.DirectorId == user.Id) &&
+                    (n.Status == NominationStatus.DirectorApproved ||
+                     n.Status == NominationStatus.DirectorRejected ||
+                     n.Status == NominationStatus.ManagerApproved ||
+                     n.Status == NominationStatus.ManagerRejected));
             }
+
             else if (User.IsInRole("TeamLead"))
             {
                 // TeamLead sees nominations for teams they lead
