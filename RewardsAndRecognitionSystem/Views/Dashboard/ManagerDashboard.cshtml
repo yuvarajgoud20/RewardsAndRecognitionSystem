@@ -1,12 +1,8 @@
 ﻿@using RewardsAndRecognitionRepository.Models
 @using RewardsAndRecognitionRepository.Enums
 @model IEnumerable<Nomination>
-
 <script src="~/lib/Charts/chart.js"></script>
- <script src="~/lib/Charts/chartjs-plugin-datalabels.js"></script>
-
-
-
+<script src="~/lib/Charts/chartjs-plugin-datalabels.js"></script>
 
 <script>
     const viewCount = sessionStorage.getItem('viewCount');
@@ -143,18 +139,19 @@
             transform: translateX(4px);
         }
 
-
 </style>
+
+<!-- Summary Cards -->
 <div class="row g-4 mb-4">
     <div class="col-md-3">
-       
+
         <a href="#" onclick="navigateToNominations('all')" class="dashboard-card text-blue d-block text-decoration-none" ">
             <div class="dashboard-title">Total Nominations</div>
             <div class="dashboard-value" style="color: #007bff;">@ViewBag.TotalNominations</div> <!-- Blue -->
         </a>
     </div>
     <div class="col-md-3">
-       
+
         <a href="#" onclick="navigateToNominations('pending')" class="dashboard-card d-block text-decoration-none">
 
             <div class="dashboard-title">Pending Reviews</div>
@@ -162,7 +159,7 @@
         </a>
     </div>
     <div class="col-md-3">
-    
+
         <a href="#" onclick="navigateToNominations('directorapproved')" class="dashboard-card d-block text-decoration-none">
 
             <div class="dashboard-title">Final Approved</div>
@@ -170,7 +167,7 @@
         </a>
     </div>
     <div class="col-md-3">
-      
+
         <a href="#" onclick="navigateToNominations('directorrejected')" class="dashboard-card d-block text-decoration-none">
 
             <div class="dashboard-title">Final Rejected</div>
@@ -178,6 +175,8 @@
         </a>
     </div>
 </div>
+
+
 
 
 @{
@@ -230,61 +229,62 @@
             var rejectedNominations = Convert.ToInt32(team.Rejected);
             var pendingNominations = Convert.ToInt32(team.Pending);
             var totalNominations = approvedNominations + rejectedNominations + pendingNominations;
-
-            <div class="col-md-4 mb-4">
-                <div class="card p-3 shadow-sm">
-                    <h6 class="text-center mb-2">@team.TeamName - @totalNominations Nominations</h6>
-                    <div class="chart-wrapper">
-                        <canvas id="@chartId" width="300" height="250"></canvas>
+            if (totalNominations > 0)
+            {
+                <div class="col-md-4 mb-4">
+                    <div class="card p-3 shadow-sm">
+                        <h6 class="text-center mb-2">@team.TeamName - @totalNominations Nominations</h6>
+                        <div class="chart-wrapper">
+                            <canvas id="@chartId" width="300" height="250"></canvas>
+                        </div>
                     </div>
                 </div>
-            </div>
 
-            <script>
-                const ctx_@chartIndex = document.getElementById('@chartId').getContext('2d');
+                <script>
+                    const ctx_@chartIndex = document.getElementById('@chartId').getContext('2d');
 
-                Chart.register(ChartDataLabels);
+                    Chart.register(ChartDataLabels);
 
-                new Chart(ctx_@chartIndex, {
-                    type: 'bar',
-                    data: {
-                        labels: ['Approved', 'Rejected', 'Pending'],
-                        datasets: [{
-                            data: [@approvedNominations, @rejectedNominations, @pendingNominations],
-                            backgroundColor: ['#4caf50', '#f44336', '#ffeb3b'], 
-                            borderColor: ['#388e3c', '#d32f2f', '#fbc02d'],
-                            borderWidth: 1
-                        }]
-                    },
-                    options: {
-                        plugins: {
-                            legend: { display: false },
-                            datalabels: {
-                                color: 'black',
-                                anchor: 'center',
-                                align: 'center',
-                                font: {
-                                    weight: 'bold',
-                                    size: 14
-                                },
-                                formatter: function (value) {
-                                    return value > 0 ? value : ''; 
-                                }
-                            },
-                            tooltip: { enabled: true },
-                            title: { display: false }
+                    new Chart(ctx_@chartIndex, {
+                        type: 'bar',
+                        data: {
+                            labels: ['Approved', 'Rejected', 'Pending'],
+                            datasets: [{
+                                data: [@approvedNominations, @rejectedNominations, @pendingNominations],
+                                backgroundColor: ['#4caf50', '#f44336', '#ffeb3b'],  // Green for Approved, Red for Rejected, Yellow for Pending
+                                borderColor: ['#388e3c', '#d32f2f', '#fbc02d'],
+                                borderWidth: 1
+                            }]
                         },
-                        scales: {
-                            y: {
-                                beginAtZero: true,
-                                ticks: { precision: 0 }
+                        options: {
+                            plugins: {
+                                legend: { display: false },
+                                datalabels: {
+                                    color: 'black',
+                                    anchor: 'center',
+                                    align: 'center',
+                                    font: {
+                                        weight: 'bold',
+                                        size: 14
+                                    },
+                                    formatter: function (value) {
+                                        return value > 0 ? value : ''; // Hide label if value is 0
+                                    }
+                                },
+                                tooltip: { enabled: true },
+                                title: { display: false }
+                            },
+                            scales: {
+                                y: {
+                                    beginAtZero: true,
+                                    ticks: { precision: 0 }
+                                }
                             }
-                        }
-                    },
-                    plugins: [ChartDataLabels]
-                });
-            </script>
-
+                        },
+                        plugins: [ChartDataLabels]
+                    });
+                </script>
+            }
             chartIndex++;
         }
     </div>
@@ -293,7 +293,6 @@
 <h4 class="mt-5 mb-4 fw-bold text-dark">
     <i class="bi bi-people-fill me-2"></i> Teams Under You
 </h4>
-
 
 <div class="accordion shadow-sm rounded" id="teamsAccordion">
     @for (int i = 0; i < teams.Count; i++)
@@ -305,7 +304,7 @@
             <h2 class="accordion-header" id="@headingId">
                 <button class="accordion-button collapsed bg-light fw-semibold" type="button" data-bs-toggle="collapse"
                         data-bs-target="#@collapseId" aria-expanded="false" aria-controls="@collapseId">
-                   @team.TeamName
+                    @team.TeamName
                 </button>
             </h2>
             <div id="@collapseId" class="accordion-collapse collapse" aria-labelledby="@headingId" data-bs-parent="#teamsAccordion">
@@ -435,42 +434,7 @@
         }
     </script>
 
-    <script>
-        function exportNominationsToExcel() {
-            const table = document.getElementById("nominationsTable");
-            if (!table) {
-                alert("Nominations table not found.");
-                return;
-            }
 
-            let csv = [];
-
-            // Add headers
-            const headers = Array.from(table.querySelectorAll("thead th"))
-                .map(th => `"${th.innerText.trim()}"`)
-                .join(",");
-            csv.push(headers);
-
-            // Add rows (only visible ones)
-            const rows = table.querySelectorAll("tbody tr");
-            rows.forEach(row => {
-                if (row.style.display === "none") return;
-                const cols = row.querySelectorAll("td");
-                const rowData = Array.from(cols).map(td => `"${td.innerText.trim()}"`);
-                csv.push(rowData.join(","));
-            });
-
-            const csvContent = csv.join("\n");
-            const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
-            const url = URL.createObjectURL(blob);
-            const link = document.createElement("a");
-            link.setAttribute("href", url);
-            link.setAttribute("download", "TeamNominations.csv");
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
-        }
-    </script>
 
 
     <script>
@@ -501,50 +465,57 @@
 
     </script>
 
-    @if (!string.IsNullOrEmpty(ViewBag.SelectedTeamId as string))
-    {
-        <script>
-            window.addEventListener('load', function () {
-                const modalElement = document.getElementById("teamNominationsModal");
-                if (modalElement) {
-                    const modalInstance = new bootstrap.Modal(modalElement);
-                    modalInstance.show();
-                }
-            });
-        </script>
-    }
 
     <script>
-       function hideTeamModal() {
-            const modalElement = document.getElementById("teamNominationsModal");
-            const modalInstance = bootstrap.Modal.getInstance(modalElement);
-            if (modalInstance) {
-                modalInstance.hide();
-                const teamSelect = document.querySelector("select[name='teamId']");
-                if (teamSelect) {
-                    teamSelect.selectedIndex = 0;
-                }
-                const url = new URL(window.location);
-                url.searchParams.delete("teamId");
-                window.history.replaceState({}, document.title, url);
-            }
-        }
+        function hideTeamModal() {
+             const modalElement = document.getElementById("teamNominationsModal");
+             const modalInstance = bootstrap.Modal.getInstance(modalElement);
+             if (modalInstance) {
+                 modalInstance.hide();
 
-        // 🔍 Filter nominations table by nominee name
-        function filterNominations() {
-            const input = document.getElementById("searchInput");
-            const filter = input.value.toLowerCase();
-            const table = document.getElementById("nominationsTable");
-            const rows = table.getElementsByTagName("tr");
+                 // ✅ Correctly reset the dropdown by ID
+                 const teamSelect = document.getElementById("teamSelect");
+                 if (teamSelect) {
+                     teamSelect.selectedIndex = 0;
+                 }
 
-            for (let i = 1; i < rows.length; i++) {
-                const nomineeCell = rows[i].getElementsByTagName("td")[1];
-                if (nomineeCell) {
-                    const name = nomineeCell.textContent || nomineeCell.innerText;
-                    rows[i].style.display = name.toLowerCase().includes(filter) ? "" : "none";
-                }
-            }
-        }
+                 // ✅ Clean the URL
+                 const url = new URL(window.location);
+                 url.searchParams.delete("teamId");
+                 window.history.replaceState({}, document.title, url);
+             }
+         }
+                 document.addEventListener('DOMContentLoaded', function () {
+             const modalElement = document.getElementById("teamNominationsModal");
+             if (modalElement) {
+                 modalElement.addEventListener('hidden.bs.modal', function () {
+                     // Reset dropdown on modal close
+                     const teamSelect = document.getElementById("teamSelect");
+                     if (teamSelect) {
+                         teamSelect.selectedIndex = 0;
+                     }
+                 });
+             }
+         });
+
+         // 🔍 Filter nominations table by nominee name
+         function filterNominations() {
+             const input = document.getElementById("searchInput");
+             const filter = input.value.toLowerCase();
+             const table = document.getElementById("nominationsTable");
+             const rows = table.getElementsByTagName("tr");
+
+             for (let i = 1; i < rows.length; i++) {
+                 const nomineeCell = rows[i].getElementsByTagName("td")[1];
+                 if (nomineeCell) {
+                     const name = nomineeCell.textContent || nomineeCell.innerText;
+                     rows[i].style.display = name.toLowerCase().includes(filter) ? "" : "none";
+                 }
+             }
+         }
     </script>
 }
+
+
+
 

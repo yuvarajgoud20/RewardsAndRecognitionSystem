@@ -108,12 +108,23 @@ namespace RewardsAndRecognitionSystem.Controllers
 
             if (isDirector)
             {
+                // Get team IDs managed by this director
+                var directorTeamIds = await _context.Teams
+                    .Where(t => t.DirectorId.ToString() == userId)
+                    .Select(t => t.Id)
+                    .ToListAsync();
+
                 query = query.Where(n =>
-                    n.Status == NominationStatus.ManagerApproved ||
-                    n.Status == NominationStatus.ManagerRejected ||
-                    n.Status == NominationStatus.DirectorApproved ||
-                    n.Status == NominationStatus.DirectorRejected);
+                    n.Nominator.TeamId != null &&
+                    directorTeamIds.Contains(n.Nominator.TeamId.Value) &&
+                    (
+                        n.Status == NominationStatus.ManagerApproved ||
+                        n.Status == NominationStatus.ManagerRejected ||
+                        n.Status == NominationStatus.DirectorApproved ||
+                        n.Status == NominationStatus.DirectorRejected
+                    ));
             }
+
 
             var teamSummary = await query
                 .GroupBy(n => n.Nominator.Team.Name)
@@ -132,9 +143,10 @@ namespace RewardsAndRecognitionSystem.Controllers
             var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
             var isManager = User.IsInRole(nameof(Roles.Manager));
             var isDirector = User.IsInRole(nameof(Roles.Director));
+
             var query = _context.Nominations
                 .Include(n => n.Nominator)
-                .ThenInclude(u => u.Team)
+                    .ThenInclude(u => u.Team)
                 .Include(n => n.Category)
                 .Where(n => n.YearQuarterId == yearQuarterId &&
                             n.Nominator.Team != null &&
@@ -148,6 +160,24 @@ namespace RewardsAndRecognitionSystem.Controllers
                     .ToListAsync();
 
                 query = query.Where(n => n.Nominator.TeamId != null && managerTeamIds.Contains(n.Nominator.TeamId.Value));
+            }
+
+            if (isDirector)
+            {
+                var directorTeamIds = await _context.Teams
+                    .Where(t => t.DirectorId.ToString() == userId)
+                    .Select(t => t.Id)
+                    .ToListAsync();
+
+                query = query.Where(n =>
+                    n.Nominator.TeamId != null &&
+                    directorTeamIds.Contains(n.Nominator.TeamId.Value) &&
+                    (
+                        n.Status == NominationStatus.ManagerApproved ||
+                        n.Status == NominationStatus.ManagerRejected ||
+                        n.Status == NominationStatus.DirectorApproved ||
+                        n.Status == NominationStatus.DirectorRejected
+                    ));
             }
 
             var nominations = await query.ToListAsync();
@@ -202,6 +232,7 @@ namespace RewardsAndRecognitionSystem.Controllers
 
             return Json(new { categoryTeamData });
         }
+
 
         [HttpPost]
         public IActionResult GenerateChartsPdf([FromBody] List<string> base64Images)

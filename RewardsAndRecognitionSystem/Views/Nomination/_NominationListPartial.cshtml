@@ -1,47 +1,51 @@
 ﻿@using Microsoft.AspNetCore.Identity
 @using RewardsAndRecognitionRepository.Enums
 @model IEnumerable<RewardsAndRecognitionSystem.ViewModels.NominationViewModel>
-
 @{
     ViewData["Title"] = "Nominations List";
- 
+    var isQuarterActive = ViewBag.IsQuarterActive != null && (bool)ViewBag.IsQuarterActive;
     var reviewedIds = ViewBag.ReviewedNominationIds as List<Guid> ?? new List<Guid>();
     var nominationsList = Model.ToList();
     var isManager = User.IsInRole("Manager");
     var isDirector = User.IsInRole("Director");
     var isTeamLead = User.IsInRole("TeamLead");
-
     var selectedFilter2 = ViewBag.FilterForDelete as string ?? "active";
     var currentFilter = selectedFilter2;
-   
-
     var dashboardFilter = ViewBag.filter;
     var all = "all";
 }
-
 <div id="nominationListContainer">
  @if (isTeamLead)
 {
     <div class="filter-bar d-flex justify-content-between align-items-center mb-3">
-      
+        <!-- Left: Search Input -->
         <div style="flex: 1;">
             <input type="text" id="liveSearch" class="form-control" placeholder="🔍 Search by Nominee" style="max-width: 300px;" />
         </div>
+
+        <!-- Right: Excel, Filter, and Create Nomination -->
         <div style="display: flex; gap: 10px; align-items: center;">
-                <a asp-action="ExportAllNominationsOpenXml" class="btn btn-success">
+                <a href="/Nomination/ExportAllNominationsOpenXml?yearQuarterId=@ViewBag.SelectedYearQuarterId"
+                   class="btn btn-success">
                     <i class="bi bi-file-earmark-excel"></i> Export
                 </a>
-            
+                  <select id="filterfordelete" class="form-select w-auto" onchange="submitWithFilter(1, this.value,all)">
+                     <option value="active" selected="@(selectedFilter2 == "active" ? "selected" : null)">Active</option>
+                     <option value="deleted" selected="@(selectedFilter2 == "deleted" ? "selected" : null)">Deleted</option>
+                  </select>
+                @if (isQuarterActive)
+                {
+                    <a asp-action="Create" class="btn btn-indigo" style="white-space: nowrap;">
+                        <i class="bi bi-plus-circle-fill"></i> Create Nomination
+                    </a>
+                }
+                else
+                {
+                    <button class="btn btn-secondary" disabled style="white-space: nowrap;">
+                        <i class="bi bi-plus-circle-fill"></i> Create Disabled
+                    </button>
+                }
 
-<select id="filterfordelete" class="form-select w-auto" onchange="submitWithFilter(1, this.value,all)">
-    <option value="active" selected="@(selectedFilter2 == "active" ? "selected" : null)">Active</option>
-    <option value="deleted" selected="@(selectedFilter2 == "deleted" ? "selected" : null)">Deleted</option>
-</select>
-
-
-            <a asp-action="Create" class="btn btn-indigo" style="white-space: nowrap;">
-                <i class="bi bi-plus-circle-fill"></i> Create Nomination
-            </a>
         </div>
     </div>
 
@@ -79,18 +83,31 @@
                             <i class="bi bi-eye-fill"></i> Details
                         </a>
 
-                        <a asp-action="Edit"
-                           asp-route-id="@n.Id"
-                           class="btn btn-indigo btn-sm @( (n.Status == NominationStatus.PendingManager) ? "" : "disabled no-click" )">
-                            <i class="bi bi-pencil-fill"></i> Edit
-                        </a>
+                                @if (isQuarterActive)
+                                {
+                                    <a asp-action="Edit"
+                                       asp-route-id="@n.Id"
+                                       class="btn btn-indigo btn-sm @( (n.Status == NominationStatus.PendingManager) ? "" : "disabled no-click" )">
+                                        <i class="bi bi-pencil-fill"></i> Edit
+                                    </a>
 
-                        <button class="btn btn-danger btn-sm @( (n.Status == NominationStatus.PendingManager) ? "" : "disabled no-click" )"
-                             data-bs-toggle="modal"
-                             data-bs-target="#deleteModal"
-                             data-id="@n.Id">
-                            <i class="bi bi-trash-fill"></i> Delete
-                            </button>
+                                    <button class="btn btn-danger btn-sm @( (n.Status == NominationStatus.PendingManager) ? "" : "disabled no-click" )"
+                                            data-bs-toggle="modal"
+                                            data-bs-target="#deleteModal"
+                                            data-id="@n.Id">
+                                        <i class="bi bi-trash-fill"></i> Delete
+                                    </button>
+                                }
+                                else
+                                {
+                                    <button class="btn btn-secondary btn-sm" disabled>
+                                        <i class="bi bi-pencil-fill"></i> Edit
+                                    </button>
+                                    <button class="btn btn-secondary btn-sm" disabled>
+                                        <i class="bi bi-trash-fill"></i> Delete
+                                    </button>
+                                }
+
                     </td>
                     }
                 </tr>
@@ -98,7 +115,6 @@
             }
         </tbody>
     </table>
-
  } 
 
  @if (isManager || isDirector)
@@ -111,12 +127,12 @@
 
         <!-- Right: Excel, Filter, and Create Nomination -->
         <div style="display: flex; gap: 10px; align-items: center;">
-                <a asp-action="ExportAllNominationsOpenXml" class="btn btn-success">
+                <a href="/Nomination/ExportAllNominationsOpenXml?yearQuarterId=@ViewBag.SelectedYearQuarterId"
+                   class="btn btn-success">
                     <i class="bi bi-file-earmark-excel"></i> Export
                 </a>
         </div>
     </div>
-
     <table class="table-custom" id="nominationsTable">
         <thead>
             <tr>
@@ -147,9 +163,6 @@
                 {
                     managerRemarks = n.Approvals?.FirstOrDefault()?.Remarks ?? "No Remarks";
                 }
-
-
-
                 <tr class="@(isReviewed ? "reviewed" : "pending")"
                     data-index="@i"
                     data-id="@n.Id"
@@ -174,17 +187,50 @@
                     <td>@n.CreatedAt.ToString("dd/MM/yyyy")</td>
                     <td>
                             <div class="d-flex justify-content-between align-items-center gap-2" style="width: 250px;">
-                                <button class="btn btn-indigo btn-sm w-100 fixed-btn open-popup" data-index="@i">
-                                    <i class="bi bi-eye-fill"></i> @(isReviewed ? "View" : "Review")
-                                </button>
-                                <button type="button"
-                                        class="btn btn-warning btn-sm w-100 fixed-btn"
-                                        data-bs-toggle="modal"
-                                        data-bs-target="#revertModal"
-                                        data-nomination-id="@n.Id"
-                                        @(isReviewed ? "disabled title='Already Reviewed'" : "")>
-                                    ⏪ Revert
-                                </button>
+                                @if (isReviewed)
+                                {
+                                    <!-- Always allow View -->
+                                    <button class="btn btn-indigo btn-sm w-100 fixed-btn open-popup" data-index="@i">
+                                        <i class="bi bi-eye-fill"></i> View
+                                    </button>
+                                }
+                                else
+                                {
+                                    @if (isQuarterActive)
+                                    {
+                                        <!-- Allow Review only if quarter active -->
+                                        <button class="btn btn-indigo btn-sm w-100 fixed-btn open-popup" data-index="@i">
+                                            <i class="bi bi-eye-fill"></i> Review
+                                        </button>
+                                    }
+                                    else
+                                    {
+                                        <!-- Disable Review if quarter inactive -->
+                                        <button class="btn btn-secondary btn-sm w-100 fixed-btn" disabled>
+                                            <i class="bi bi-eye-fill"></i> Review
+                                        </button>
+                                    }
+                                }
+
+
+                                @if (isQuarterActive)
+                                {
+                                    <button type="button"
+                                            class="btn btn-warning btn-sm w-100 fixed-btn"
+                                            data-bs-toggle="modal"
+                                            data-bs-target="#revertModal"
+                                            data-nomination-id="@n.Id"
+                                            @(isReviewed ? "disabled title='Already Reviewed'" : "")>
+                                        ⏪ Revert
+                                    </button>
+                                }
+                                else
+                                {
+                                    <button class="btn btn-secondary btn-sm w-100 fixed-btn" disabled>
+                                        ⏪ Revert
+                                    </button>
+                                }
+
                             </div>
 
                             
@@ -270,7 +316,6 @@ console.log(IS_TEAMLEAD);
                 }
             }
 </script>
-
  <script src="~/js/Nomination.js"></script>
  <script>
        function submitWithFilter(page, filter,dashboardFilter) {
@@ -282,11 +327,9 @@ console.log(IS_TEAMLEAD);
         }
     });
 }
-        
-
+       
 $(document).on("click", ".pagination-link", function () {
     const page = $(this).data("page");
-
     const filter = $("#filterfordelete").val(); // get value from dropdown
     const dashboardFilter =$(this).data("dashboardFilter");
         submitWithFilter(page, filter,dashboardFilter);

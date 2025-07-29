@@ -1,9 +1,8 @@
 ﻿@using RewardsAndRecognitionRepository.Models
 @using RewardsAndRecognitionRepository.Enums
 @model IEnumerable<Nomination>
-
-
-@{
+<script src="~/lib/Charts/chart.js"></script>
+<script src="~/lib/Charts/chartjs-plugin-datalabels.js"></script>@{
     ViewData["Title"] = "Director Dashboard";
     Layout = "~/Views/Shared/_Layout.cshtml";
 
@@ -16,9 +15,8 @@
     var selectedTeamId = ViewBag.SelectedTeamId as string;
     var selectedTeamNominations = ViewBag.SelectedTeamNominations as List<Nomination> ?? new();
     var selectedTeamName = teams?.FirstOrDefault(t => t.TeamId.ToString() == selectedTeamId)?.TeamName ?? "";
+    bool noNominations = total == 0;
 }
-
-
 
 <div class="d-flex align-items-center justify-content-between mb-4 flex-wrap">
     <h2 class="modern-heading mb-0">
@@ -81,9 +79,6 @@
     var chartIndex = 0;
     var teamChartData = ViewBag.TeamStatusData;
 }
-<!-- Load Chart.js -->
-<script src="~/lib/Charts/chart.js"></script>
-
 
 <div class="d-flex justify-content-between align-items-center mb-3">
     <h4 class="mt-5"><i class="bi bi-bar-chart-line-fill"></i> Team Wise Statistics</h4>
@@ -126,6 +121,7 @@
         .analytics-btn:hover i {
             transform: translateX(4px);
         }
+
     .chart-wrapper {
         height: 275px;
         max-width: 250px;
@@ -133,7 +129,6 @@
     }
 
         .chart-wrapper canvas {
-            width: 100% !important; 
             width: 100% !important;
             height: 100% !important;
         }
@@ -158,61 +153,62 @@
             var rejectedNominations = Convert.ToInt32(team.Rejected);
             var pendingNominations = Convert.ToInt32(team.Pending);
             var totalNominations = approvedNominations + rejectedNominations + pendingNominations;
-
-            <div class="col-md-4 mb-4">
-                <div class="card p-3 shadow-sm">
-                    <h6 class="text-center mb-2">@team.TeamName - @totalNominations Nominations</h6>
-                    <div class="chart-wrapper">
-                        <canvas id="@chartId" width="300" height="250"></canvas>
+            if (totalNominations > 0)   // <-- ADD THIS CHECK
+            {
+                <div class="col-md-4 mb-4">
+                    <div class="card p-3 shadow-sm">
+                        <h6 class="text-center mb-2">@team.TeamName - @totalNominations Nominations</h6>
+                        <div class="chart-wrapper">
+                            <canvas id="@chartId" width="300" height="250"></canvas>
+                        </div>
                     </div>
                 </div>
-            </div>
 
-            <script>
-                const ctx_@chartIndex = document.getElementById('@chartId').getContext('2d');
+                <script>
+                    const ctx_@chartIndex = document.getElementById('@chartId').getContext('2d');
 
-                Chart.register(ChartDataLabels);
+                    Chart.register(ChartDataLabels);
 
-                new Chart(ctx_@chartIndex, {
-                    type: 'bar',
-                    data: {
-                        labels: ['Approved', 'Rejected', 'Pending'],
-                        datasets: [{
-                            data: [@approvedNominations, @rejectedNominations, @pendingNominations],
-                            backgroundColor: ['#4caf50', '#f44336', '#ffeb3b'],  // Green for Approved, Red for Rejected, Yellow for Pending
-                            borderColor: ['#388e3c', '#d32f2f', '#fbc02d'],
-                            borderWidth: 1
-                        }]
-                    },
-                    options: {
-                        plugins: {
-                            legend: { display: false },
-                            datalabels: {
-                                color: 'black',
-                                anchor: 'center',
-                                align: 'center',
-                                font: {
-                                    weight: 'bold',
-                                    size: 14
-                                },
-                                formatter: function (value) {
-                                    return value > 0 ? value : ''; // Hide label if value is 0
-                                }
-                            },
-                            tooltip: { enabled: true },
-                            title: { display: false }
+                    new Chart(ctx_@chartIndex, {
+                        type: 'bar',
+                        data: {
+                            labels: ['Approved', 'Rejected', 'Pending'],
+                            datasets: [{
+                                data: [@approvedNominations, @rejectedNominations, @pendingNominations],
+                                backgroundColor: ['#4caf50', '#f44336', '#ffeb3b'],  // Green for Approved, Red for Rejected, Yellow for Pending
+                                borderColor: ['#388e3c', '#d32f2f', '#fbc02d'],
+                                borderWidth: 1
+                            }]
                         },
-                        scales: {
-                            y: {
-                                beginAtZero: true,
-                                ticks: { precision: 0 }
+                        options: {
+                            plugins: {
+                                legend: { display: false },
+                                datalabels: {
+                                    color: 'black',
+                                    anchor: 'center',
+                                    align: 'center',
+                                    font: {
+                                        weight: 'bold',
+                                        size: 14
+                                    },
+                                    formatter: function (value) {
+                                        return value > 0 ? value : ''; // Hide label if value is 0
+                                    }
+                                },
+                                tooltip: { enabled: true },
+                                title: { display: false }
+                            },
+                            scales: {
+                                y: {
+                                    beginAtZero: true,
+                                    ticks: { precision: 0 }
+                                }
                             }
-                        }
-                    },
-                    plugins: [ChartDataLabels]
-                });
-            </script>
-
+                        },
+                        plugins: [ChartDataLabels]
+                    });
+                </script>
+            }
             chartIndex++;
         }
     </div>
@@ -233,13 +229,13 @@
         <div class="accordion-item shadow-sm rounded mb-2">
             <h2 class="accordion-header" id="@headingId">
                 <button class="accordion-button collapsed bg-light" type="button" data-bs-toggle="collapse" data-bs-target="#@collapseId">
-                   @team.TeamName
+                    @team.TeamName
                 </button>
             </h2>
             <div id="@collapseId" class="accordion-collapse collapse" aria-labelledby="@headingId" data-bs-parent="#teamsAccordion">
                 <div class="accordion-body">
                     <p class="mb-1"><strong>Team Lead:</strong> @team.TeamLeadName</p>
-                  
+
 
                     <p class="fw-semibold text-muted mb-2">Category-wise Nominations:</p>
 
@@ -332,6 +328,7 @@
             }
         });
 
+
         function loadYears() {
             $.get('/Dashboard/GetYears', function (years) {
                 let options = '<option value="">-- Select Year --</option>';
@@ -348,7 +345,6 @@
                 }
             });
         }
-
 
         function loadQuarters(year, selectedId) {
             $.get(`/Dashboard/GetQuarters?year=${year}`, function (quarters) {
@@ -387,6 +383,7 @@
                 document.getElementById("teamSelect").selectedIndex = 0;
             }
         }
+
         function filterNominations() {
             const filter = document.getElementById("searchInput").value.toLowerCase();
             const rows = document.querySelectorAll("#nominationsTable tbody tr");
@@ -397,33 +394,7 @@
             });
         }
 
-        function exportNominationsToExcel() {
-            const table = document.getElementById("nominationsTable");
-            if (!table) {
-                alert("Nominations table not found.");
-                return;
-            }
 
-            let csv = [];
-            const headers = Array.from(table.querySelectorAll("thead th")).map(th => `"${th.innerText.trim()}"`).join(",");
-            csv.push(headers);
-
-            const rows = table.querySelectorAll("tbody tr");
-            rows.forEach(row => {
-                if (row.style.display === "none") return;
-                const rowData = Array.from(row.querySelectorAll("td")).map(td => `"${td.innerText.trim()}"`);
-                csv.push(rowData.join(","));
-            });
-
-            const blob = new Blob([csv.join("\n")], { type: "text/csv;charset=utf-8;" });
-            const url = URL.createObjectURL(blob);
-            const link = document.createElement("a");
-            link.setAttribute("href", url);
-            link.setAttribute("download", "TeamNominations.csv");
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
-        }
     </script>
 }
 
