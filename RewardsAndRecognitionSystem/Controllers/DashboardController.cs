@@ -11,6 +11,7 @@ using RewardsAndRecognitionRepository.Enums;
 using RewardsAndRecognitionRepository.Interfaces;
 
 using RewardsAndRecognitionRepository.Models;
+using RewardsAndRecognitionSystem.Common;
 
 [Authorize]
 
@@ -115,16 +116,17 @@ public class DashboardController : Controller
 
             if (currentYQ == null)
             {
-                TempData["Error"] = "No active Year-Quarter found.";
+                TempData["Error"] = GeneralMessages.No_Active_Quarter;
                 return View(new List<int>()); // fallback just to load dropdowns
             }
+
 
             return RedirectToAction(nameof(Index), new { yearQuarterId = currentYQ.Id });
         }
         var selectedQuarter = await _context.YearQuarters.FindAsync(yearQuarterId);
         if (selectedQuarter == null)
         {
-            TempData["Error"] = "Selected Year-Quarter not found.";
+            TempData["Error"] = GeneralMessages.No_Valid_Quarter;
             return View(new List<int>());
         }
 
@@ -193,7 +195,7 @@ public class DashboardController : Controller
             {
                 TeamId = t.Id,
                 TeamName = t.Name,
-                TeamLeadName = t.TeamLead?.Name ?? "N/A",
+                TeamLeadName = t.TeamLead?.Name ?? GeneralMessages.NotAvailable_Error,
                 NominatedCount = nominationsList.Count(n => n.NominatorId == t.TeamLeadId)
             }).ToList<dynamic>();
 
@@ -288,7 +290,7 @@ public class DashboardController : Controller
 
                 TeamName = t.Name,
 
-                TeamLeadName = t.TeamLead?.Name ?? "N/A",
+                TeamLeadName = t.TeamLead?.Name ?? GeneralMessages.NotAvailable_Error,
 
                 NominatedCount = NominationsList.Count(n => n.NominatorId == t.TeamLeadId)
 
@@ -320,9 +322,6 @@ public class DashboardController : Controller
 
         }
 
-
-
-
         // For Team Lead Role
         if (roles.Contains(nameof(Roles.TeamLead)))
         {
@@ -333,8 +332,7 @@ public class DashboardController : Controller
 
             if (team == null)
             {
-                TempData["Error"] = "No team assigned to you as Team Lead.";
-
+                TempData["Error"] = GeneralMessages.No_Team_Assigned_TeamLead;
                 // Set default ViewBag values to avoid runtime binding errors
                 ViewBag.TotalNominations = 0;
                 ViewBag.PendingNominations = 0;

@@ -1,5 +1,6 @@
 ﻿@using RewardsAndRecognitionRepository.Models
 @using RewardsAndRecognitionRepository.Enums
+@using RewardsAndRecognitionSystem.Common
 @model IEnumerable<Nomination>
 <script src="~/lib/Charts/chart.js"></script>
 <script src="~/lib/Charts/chartjs-plugin-datalabels.js"></script>@{
@@ -146,6 +147,10 @@
 
 <div class="container">
     <div class="row">
+        @{
+            var chartsRendered = 0; // Track how many charts are shown
+        }
+
         @foreach (var team in teamChartData)
         {
             var chartId = $"barChart_{chartIndex}";
@@ -153,8 +158,11 @@
             var rejectedNominations = Convert.ToInt32(team.Rejected);
             var pendingNominations = Convert.ToInt32(team.Pending);
             var totalNominations = approvedNominations + rejectedNominations + pendingNominations;
-            if (totalNominations > 0)   // <-- ADD THIS CHECK
+
+            if (totalNominations > 0) // Show only if this team has nominations
             {
+                chartsRendered++; // Count visible charts
+
                 <div class="col-md-4 mb-4">
                     <div class="card p-3 shadow-sm">
                         <h6 class="text-center mb-2">@team.TeamName - @totalNominations Nominations</h6>
@@ -166,7 +174,6 @@
 
                 <script>
                     const ctx_@chartIndex = document.getElementById('@chartId').getContext('2d');
-
                     Chart.register(ChartDataLabels);
 
                     new Chart(ctx_@chartIndex, {
@@ -175,7 +182,7 @@
                             labels: ['Approved', 'Rejected', 'Pending'],
                             datasets: [{
                                 data: [@approvedNominations, @rejectedNominations, @pendingNominations],
-                                backgroundColor: ['#4caf50', '#f44336', '#ffeb3b'],  // Green for Approved, Red for Rejected, Yellow for Pending
+                                backgroundColor: ['#4caf50', '#f44336', '#ffeb3b'],
                                 borderColor: ['#388e3c', '#d32f2f', '#fbc02d'],
                                 borderWidth: 1
                             }]
@@ -192,11 +199,10 @@
                                         size: 14
                                     },
                                     formatter: function (value) {
-                                        return value > 0 ? value : ''; // Hide label if value is 0
+                                        return value > 0 ? value : '';
                                     }
                                 },
-                                tooltip: { enabled: true },
-                                title: { display: false }
+                                tooltip: { enabled: true }
                             },
                             scales: {
                                 y: {
@@ -209,10 +215,21 @@
                     });
                 </script>
             }
+
             chartIndex++;
+        }
+
+        @if (chartsRendered == 0)  // If no chart was rendered
+        {
+            <div class="col-12">
+                <div class="alert alert-light border rounded-3 shadow-sm text-center py-4 my-3" style="max-width: 500px; margin: 0 auto;">
+                    <h5 class="mt-2 mb-1 text-dark fw-semibold">@GeneralMessages.No_Nominations_This_Quarter</h5>
+                </div>
+            </div>
         }
     </div>
 </div>
+
 <h4 class="mt-5 mb-3 text-primary fw-semibold">
     <i class="bi bi-people-fill me-2"></i> Teams Under You
 </h4>

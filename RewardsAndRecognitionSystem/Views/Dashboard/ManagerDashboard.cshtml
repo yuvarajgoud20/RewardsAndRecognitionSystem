@@ -1,5 +1,6 @@
 ﻿@using RewardsAndRecognitionRepository.Models
 @using RewardsAndRecognitionRepository.Enums
+@using RewardsAndRecognitionSystem.Common
 @model IEnumerable<Nomination>
 <script src="~/lib/Charts/chart.js"></script>
 <script src="~/lib/Charts/chartjs-plugin-datalabels.js"></script>
@@ -287,6 +288,23 @@
             }
             chartIndex++;
         }
+        @* Show message if no team has nominations *@
+        @{
+            var data = teamChartData as IEnumerable<dynamic>;
+            var hasData = data != null && data.Any(t =>
+            Convert.ToInt32(t.Approved) +
+            Convert.ToInt32(t.Rejected) +
+            Convert.ToInt32(t.Pending) > 0);
+        }
+        @if (!hasData)
+        {
+            <div class="col-12">
+                <div class="alert alert-light border rounded-3 shadow-sm text-center py-4 my-3" style="max-width: 500px; margin: 0 auto;">
+                    <h5 class="mt-2 mb-1 text-dark fw-semibold">@GeneralMessages.No_Nominations_This_Quarter</h5>
+                </div>
+            </div>
+
+        }
     </div>
 </div>
 @* Enhanced Teams Accordion *@
@@ -467,36 +485,23 @@
 
 
     <script>
-        function hideTeamModal() {
-             const modalElement = document.getElementById("teamNominationsModal");
-             const modalInstance = bootstrap.Modal.getInstance(modalElement);
-             if (modalInstance) {
-                 modalInstance.hide();
+            document.addEventListener('DOMContentLoaded', function () {
+            const modalElement = document.getElementById("teamNominationsModal");
+            if (modalElement) {
+                modalElement.addEventListener('hidden.bs.modal', function () {
+                    // Reset dropdown on modal close
+                    const teamSelect = document.getElementById("teamSelect");
+                    if (teamSelect) {
+                        teamSelect.selectedIndex = 0;
+                    }
 
-                 // ✅ Correctly reset the dropdown by ID
-                 const teamSelect = document.getElementById("teamSelect");
-                 if (teamSelect) {
-                     teamSelect.selectedIndex = 0;
-                 }
-
-                 // ✅ Clean the URL
-                 const url = new URL(window.location);
-                 url.searchParams.delete("teamId");
-                 window.history.replaceState({}, document.title, url);
-             }
-         }
-                 document.addEventListener('DOMContentLoaded', function () {
-             const modalElement = document.getElementById("teamNominationsModal");
-             if (modalElement) {
-                 modalElement.addEventListener('hidden.bs.modal', function () {
-                     // Reset dropdown on modal close
-                     const teamSelect = document.getElementById("teamSelect");
-                     if (teamSelect) {
-                         teamSelect.selectedIndex = 0;
-                     }
-                 });
-             }
-         });
+                    // Clean the URL (remove teamId query param)
+                    const url = new URL(window.location);
+                    url.searchParams.delete("teamId");
+                    window.history.replaceState({}, document.title, url);
+                });
+            }
+        });
 
          // 🔍 Filter nominations table by nominee name
          function filterNominations() {

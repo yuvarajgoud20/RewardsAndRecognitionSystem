@@ -9,8 +9,10 @@ namespace RewardsAndRecognitionSystem.FluentValidators
         {
 
             RuleFor(x => x.Name)
-                .NotEmpty().WithMessage("Name is required.")
-                .MaximumLength(100).WithMessage("Name must not exceed 100 characters.");
+                 .NotEmpty().WithMessage("Name is required.")
+                 .MaximumLength(100).WithMessage("Name must not exceed 100 characters.")
+                 .Matches(@"^(?=.*[A-Za-z])[A-Za-z0-9\s'-]+$")
+                 .WithMessage("Name can contain letters, numbers, spaces, hyphens, or apostrophes, but must include at least one letter.");
 
             RuleFor(x => x.Email)
                 .NotEmpty().WithMessage("Email is required.")
@@ -28,3 +30,10 @@ namespace RewardsAndRecognitionSystem.FluentValidators
 
     }
 }
+
+
+
+
+
+
+
