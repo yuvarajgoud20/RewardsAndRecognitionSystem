@@ -739,5 +739,153 @@ namespace RewardsAndRecognitionSystem.Controllers
                 $"{teamName}_Nominations.xlsx");
         }
 
+        [HttpGet]
+        public IActionResult DownloadTemplate()
+        {
+            using (var ms = new MemoryStream())
+            {
+                using (var spreadsheet = SpreadsheetDocument.Create(ms, SpreadsheetDocumentType.Workbook))
+                {
+                    var workbookPart = spreadsheet.AddWorkbookPart();
+                    workbookPart.Workbook = new Workbook();
+
+                    var worksheetPart = workbookPart.AddNewPart<WorksheetPart>();
+                    var sheetData = new SheetData();
+
+                    // Define header row
+                    var headerRow = new Row();
+                    string[] headers = { "NomineeEmail", "CategoryName", "YearQuarterName", "Description", "Achievements" };
+                    foreach (var header in headers)
+                    {
+                        headerRow.AppendChild(new Cell
+                        {
+                            DataType = CellValues.String,
+                            CellValue = new CellValue(header)
+                        });
+                    }
+                    sheetData.Append(headerRow);
+
+                    string[] data = { "nominee@zelis.com", "star of the quarter", "Q3,2025", "Good job", "Excellent Job" };
+
+                    var dataRow = new Row();
+
+                    foreach (var d in data)
+                    {
+                        dataRow.AppendChild(new Cell
+                        {
+                            DataType = CellValues.String,
+                            CellValue = new CellValue(d)
+                        });
+                    }
+                    sheetData.Append(dataRow);
+
+                    worksheetPart.Worksheet = new Worksheet(sheetData);
+                    var sheets = spreadsheet.WorkbookPart.Workbook.AppendChild(new Sheets());
+                    sheets.Append(new Sheet
+                    {
+                        Id = spreadsheet.WorkbookPart.GetIdOfPart(worksheetPart),
+                        SheetId = 1,
+                        Name = "Template"
+                    });
+                    workbookPart.Workbook.Save();
+                }
+                ms.Position = 0;
+                return File(ms.ToArray(),
+                    "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                    "BatchNominationTemplate.xlsx");
+            }
+        }
+
+
+        [HttpGet]
+        public IActionResult UploadNomination()
+        {
+            return View();
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> UploadNomination(IFormFile file)
+        {
+            if (file == null || file.Length == 0)
+                return BadRequest("File is empty");
+
+            using var stream = new MemoryStream();
+            await file.CopyToAsync(stream);
+
+            using var document = SpreadsheetDocument.Open(stream, false);
+            var workbookPart = document.WorkbookPart;
+            var sheet = workbookPart.Workbook.Sheets.Elements<Sheet>().First();
+            var worksheetPart = (WorksheetPart)workbookPart.GetPartById(sheet.Id);
+            var rows = worksheetPart.Worksheet.Descendants<Row>().Skip(1); // Skip header
+
+            var nominations = new List<Nomination>();
+            var nominator = await _userManager.GetUserAsync(User);
+            foreach (var row in rows)
+            {
+                var cells = row.Elements<Cell>().ToList();
+                var nomineeEmail = GetCellValue(workbookPart, cells[0]);
+                var categoryName = GetCellValue(workbookPart, cells[1]);
+                var yearQuarterName = GetCellValue(workbookPart, cells[2]);
+                var description = GetCellValue(workbookPart, cells[3]);
+                var achievements = GetCellValue(workbookPart, cells[4]);
+
+                // Resolve foreign keys from DB
+
+                var nominee = await _context.Users.Include(x => x.Team).FirstOrDefaultAsync(x => (x.Email == nomineeEmail) && (x.Team.TeamLeadId == nominator.Id));
+                var category = await _context.Categories.FirstOrDefaultAsync(x => x.Name == categoryName);
+                var yq = yearQuarterName.Split(',');
+                if (yq.Length != 2)
+                {
+                    throw new Exception("Invalid data in excel row");
+                }
+                var quarterString = yq[0];   // "Q1" from Excel
+                var year = int.Parse(yq[1]); // year from Excel
+
+                // Convert string to enum
+                if (!Enum.TryParse<Quarter>(quarterString, true, out var quarterEnum))
+                {
+                    throw new Exception($"Invalid Quarter value '{quarterString}' in Excel");
+                }
+                var yearQuarter = await _context.YearQuarters.FirstOrDefaultAsync(x => x.Year == year && x.Quarter == quarterEnum);
+
+                if (nominator == null || nominee == null || category == null || yearQuarter == null)
+                    throw new Exception("Invalid data in excel row");
+
+                nominations.Add(new Nomination
+                {
+                    Id = Guid.NewGuid(),
+                    NominatorId = nominator.Id,
+                    NomineeId = nominee.Id,
+                    CategoryId = category.Id,
+                    YearQuarterId = yearQuarter.Id,
+                    Description = description,
+                    Achievements = achievements,
+                    Status = NominationStatus.PendingManager,
+                    CreatedAt = DateTime.UtcNow,
+                    IsDeleted = false
+                });
+            }
+
+            // Transaction (rollback if any failure)
+            using var transaction = await _context.Database.BeginTransactionAsync();
+            _context.Nominations.AddRange(nominations);
+            await _context.SaveChangesAsync();
+            await transaction.CommitAsync();
+            return RedirectToAction(nameof(Index));
+        }
+
+        private string GetCellValue(WorkbookPart wbPart, Cell cell)
+        {
+            string value = cell.InnerText;
+            if (cell.DataType == null) return value;
+
+            if (cell.DataType == CellValues.SharedString)
+            {
+                return wbPart.SharedStringTablePart.SharedStringTable
+                    .Elements<SharedStringItem>().ElementAt(int.Parse(value)).InnerText;
+            }
+            return value;
+        }
+
     }
 }
