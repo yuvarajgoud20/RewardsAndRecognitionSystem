@@ -17,6 +17,7 @@ namespace RewardsAndRecognitionRepository.Interfaces
         Task SoftDeleteAsync(Guid id);
         Task<bool> ExistsAsync(Guid id);
         public Task<IEnumerable<Category>> GetDeletedAsync();
+        Task<List<Guid>> GetNominatedCategoriesAsync(string nomineeId);
         public Task<List<Guid>> GetUsedCategoryIdsAsync();
     }
 }

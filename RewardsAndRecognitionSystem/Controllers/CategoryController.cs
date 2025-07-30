@@ -90,6 +90,7 @@ namespace RewardsAndRecognitionSystem.Controllers
                 category.CreatedAt = DateTime.UtcNow;
 
                 await _categoryRepo.AddAsync(category);
+                TempData["message"] = "Successfully created Category";
                 return RedirectToAction(nameof(Index));
             }
 
@@ -128,6 +129,7 @@ namespace RewardsAndRecognitionSystem.Controllers
             existing.CreatedAt = viewModel.CreatedAt;
 
             await _categoryRepo.UpdateAsync(existing);
+            TempData["message"] = "Successfully updated Category";
             return RedirectToAction(nameof(Index));
         }
 
@@ -151,8 +153,8 @@ namespace RewardsAndRecognitionSystem.Controllers
             {
                 return NotFound();
             }
-
             await _categoryRepo.SoftDeleteAsync(id);
+            TempData["message"] = "Successfully deleted Category";
             return RedirectToAction(nameof(Index));
         }
 

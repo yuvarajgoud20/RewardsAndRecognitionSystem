@@ -22,10 +22,43 @@
     <!-- ASP Validation Scripts -->
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
-    
-
+    <!-- Toast Msgs Stylesheet-->
+    <link rel="stylesheet" href="~/lib/Toaster/style.css" />
 
     <style>
+        /* Solid green background, no shadow */
+        #toast-container > .toast-success {
+            background-color: #008000 !important;
+            opacity: 1 !important;
+            color: white !important;
+            border-radius: 10px;
+            background-image: none !important;
+            box-shadow: none !important;
+            margin-top: 0 !important;
+            padding-top: 10px !important;
+            padding-bottom: 8px !important;
+            padding-left: 10px !important;
+            padding-right: 10px !important;
+        }
+
+            /* Left-aligned text, large font */
+            #toast-container > .toast-success .toast-message {
+                text-align: left;
+                margin: 0;
+                font-size: 3rem;
+            }
+
+            /* Simple close button, no hover effect */
+            #toast-container > .toast-success .toast-close-button {
+                color: white !important;
+                opacity: 1 !important;
+                text-shadow: none !important;
+                font-weight: bold;
+                font-size: 1.2rem;
+                padding: 0;
+                /* cursor: default; */
+            }
+
         body {
             font-family: 'Segoe UI', sans-serif;
             background: linear-gradient(to right, #f9fafc, #eef1f6);
@@ -186,3 +219,29 @@
     @await RenderSectionAsync("Scripts", required: false)
 </body>
 </html>
+@if (TempData["message"] != null)
+{
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/Toaster/toaster.js"></script>
+    <script>
+        $(function(){
+                       toastr.options = {
+          closeButton: true,
+          progressBar: false,
+          positionClass: 'toast-top-right',
+          showMethod: 'show',          // Instant display
+          showDuration: 0,
+          hideMethod: 'hide',          // Instant hide
+          hideDuration: 0,
+          timeOut: 3000,               // Toast disappears after 3 seconds
+          extendedTimeOut: 1000,
+
+          newestOnTop: false,
+          preventDuplicates: false,
+          messageClass: 'toast-text-center'
+        };
+
+          toastr.success('@TempData["message"]');
+        });
+    </script>
+}
