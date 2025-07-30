@@ -292,12 +292,18 @@ namespace RewardsAndRecognitionSystem.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(NominationViewModel viewModel)
         {
-            var awardedCategories = await _categoryRepo.GetNominatedCategoriesAsync(viewModel.NomineeId);
-            bool exists = awardedCategories.Contains(viewModel.CategoryId);
-            if (exists)
+            var exists = await _context.Nominations
+                   .AnyAsync(n => n.NomineeId == viewModel.NomineeId
+                   && n.CategoryId == viewModel.CategoryId
+                   && n.YearQuarterId == viewModel.YearQuarterId
+                   && !n.IsDeleted);
+
+           if (exists)
             {
-                ModelState.AddModelError("CategoryId", "Please select another category — this person is already nominated in the chosen category.");
+                ModelState.AddModelError("CategoryId",
+                "Please select another category — this person is already nominated in the chosen category for this quarter.");
             }
+
             if (ModelState.IsValid)
             {
                 var nomination = _mapper.Map<Nomination>(viewModel);
