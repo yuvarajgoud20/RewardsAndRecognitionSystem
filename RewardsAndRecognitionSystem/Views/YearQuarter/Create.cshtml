@@ -34,13 +34,13 @@
     <form asp-action="Create" method="post">
         @Html.AntiForgeryToken()
         <div class="mb-3">
-            <label asp-for="Year" class="form-label">Year</label>
+            <label asp-for="Year" class="form-label">Year</label><span class="text-danger">*</span>
             <input asp-for="Year" class="form-control" />
             <span asp-validation-for="Year" class="text-danger"></span>
         </div>
 
         <div class="mb-3">
-            <label asp-for="Quarter" class="form-label">Quarter</label>
+            <label asp-for="Quarter" class="form-label">Quarter</label><span class="text-danger">*</span>
             <select asp-for="Quarter" class="form-select" asp-items="ViewBag.Quarters">
                 <option value="">-- Select Quarter --</option>
             </select>
@@ -48,13 +48,13 @@
         </div>
 
         <div class="mb-3">
-            <label asp-for="StartDate" class="form-label">Start Date</label>
+            <label asp-for="StartDate" class="form-label">Start Date</label><span class="text-danger">*</span>
             <input asp-for="StartDate" class="form-control" type="date" />
             <span asp-validation-for="StartDate" class="text-danger"></span>
         </div>
 
         <div class="mb-3">
-            <label asp-for="EndDate" class="form-label">End Date</label>
+            <label asp-for="EndDate" class="form-label">End Date</label><span class="text-danger">*</span>
             <input asp-for="EndDate" class="form-control" type="date" />
             <span asp-validation-for="EndDate" class="text-danger"></span>
         </div>
