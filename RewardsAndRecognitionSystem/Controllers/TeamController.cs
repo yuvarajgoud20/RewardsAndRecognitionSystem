@@ -80,6 +80,7 @@ namespace RewardsAndRecognitionSystem.Controllers
                 User user = await _userRepo.GetByIdAsync(team.TeamLeadId);
                 user.TeamId = team.Id;
                 await _userManager.UpdateAsync(user);
+                TempData["message"] = "Successfully created Team";
                 return RedirectToAction(nameof(Index));
             }
 
@@ -163,6 +164,7 @@ namespace RewardsAndRecognitionSystem.Controllers
             existingTeam.DirectorId = updatedTeam.DirectorId;
 
             await _teamRepo.UpdateAsync(existingTeam);
+            TempData["message"] = "Successfully updated Team";
             return RedirectToAction(nameof(Index));
         }
 
@@ -196,7 +198,7 @@ namespace RewardsAndRecognitionSystem.Controllers
                 return NotFound();
 
             await _teamRepo.DeleteAsync(team);
-
+            TempData["message"] = "Successfully deleted Team";
             return RedirectToAction(nameof(Index));
         }
 
