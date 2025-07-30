@@ -80,6 +80,7 @@ namespace RewardsAndRecognitionSystem.Controllers
             yq.Id = Guid.NewGuid();
             var yearQuarter = _mapper.Map<YearQuarter>(yq);
             await _yearQuarterRepo.AddAsync(yearQuarter);
+            TempData["message"] = "Successfully created YearQuarter";
             return RedirectToAction(nameof(Index));
         }
 
@@ -119,6 +120,7 @@ namespace RewardsAndRecognitionSystem.Controllers
             existing.IsActive = yq.IsActive;
 
             await _yearQuarterRepo.UpdateAsync(existing);
+            TempData["message"] = "Successfully updated YearQuarter";
             return RedirectToAction(nameof(Index));
         }
 
@@ -136,6 +138,7 @@ namespace RewardsAndRecognitionSystem.Controllers
         public async Task<IActionResult> DeleteConfirmed(Guid id)
         {
             await _yearQuarterRepo.DeleteAsync(id);
+            TempData["message"] = "Successfully deleted YearQuarter";
             return RedirectToAction(nameof(Index));
         }
     }

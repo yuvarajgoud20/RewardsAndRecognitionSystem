@@ -12,6 +12,7 @@ using RewardsAndRecognitionRepository.Enums;
 using RewardsAndRecognitionRepository.Interfaces;
 using RewardsAndRecognitionRepository.Models;
 using RewardsAndRecognitionRepository.Repos;
+using RewardsAndRecognitionRepository.Repositories;
 using RewardsAndRecognitionRepository.Service;
 using RewardsAndRecognitionSystem.Common;
 using RewardsAndRecognitionSystem.Utilities;
@@ -28,13 +29,15 @@ namespace RewardsAndRecognitionSystem.Controllers
         private readonly ApplicationDbContext _context;
         private readonly UserManager<User> _userManager;
         private readonly IEmailService _emailService;
+        private readonly ICategoryRepo _categoryRepo;
 
         public NominationController(
             IMapper mapper,
             INominationRepo nominationRepo,
             ApplicationDbContext context,
             UserManager<User> userManager,
-            IEmailService emailService)
+            IEmailService emailService,
+            ICategoryRepo categoryRepo)
 
         {
             _nominationRepo = nominationRepo;
@@ -42,6 +45,7 @@ namespace RewardsAndRecognitionSystem.Controllers
             _userManager = userManager;
             _mapper = mapper;
             _emailService = emailService;
+            _categoryRepo = categoryRepo;
         }
 
         // GET: Nomination
@@ -288,13 +292,19 @@ namespace RewardsAndRecognitionSystem.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(NominationViewModel viewModel)
         {
-
+            var awardedCategories = await _categoryRepo.GetNominatedCategoriesAsync(viewModel.NomineeId);
+            bool exists = awardedCategories.Contains(viewModel.CategoryId);
+            if (exists)
+            {
+                ModelState.AddModelError("CategoryId", "Please select another category — this person is already nominated in the chosen category.");
+            }
             if (ModelState.IsValid)
             {
                 var nomination = _mapper.Map<Nomination>(viewModel);
                 nomination.Id = Guid.NewGuid();
                 nomination.CreatedAt = DateTime.UtcNow;
                 await _nominationRepo.AddNominationAsync(nomination);
+                TempData["message"] = "Successfully created Nomination";
                 return RedirectToAction(nameof(Index));
             }
             var currentUser = await _userManager.GetUserAsync(User);
@@ -359,6 +369,7 @@ namespace RewardsAndRecognitionSystem.Controllers
             existing.Status = viewModel.Status;
 
             await _nominationRepo.UpdateNominationAsync(existing);
+            TempData["message"] = "Successfully updated Nomination";
             return RedirectToAction(nameof(Index));
         }
 
@@ -373,6 +384,7 @@ namespace RewardsAndRecognitionSystem.Controllers
                 return Forbid();
 
             await _nominationRepo.SoftDeleteNominationAsync(id);
+            TempData["message"] = "Successfully deleted Nomination";
             return RedirectToAction(nameof(Index));
         }
 
@@ -476,7 +488,7 @@ namespace RewardsAndRecognitionSystem.Controllers
                 }
             }
 
-
+            TempData["message"] = ((nomination.Status == NominationStatus.ManagerApproved) || (nomination.Status == NominationStatus.DirectorApproved)) ? "Sucessfully Approved" : "Rejected Successfully";
             return RedirectToAction(nameof(Index));
         }
 
@@ -517,7 +529,7 @@ namespace RewardsAndRecognitionSystem.Controllers
                     to: teamLead.Email
                 );
             }
-
+            TempData["message"] = "Successfully Reverted the Nomination";
             return RedirectToAction(nameof(Index));
         }
 

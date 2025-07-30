@@ -82,5 +82,14 @@ namespace RewardsAndRecognitionRepository.Repositories
                .Distinct()
                .ToListAsync();
         }
+
+        async Task<List<Guid>> ICategoryRepo.GetNominatedCategoriesAsync(string nomineeId)
+        {
+            return await _context.Nominations
+             .Where(n => (n.NomineeId == nomineeId && (!n.IsDeleted) )) // EF Core must see this
+             .Select(n => n.CategoryId)
+             .Distinct()
+             .ToListAsync();
+        }
     }
 }
