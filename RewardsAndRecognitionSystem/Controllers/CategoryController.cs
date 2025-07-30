@@ -7,6 +7,7 @@ using RewardsAndRecognitionRepository.Models;
 using RewardsAndRecognitionRepository.Service;
 using RewardsAndRecognitionSystem.ViewModels;
 using RewardsAndRecognitionRepository.Enums;
+using RewardsAndRecognitionSystem.Utilities;
 
 namespace RewardsAndRecognitionSystem.Controllers
 {
@@ -75,6 +76,13 @@ namespace RewardsAndRecognitionSystem.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(CategoryViewModel viewModel)
         {
+            var allcategories = await _categoryRepo.GetAllAsync();
+            string newCategoryName = NormalisingString.Normalize(viewModel.Name);
+
+            if (allcategories.Any(category => NormalisingString.Normalize(category.Name) == newCategoryName))
+            {
+                ModelState.AddModelError("Name", "Category Already Exists");
+            }
             if (ModelState.IsValid)
             {
                 var category = _mapper.Map<Category>(viewModel);

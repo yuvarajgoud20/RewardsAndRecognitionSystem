@@ -14,6 +14,22 @@
     var dashboardFilter = ViewBag.filter;
     var all = "all";
 }
+<style>
+    .truncate-text {
+        overflow: hidden;
+        display: -webkit-box;
+        -webkit-line-clamp: 2; /* Show only 2 lines */
+        -webkit-box-orient: vertical;
+    }
+
+    .read-more-link {
+        color: #3f51b5;
+        cursor: pointer;
+        font-weight: 500;
+        margin-left: 6px;
+        font-size: 0.9rem;
+    }
+</style>
 <div id="nominationListContainer">
  @if (isTeamLead)
 {
@@ -81,7 +97,26 @@
                     <td>@n.Nominee?.Name</td>
                     <td>@n.Nominee?.Team?.Name</td>
                     <td>@n.Category?.Name</td>
-                    <td>@n.Status</td>
+                        @if (n.Status == NominationStatus.PendingManager)
+                        {
+                            <td>Pending Manager</td>
+                        }
+                        @if (n.Status == NominationStatus.ManagerApproved)
+                        {
+                            <td>Manager Approved</td>
+                        }
+                        @if (n.Status == NominationStatus.ManagerRejected)
+                        {
+                            <td>Manager Rejected </td>
+                        }
+                        @if (n.Status == NominationStatus.DirectorApproved)
+                        {
+                            <td>Director Approved</td>
+                        }
+                        @if (n.Status == NominationStatus.DirectorRejected)
+                        {
+                            <td>Director Rejected</td>
+                        }
                     <td>@n.CreatedAt.ToString("dd/MM/yyyy")</td>
                         @if (selectedFilter2 == "active")
                         {
@@ -194,7 +229,26 @@
                     <td>@n.Nominee?.Team?.Name</td>
                     <td>@n.Category?.Name</td>
                     <td>@n.Nominator?.Name</td>
-                    <td>@n.Status</td>
+                        @if (n.Status == NominationStatus.PendingManager)
+                        {
+                            <td>Pending Manager</td>
+                        }
+                        @if (n.Status == NominationStatus.ManagerApproved)
+                        {
+                            <td>Manager Approved</td>
+                        }
+                        @if (n.Status == NominationStatus.ManagerRejected)
+                        {
+                            <td>Manager Rejected </td>
+                        }
+                        @if (n.Status == NominationStatus.DirectorApproved)
+                        {
+                            <td>Director Approved</td>
+                        }
+                        @if (n.Status == NominationStatus.DirectorRejected)
+                        {
+                            <td>Director Rejected</td>
+                        }
                     <td>@n.CreatedAt.ToString("dd/MM/yyyy")</td>
                     <td>
                             <div class="d-flex justify-content-between align-items-center gap-2" style="width: 250px;">

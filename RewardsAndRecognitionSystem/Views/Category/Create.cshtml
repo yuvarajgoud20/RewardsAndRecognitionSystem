@@ -32,13 +32,13 @@
         @Html.AntiForgeryToken()
         @* <div asp-validation-summary="All" class="text-danger"></div> *@
         <div class="mb-3">
-            <label asp-for="Name" class="form-label"></label>
+            <label asp-for="Name" class="form-label"></label><span class="text-danger">*</span>
             <input asp-for="Name" class="form-control border-dark-subtle" />
             <span asp-validation-for="Name" class="text-danger"></span>
         </div>
 
         <div class="mb-3">
-            <label asp-for="Description" class="form-label"></label>
+            <label asp-for="Description" class="form-label"></label><span class="text-danger">*</span>
             <textarea asp-for="Description" class="form-control border-dark-subtle" rows="4"></textarea>
             <span asp-validation-for="Description" class="text-danger"></span>
         </div>
