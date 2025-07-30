@@ -25,10 +25,14 @@
 
         <!-- Right: Excel, Filter, and Create Nomination -->
         <div style="display: flex; gap: 10px; align-items: center;">
-                <a href="/Nomination/ExportAllNominationsOpenXml?yearQuarterId=@ViewBag.SelectedYearQuarterId"
-                   class="btn btn-success">
-                    <i class="bi bi-file-earmark-excel"></i> Export
-                </a>
+                @if (dashboardFilter?.ToString().ToLower() == "all")
+                {
+                    <a href="/Nomination/ExportAllNominationsOpenXml?yearQuarterId=@ViewBag.SelectedYearQuarterId"
+                       class="btn btn-success">
+                        <i class="bi bi-file-earmark-excel"></i> Export
+                    </a>
+                }
+
                   <select id="filterfordelete" class="form-select w-auto" onchange="submitWithFilter(1, this.value,all)">
                      <option value="active" selected="@(selectedFilter2 == "active" ? "selected" : null)">Active</option>
                      <option value="deleted" selected="@(selectedFilter2 == "deleted" ? "selected" : null)">Deleted</option>
@@ -120,22 +124,26 @@
     </table>
  } 
 
- @if (isManager || isDirector)
-{
-    <div class="filter-bar d-flex justify-content-between align-items-center mb-3">
-        <!-- Left: Search Input -->
-         <div style="flex: 1;">
-            <!-- <input type="text" id="liveSearch" class="form-control" placeholder="🔍 Search by Nominee" style="max-width: 300px;" /> -->
-            </div> 
 
-        <!-- Right: Excel, Filter, and Create Nomination -->
-        <div style="display: flex; gap: 10px; align-items: center;">
-                <a href="/Nomination/ExportAllNominationsOpenXml?yearQuarterId=@ViewBag.SelectedYearQuarterId"
-                   class="btn btn-success">
-                    <i class="bi bi-file-earmark-excel"></i> Export
-                </a>
-        </div>
-    </div>
+    @if (isManager || isDirector)
+    {
+            <div class="filter-bar d-flex justify-content-between align-items-center mb-3">
+                <div style="flex: 1;">
+                    <!-- <input type="text" id="liveSearch" class="form-control" placeholder="🔍 Search by Nominee" style="max-width: 300px;" /> -->
+                </div>
+
+                <!-- Right: Excel Button -->
+                <div style="display: flex; gap: 10px; align-items: center;">
+                    @if (dashboardFilter?.ToString().ToLower() == "all")
+                    {
+                        <a href="/Nomination/ExportAllNominationsOpenXml?yearQuarterId=@ViewBag.SelectedYearQuarterId"
+                           class="btn btn-success">
+                            <i class="bi bi-file-earmark-excel"></i> Export All Nominations
+                        </a>
+                    }
+                </div>
+            </div>
+
     <table class="table-custom" id="nominationsTable">
         <thead>
             <tr>

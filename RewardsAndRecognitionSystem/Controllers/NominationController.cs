@@ -13,9 +13,10 @@ using RewardsAndRecognitionRepository.Interfaces;
 using RewardsAndRecognitionRepository.Models;
 using RewardsAndRecognitionRepository.Repos;
 using RewardsAndRecognitionRepository.Service;
+using RewardsAndRecognitionSystem.Common;
 using RewardsAndRecognitionSystem.Utilities;
 using RewardsAndRecognitionSystem.ViewModels;
-//Respective Exports for teamlead,manager director,according to selected year and selected quarter
+//Export only for all filter
 namespace RewardsAndRecognitionSystem.Controllers
 {
    
@@ -64,7 +65,8 @@ namespace RewardsAndRecognitionSystem.Controllers
 
             if (selectedQuarter == null)
             {
-                TempData["Message"] = "❌ No valid quarter found.";
+                TempData["Message"] = GeneralMessages.No_Valid_Quarter;
+              
                 return View(new List<Nomination>());
             }
             ViewBag.IsQuarterActive = selectedQuarter.IsActive;
@@ -252,7 +254,8 @@ namespace RewardsAndRecognitionSystem.Controllers
         public async Task<IActionResult> Create()
         {
             if (!User.Identity.IsAuthenticated)
-                return RedirectToAction("Identity/Account/Login");
+                //return RedirectToAction("Identity/Account/Login");
+                return RedirectToAction("/Login");
 
             var currentUser = await _userManager.GetUserAsync(User);
             if (currentUser == null) return Unauthorized();
@@ -436,7 +439,7 @@ namespace RewardsAndRecognitionSystem.Controllers
                 if (nominator != null)
                 {
                     await _emailService.SendEmailAsync(
-                        subject: "🎉 Your Nomination is Approved!",
+                          subject: GeneralMessages.Nomation_Approved,
                         isHtml: true,
                         body: $@"
                         <body style=""font-family: Arial, sans-serif; margin: 0; padding: 0; background-color: #ffffff;"">
@@ -457,7 +460,7 @@ namespace RewardsAndRecognitionSystem.Controllers
                 if (nominee != null)
                 {
                     await _emailService.SendEmailAsync(
-                        subject: "🎖️ You Have Been Selected for an Award!",
+                          subject: GeneralMessages.Selected_Award,
                         isHtml: true,
                         body: $@"<body style=""font-family: Arial, sans-serif; margin: 0; padding: 0; background-color: #ffffff;"">
                           <div style=""background-color: #ffffff; padding: 10px 20px; max-width: 600px; margin: auto; color: #000;"">
@@ -500,7 +503,7 @@ namespace RewardsAndRecognitionSystem.Controllers
             if (teamLead != null)
             {
                 await _emailService.SendEmailAsync(
-                    subject: "Nomination Reverted",
+                     subject: GeneralMessages.Nomination_Reverted,
                     isHtml: true,
                     body: $@"
                      <body style=""font-family: Arial, sans-serif; margin: 0; padding: 0; background-color: #ffffff;"">
@@ -530,11 +533,13 @@ namespace RewardsAndRecognitionSystem.Controllers
                 .Include(n => n.YearQuarter);
 
             // Filter by role (Manager)
-            if (User.IsInRole("Manager"))
+
+            if (User.IsInRole(Roles.Manager.ToString()))
+
             {
                 query = query.Where(n => n.Nominee.Team.ManagerId == user.Id);
             }
-            else if (User.IsInRole("Director"))
+            else if (User.IsInRole(Roles.Director.ToString()))
             {
                 query = query.Where(n =>
                     (n.Nominator.Team.DirectorId == user.Id || n.Nominee.Team.DirectorId == user.Id) &&
@@ -544,7 +549,7 @@ namespace RewardsAndRecognitionSystem.Controllers
                      n.Status == NominationStatus.ManagerRejected));
             }
 
-            else if (User.IsInRole("TeamLead"))
+            else if (User.IsInRole(Roles.TeamLead.ToString()))
             {
                 // TeamLead sees nominations for teams they lead
                 query = query.Where(n => n.Nominee.Team.TeamLeadId == user.Id);
@@ -649,18 +654,18 @@ namespace RewardsAndRecognitionSystem.Controllers
                 .AsQueryable();
 
             // Role-based filtering
-            if (userRoles.Contains("Manager"))
-            {
+          
+            if (userRoles.Contains(nameof(Roles.Manager)))
+                {
                 query = query.Where(n =>
                     n.Nominator.Team.Manager.Id == currentUser.Id &&
                     n.Nominator.TeamId == teamId);
             }
-            else if (userRoles.Contains("Director"))
+            else if (userRoles.Contains(nameof(Roles.Director)))
             {
                 query = query.Where(n =>
                     n.Nominator.Team.Director.Id == currentUser.Id &&
-                    n.Nominator.TeamId == teamId &&
-                    n.Status != NominationStatus.PendingManager);
+                    n.Nominator.TeamId == teamId);
             }
 
             // Year + Quarter filtering
