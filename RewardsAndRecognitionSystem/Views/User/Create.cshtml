@@ -102,16 +102,5 @@
         toggleTeam();
     });
 
-    $("#myForm").on("submit", function (e) {
-        const role = $("#SelectedRole").val();
-        const team = $("select[name='TeamId']").val();
 
-        if (role === "Employee" && !team) {
-            e.preventDefault();
-            alert("You must select a Team for Employee.");
-            $("select[name='TeamId']").focus();
-            return false;
-        }
-
-    });
 </script>
