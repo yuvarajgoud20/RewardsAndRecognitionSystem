@@ -25,6 +25,10 @@ namespace RewardsAndRecognitionSystem.FluentValidators
 
             RuleFor(x => x.SelectedRole)
                 .NotEmpty().WithMessage("Please select a role.");
+                 // Conditional validation for TeamId if role is Employee
+     RuleFor(x => x.TeamId)
+     .NotEmpty().WithMessage("Team must be selected for employees.")
+     .When(x => x.SelectedRole != null && x.SelectedRole.Equals("Employee", StringComparison.OrdinalIgnoreCase));
 
         }
 
