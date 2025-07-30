@@ -81,16 +81,7 @@
 </div>
 
 <script>
-    function filterNominations() {
-        const input = document.getElementById("searchInput").value.toLowerCase();
-        const rows = document.querySelectorAll("#nominationsTable tbody tr");
-
-        rows.forEach(row => {
-            const nameCell = row.cells[1]?.textContent.toLowerCase();
-            row.style.display = nameCell.includes(input) ? "" : "none";
-        });
-    }
-
+    
     function exportNominationsToExcel() {
         // Trigger Excel export via backend
         window.location.href = '@Url.Action("ExportToExcel", "Nomination", new { teamName = ViewBag.TeamName })';

@@ -18,7 +18,7 @@
         public static string Nomination_Reverted = "Nomination Reverted";
         public static string No_Team_Assigned_TeamLead = "No team assigned to you as Team Lead.";
         //user controller
-       
+
     }
     public static class GeneralMessages_User
     {
