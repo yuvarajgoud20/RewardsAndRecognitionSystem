@@ -1,5 +1,5 @@
 using Microsoft.AspNetCore.Authorization;
-//Fixed Respective Director View
+//Fixed Respective Director View and No nominations found message
 using Microsoft.AspNetCore.Identity;
 
 using Microsoft.AspNetCore.Mvc;

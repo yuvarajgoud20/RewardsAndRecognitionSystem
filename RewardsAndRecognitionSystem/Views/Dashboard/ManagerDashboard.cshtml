@@ -503,21 +503,43 @@
             }
         });
 
-         // 🔍 Filter nominations table by nominee name
-         function filterNominations() {
-             const input = document.getElementById("searchInput");
-             const filter = input.value.toLowerCase();
-             const table = document.getElementById("nominationsTable");
-             const rows = table.getElementsByTagName("tr");
+      
+                 // 🔍 Filter nominations table by nominee name
+        function filterNominations() {
+            const input = document.getElementById("searchInput");
+            const filter = input.value.toLowerCase();
+            const table = document.getElementById("nominationsTable");
+            const rows = table.getElementsByTagName("tr");
 
-             for (let i = 1; i < rows.length; i++) {
-                 const nomineeCell = rows[i].getElementsByTagName("td")[1];
-                 if (nomineeCell) {
-                     const name = nomineeCell.textContent || nomineeCell.innerText;
-                     rows[i].style.display = name.toLowerCase().includes(filter) ? "" : "none";
-                 }
-             }
-         }
+            let matchFound = false;
+
+            // Loop through table rows (skip header row at index 0)
+            for (let i = 1; i < rows.length; i++) {
+                const nomineeCell = rows[i].getElementsByTagName("td")[1];
+                if (nomineeCell) {
+                    const name = nomineeCell.textContent || nomineeCell.innerText;
+                    if (name.toLowerCase().includes(filter)) {
+                        rows[i].style.display = "";
+                        matchFound = true;
+                    } else {
+                        rows[i].style.display = "none";
+                    }
+                }
+            }
+
+            // Handle "No matches found" row
+            let noMatchRow = document.getElementById("noMatchRow");
+            if (!noMatchRow) {
+                noMatchRow = document.createElement("tr");
+                noMatchRow.id = "noMatchRow";
+                noMatchRow.innerHTML = `<td colspan="${rows[0].cells.length}" style="text-align:center; font-weight:bold;">No matches found</td>`;
+                table.querySelector("tbody").appendChild(noMatchRow);
+            }
+
+            // Show or hide the "No matches found" row
+            noMatchRow.style.display = matchFound ? "none" : "";
+        }
+
     </script>
 }
 
