@@ -283,19 +283,42 @@
     </form>
 } 
 
-@if (ViewBag.TotalPages > 1)
+@if (ViewBag.TotalPages > 0)
 {
-    <nav aria-label="Page navigation" class="mt-4 d-flex justify-content-center">
-        <ul class="pagination">
-            @for (int i = 1; i <= ViewBag.TotalPages; i++)
-            {
-                <li class="page-item @(ViewBag.CurrentPage == i ? "active" : "")">
-                        <a class="page-link pagination-link" href="javascript:void(0);" data-page="@i" data-filter="@currentFilter" data-dashboard-filter="@dashboardFilter">@i</a>
+    <div class="d-flex justify-content-between align-items-center mt-4">
+        <!-- Left: Page X of Y -->
+        <div>
+            <span class="fw-bold">Page @ViewBag.CurrentPage of @ViewBag.TotalPages</span>
+        </div>
+
+        <!-- Right: Pagination Buttons -->
+        <nav>
+            <ul class="pagination mb-0">
+                <li class="page-item @(ViewBag.CurrentPage == 1 ? "disabled" : "")">
+                    <a class="page-link pagination-link"
+                       href="javascript:void(0);"
+                       data-page="@(ViewBag.CurrentPage - 1)"
+                       data-filter="@currentFilter"
+                       data-dashboard-filter="@dashboardFilter">Previous</a>
                 </li>
-            }
-        </ul>
-    </nav>
+
+                <li class="page-item active">
+                    <span class="page-link">@ViewBag.CurrentPage</span>
+                </li>
+
+                <li class="page-item @(ViewBag.CurrentPage == ViewBag.TotalPages ? "disabled" : "")">
+                    <a class="page-link pagination-link"
+                       href="javascript:void(0);"
+                       data-page="@(ViewBag.CurrentPage + 1)"
+                       data-filter="@currentFilter"
+                       data-dashboard-filter="@dashboardFilter">Next</a>
+                </li>
+            </ul>
+        </nav>
+    </div>
 }
+
+
 </div>
 
 <script>

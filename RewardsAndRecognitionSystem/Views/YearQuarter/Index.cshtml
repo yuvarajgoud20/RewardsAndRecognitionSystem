@@ -33,7 +33,6 @@
         display: inline-flex;
         align-items: center;
         gap: 8px;
-       
     }
 
         .add-btn:hover {
@@ -79,7 +78,6 @@
         display: inline-flex;
         align-items: center;
         gap: 6px;
-       
     }
 
     .btn-secondary {
@@ -109,12 +107,31 @@
         }
 </style>
 
-<div class="page-header">
-    <h2><i class="bi bi-calendar2-week-fill me-2"></i> Year Quarters</h2>
-    <a asp-action="Create" class="add-btn">
-        <i class="bi bi-plus-circle-fill"></i> Add Year Quarter
-    </a>
+<div class="page-header d-flex justify-content-between align-items-start mb-3 flex-wrap">
+    <!-- Left Side: Heading -->
+    <div>
+        <h2><i class="bi bi-calendar2-week-fill me-2"></i> Year Quarters</h2>
+    </div>
+
+    <!-- Right Side: Add Button + Filter -->
+    <div class="d-flex flex-column align-items-end">
+        <a asp-action="Create" class="btn btn-primary mb-2">
+            <i class="bi bi-plus-circle-fill"></i> Add Year Quarter
+        </a>
+
+        <div class="form-check form-switch d-flex align-items-center">
+            <input class="form-check-input" type="checkbox" role="switch" id="toggleFilter"
+                   @(ViewBag.SelectedFilter == "deleted" ? "checked" : "")>
+            <label class="form-check-label ms-2" for="toggleFilter">
+                Show Deleted
+            </label>
+        </div>
+
+    </div>
 </div>
+
+
+
 
 <div id="yearQuarterContainer">
     @Html.Partial("_YearQuarterListPartial", Model)
@@ -133,10 +150,10 @@
         reverseButtons: true
       }).then((result) => {
         if (result.isConfirmed) {
-         
+
           const form = document.createElement('form');
           form.method = 'POST';
-          form.action = '/YearQuarter/Delete/' + userId;
+          form.action = '/YearQuarter/DeleteConfirmed/' + userId;
           const token = document.querySelector('input[name="__RequestVerificationToken"]');
           if (token) {
             const hiddenToken = document.createElement('input');
@@ -151,6 +168,8 @@
         }
       });
     }
+
+
 </script>
 <script src="~/lib/jquery/dist/jquery.min.js"></script>
 <script>
@@ -170,4 +189,25 @@
             }
         });
     });
+    document.getElementById("toggleFilter").addEventListener("change", function () {
+        const filter = this.checked ? "deleted" : "active";
+
+        $.ajax({
+            url: "/YearQuarter/Index?filter=" + filter,
+            type: "GET",
+            headers: { "X-Requested-With": "XMLHttpRequest" },
+            success: function (result) {
+                $('#yearQuarterContainer').html(result);
+            },
+            error: function () {
+                alert("Failed to load year quarters.");
+            }
+        });
+    });
 </script>
+<style>
+    .form-switch .form-check-input:checked {
+        background-color: var(--danger);
+        border-color: var(--danger-hover);
+    }
+</style>

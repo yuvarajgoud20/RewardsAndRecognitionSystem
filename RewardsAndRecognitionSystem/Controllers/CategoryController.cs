@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
+using System.Linq;
 using RewardsAndRecognitionRepository.Interfaces;
 using RewardsAndRecognitionRepository.Models;
 using RewardsAndRecognitionRepository.Service;
@@ -29,10 +30,13 @@ namespace RewardsAndRecognitionSystem.Controllers
         public async Task<IActionResult> Index(int page = 1, bool showDeleted = false)
         {
 
-            // var categories = await _categoryRepo.GetAllAsync();
-            int pageSize = 10;
+     
+            int pageSize = 25;
 
-            var allCategories = await _categoryRepo.GetAllAsync(showDeleted);
+            var allCategoriesEnumerable = await _categoryRepo.GetAllAsync(showDeleted);
+            var allCategories = allCategoriesEnumerable
+                                .OrderBy(t => t.Name)
+                                .ToList();
             var usedCategoryIds = await _nominationRepo.GetUsedCategoryIdsAsync();
 
             int totalCategories = allCategories.Count();

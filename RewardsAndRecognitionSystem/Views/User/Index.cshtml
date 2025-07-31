@@ -22,10 +22,7 @@
         align-items: center;
         margin: 30px 0 20px;
     }
-
-    .create-btn {
-        background: linear-gradient(to right, var(--indigo-main), var(--indigo-light));
-    }
+    
 
 
     .create-btn {
@@ -128,17 +125,9 @@
 </div>
 
 <div class="d-flex justify-content-center mt-4" id="paginationContainer">
-    <nav>
-        <ul class="pagination">
-            @for (int i = 1; i <= (int)ViewBag.TotalPages; i++)
-            {
-                <li class="page-item @(i == (int)ViewBag.CurrentPage ? "active" : "")">
-                    <a class="page-link pagination-link" href="@Url.Action("Index", new { page = i })">@i</a>
-                </li>
-            }
-        </ul>
-    </nav>
+    @await Html.PartialAsync("_PaginationPartial", ((int)ViewBag.CurrentPage, (int)ViewBag.TotalPages, (string)ViewBag.ActionName))
 </div>
+
 
 @section Scripts {
     <script>

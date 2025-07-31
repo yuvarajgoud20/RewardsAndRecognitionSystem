@@ -73,34 +73,36 @@
     </tbody>
 </table>
 
-<div class="d-flex justify-content-between align-items-center mt-4">
+<div class="d-flex justify-content-between align-items-center mt-4 pt-3 border-top">
+    <!-- Left: page info -->
     <div>
         Showing page @ViewBag.CurrentPage of @ViewBag.TotalPages
     </div>
+
+    <!-- Right: simplified pagination -->
     <nav>
         <ul class="pagination mb-0">
             <li class="page-item @(ViewBag.CurrentPage == 1 ? "disabled" : "")">
                 <a class="page-link pagination-link"
                    asp-action="Index"
                    asp-route-page="@(ViewBag.CurrentPage - 1)"
-                   asp-route-showDeleted="@showDeleted">Previous</a>
+                   asp-route-showDeleted="@showDeleted">
+                    Previous
+                </a>
             </li>
-            @for (int i = 1; i <= ViewBag.TotalPages; i++)
-            {
-                <li class="page-item @(i == ViewBag.CurrentPage ? "active" : "")">
-                    <a class="page-link pagination-link"
-                       asp-action="Index"
-                       asp-route-page="@i"
-                       asp-route-showDeleted="@showDeleted">@i</a>
-                </li>
-            }
+
+            <li class="page-item active">
+                <span class="page-link">@ViewBag.CurrentPage</span>
+            </li>
+
             <li class="page-item @(ViewBag.CurrentPage == ViewBag.TotalPages ? "disabled" : "")">
                 <a class="page-link pagination-link"
                    asp-action="Index"
                    asp-route-page="@(ViewBag.CurrentPage + 1)"
-                   asp-route-showDeleted="@showDeleted">Next</a>
+                   asp-route-showDeleted="@showDeleted">
+                    Next
+                </a>
             </li>
         </ul>
     </nav>
 </div>
-

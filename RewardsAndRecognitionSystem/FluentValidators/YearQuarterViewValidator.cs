@@ -22,7 +22,7 @@ namespace RewardsAndRecognitionSystem.FluentValidators
                 .NotNull().WithMessage("End Date is required.")
                 .GreaterThan(x => x.StartDate)
                 .WithMessage("End Date must be after Start Date.");
-
+           
         }
 
     }

@@ -19,6 +19,7 @@ namespace RewardsAndRecognitionRepository.Models
         public DateTime? EndDate { get; set; }
 
         public ICollection<Nomination>? Nominations { get; set; }
+        public bool IsDeleted { get; set; } = false;
     }
 
 }
