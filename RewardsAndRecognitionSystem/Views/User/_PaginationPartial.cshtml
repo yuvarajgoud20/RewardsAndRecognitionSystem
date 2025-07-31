@@ -1,15 +1,74 @@
-﻿@{
-    int currentPage = (int)ViewBag.CurrentPage;
-    int totalPages = (int)ViewBag.TotalPages;
-}
+﻿@model (int currentPage, int totalPages, string actionName)
 
-<nav>
-    <ul class="pagination">
-        @for (int i = 1; i <= totalPages; i++)
-        {
-            <li class="page-item @(i == currentPage ? "active" : "")">
-                <a class="page-link pagination-link" href="@Url.Action("Index", new { page = i })">@i</a>
-            </li>
+<style>
+    .pagination .page-link {
+        transition: all 0.3s ease;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.2rem;
+    }
+
+        .pagination .page-link:hover {
+            background-color: #e9ecef;
+            transform: scale(1.1);
         }
-    </ul>
-</nav>
+
+    .pagination .page-item.disabled .page-link {
+        opacity: 0.5;
+        pointer-events: none;
+    }
+
+    .pagination .page-link i {
+        transition: transform 0.3s ease;
+    }
+
+    .pagination .page-link:hover i.bi-chevron-left {
+        transform: translateX(-4px);
+    }
+
+    .pagination .page-link:hover i.bi-chevron-right {
+        transform: translateX(4px);
+    }
+</style>
+
+<div class="container">
+    <div class="d-flex justify-content-between align-items-center mt-4">
+        <!-- Left: Page info -->
+        <div class="fw">
+            Showing Page @Model.currentPage of @Model.totalPages
+        </div>
+
+        <!-- Right: Pagination controls -->
+        <nav>
+            <ul class="pagination mb-0">
+                <!-- Previous -->
+                <li class="page-item @(Model.currentPage == 1 ? "disabled" : "")">
+                    <a class="page-link"
+                       asp-action="@Model.actionName"
+                       asp-route-page="@(Model.currentPage - 1)"
+                       aria-label="Previous">
+                        <i class="bi bi-chevron-left"></i>
+                    </a>
+                </li>
+
+                <!-- Current Page Number -->
+                <li class="page-item active">
+                    <span class="page-link">
+                        @Model.currentPage
+                    </span>
+                </li>
+
+                <!-- Next -->
+                <li class="page-item @(Model.currentPage == Model.totalPages ? "disabled" : "")">
+                    <a class="page-link"
+                       asp-action="@Model.actionName"
+                       asp-route-page="@(Model.currentPage + 1)"
+                       aria-label="Next">
+                        <i class="bi bi-chevron-right"></i>
+                    </a>
+                </li>
+            </ul>
+        </nav>
+    </div>
+</div>

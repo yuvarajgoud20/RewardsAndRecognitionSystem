@@ -27,12 +27,12 @@ namespace RewardsAndRecognitionSystem.FluentValidators
             RuleFor(x => x.EndDate)
                 .NotNull().WithMessage("End Date is required.")
                 .GreaterThan(x => x.StartDate)
+
                 .WithMessage("End Date must be after Start Date.")
                 .Must((model, endDate) =>
                 {
                     return endDate?.Year == model.Year;
                 }).WithMessage("End Date must be within the selected year.");
-
         }
 
     }

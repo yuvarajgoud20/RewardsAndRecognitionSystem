@@ -22,20 +22,37 @@ namespace RewardsAndRecognitionSystem.Controllers
             _yearQuarterRepo = yearQuarterRepo;
         }
 
-        public async Task<IActionResult> Index(int page = 1)
+        public async Task<IActionResult> Index(string filter = "active", int page = 1)
         {
+            int pageSize = 25;
+            IEnumerable<YearQuarter> allQuarters;
 
-            int pageSize = 10;
-            var allQuarters = await _yearQuarterRepo.GetAllAsync();
-            var totalRecords = allQuarters.Count();
+            if (filter == "deleted")
+            {
+                allQuarters = await _yearQuarterRepo.GetDeletedAsync();
+            }
+            else // default is active
+            {
+                allQuarters = await _yearQuarterRepo.GetActiveAsync();
+            }
+
+            var sortedQuarters = allQuarters
+           .OrderBy(q => q.Year)
+           .ThenBy(q => q.Quarter)
+           .ToList();
+
+            var totalRecords = sortedQuarters.Count();
             var totalPages = (int)Math.Ceiling(totalRecords / (double)pageSize);
-            var paginated = allQuarters
+
+            var paginated = sortedQuarters
                 .Skip((page - 1) * pageSize)
                 .Take(pageSize)
                 .ToList();
 
             ViewBag.CurrentPage = page;
             ViewBag.TotalPages = totalPages;
+            ViewBag.SelectedFilter = filter;
+
             var qList = _mapper.Map<List<YearQuarterViewModel>>(paginated);
 
             if (Request.Headers["X-Requested-With"] == "XMLHttpRequest")
@@ -133,13 +150,24 @@ namespace RewardsAndRecognitionSystem.Controllers
             return View(yq);
         }
 
-        [HttpPost, ActionName("Delete")]
+        [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(Guid id)
         {
-            await _yearQuarterRepo.DeleteAsync(id);
+
+            var result = await _yearQuarterRepo.SoftDeleteAsync(id); // Your soft-delete logic
+
+            if (Request.Headers["X-Requested-With"] == "XMLHttpRequest")
+            {
+                if (result)
+                {
+                    return Json(new { success = true, message = "Year quarter soft-deleted successfully." });
+                }
+                return Json(new { success = false, message = "Failed to delete year quarter." });
+            }
             TempData["message"] = "Successfully deleted YearQuarter";
-            return RedirectToAction(nameof(Index));
+            return RedirectToAction("Index");
         }
+
     }
 }

@@ -47,11 +47,11 @@ namespace RewardsAndRecognitionSystem.Controllers
 
         public async Task<IActionResult> Index(int page = 1)
         {
-            int pageSize = 10;
+            int pageSize = 25;
             var usersQuery = _context.Users
-                .Include(u => u.Team)
-                    .ThenInclude(t => t.Manager);
-
+                    .Include(u => u.Team)
+                    .ThenInclude(t => t.Manager)
+                    .OrderBy(u => u.Name);
             var totalRecords = await usersQuery.CountAsync();
             var totalPages = (int)Math.Ceiling(totalRecords / (double)pageSize);
 
@@ -70,13 +70,15 @@ namespace RewardsAndRecognitionSystem.Controllers
             ViewBag.UserRoles = userRoles;
             ViewBag.CurrentPage = page;
             ViewBag.TotalPages = totalPages;
+            ViewBag.ActionName = nameof(Index);
+
             var usersList = _mapper.Map<List<UserViewModel>>(users);
 
             if (Request.Headers["X-Requested-With"] == "XMLHttpRequest")
             {
                 if (Request.Query.ContainsKey("paginationOnly"))
                 {
-                    return PartialView("_PaginationPartial");
+                    return PartialView("_PaginationPartial", (page, totalPages, nameof(Index)));
                 }
                 return PartialView("_UserListPartial", usersList);
             }

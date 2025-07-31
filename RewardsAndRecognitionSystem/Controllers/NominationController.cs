@@ -55,7 +55,7 @@ namespace RewardsAndRecognitionSystem.Controllers
             ViewBag.filter = filter;
 
 
-            int pageSize = 10;
+            int pageSize = 25;
 
             var currentUser = await _userManager.GetUserAsync(User);
             if (currentUser == null)
@@ -115,6 +115,7 @@ namespace RewardsAndRecognitionSystem.Controllers
                 ViewBag.TotalPages = (int)Math.Ceiling(nominationsToShow.Count / (double)pageSize);
                 ViewBag.CurrentPage = page;
                 ViewBag.ReviewedNominationIds = alreadyReviewedIds;
+               
                 var pagedNominations = nominationsToShow
                     .Skip((page - 1) * pageSize)
                     .Take(pageSize)

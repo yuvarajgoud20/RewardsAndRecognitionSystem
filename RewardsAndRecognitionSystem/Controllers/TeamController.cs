@@ -32,36 +32,46 @@ namespace RewardsAndRecognitionSystem.Controllers
             _userManager = userManager;
         }
 
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(int page = 1, bool showDeleted = false)
         {
-            var teams = await _context.Teams
-                .Include(t => t.TeamLead)
-                .Include(t => t.Manager)
-                .Include(t => t.Director)
-                .Include(t => t.Users)
-                .ToListAsync();
+            int pageSize = 25;
+
+            var teamsQuery = (await _teamRepo.GetAllAsync(showDeleted))
+                             .OrderBy(t => t.Name)
+                              .ToList();
+            var totalRecords = teamsQuery.Count();
+            var totalPages = (int)Math.Ceiling(totalRecords / (double)pageSize);
+
+            var pagedTeams = teamsQuery
+                .Skip((page - 1) * pageSize)
+                .Take(pageSize)
+                .ToList();
 
             var userRoles = new Dictionary<string, string>();
-
-            foreach (var team in teams)
+            foreach (var team in pagedTeams)
             {
-                foreach (var user in team.Users)
+                foreach (var user in team.Users ?? new List<User>())
                 {
                     var roles = await _userManager.GetRolesAsync(user);
                     userRoles[user.Id] = roles.FirstOrDefault() ?? GeneralMessages.NotAvailable_Error;
                 }
             }
 
-            var grouped = teams.Select(team => new GroupedTeam
+            var grouped = pagedTeams.Select(team => new GroupedTeam
             {
                 Team = team,
                 Users = team.Users?.ToList() ?? new List<User>()
             }).ToList();
 
             ViewBag.UserRoles = userRoles;
+            ViewBag.ShowDeleted = showDeleted;
+            ViewBag.CurrentPage = page;
+            ViewBag.TotalPages = totalPages;
+            ViewBag.ActionName = nameof(Index); // for pagination
 
             return View(grouped);
         }
+
 
         public async Task<IActionResult> Create()
         {
@@ -75,7 +85,7 @@ namespace RewardsAndRecognitionSystem.Controllers
         {
             if (ModelState.IsValid)
             {
-                var team=_mapper.Map<Team>(viewModel);
+                var team = _mapper.Map<Team>(viewModel);
                 await _teamRepo.AddAsync(team);
                 User user = await _userRepo.GetByIdAsync(team.TeamLeadId);
                 user.TeamId = team.Id;
@@ -132,7 +142,7 @@ namespace RewardsAndRecognitionSystem.Controllers
                 ViewBag.Managers = new SelectList(managers, "Id", "Name", existingTeam.ManagerId);
                 ViewBag.TeamLeads = new SelectList(leads, "Id", "Name", existingTeam.TeamLeadId);
                 ViewBag.Directors = new SelectList(directors, "Id", "Name", existingTeam.DirectorId);
-                return View(teamViewModel); 
+                return View(teamViewModel);
             }
 
             if (existingTeam.TeamLeadId != updatedTeam.TeamLeadId)
@@ -193,14 +203,16 @@ namespace RewardsAndRecognitionSystem.Controllers
         public async Task<IActionResult> DeleteConfirmed(Guid id)
         {
             var team = await _teamRepo.GetByIdAsync(id);
-
             if (team == null)
                 return NotFound();
 
-            await _teamRepo.DeleteAsync(team);
+
+            await _teamRepo.SoftDeleteAsync(id); 
+
             TempData["message"] = "Successfully deleted Team";
             return RedirectToAction(nameof(Index));
         }
+
 
         private async Task LoadDropdownsAsync()
         {
