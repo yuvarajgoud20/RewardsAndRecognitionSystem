@@ -25,7 +25,7 @@
             <table class="table table-bordered table-hover" id="nominationsTable">
                 <thead class="table-primary text-center">
                     <tr>
-                        <th>#</th>
+                        <th>S.no</th>
                         <th>Nominee</th>
                         <th>Category</th>
                         <th>Description</th>
@@ -81,16 +81,7 @@
 </div>
 
 <script>
-    function filterNominations() {
-        const input = document.getElementById("searchInput").value.toLowerCase();
-        const rows = document.querySelectorAll("#nominationsTable tbody tr");
-
-        rows.forEach(row => {
-            const nameCell = row.cells[1]?.textContent.toLowerCase();
-            row.style.display = nameCell.includes(input) ? "" : "none";
-        });
-    }
-
+    
     function exportNominationsToExcel() {
         // Trigger Excel export via backend
         window.location.href = '@Url.Action("ExportToExcel", "Nomination", new { teamName = ViewBag.TeamName })';

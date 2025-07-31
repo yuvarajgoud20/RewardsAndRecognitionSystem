@@ -199,7 +199,7 @@ internal class Program
                 {
                     await context.HttpContext.SignOutAsync();
                     context.HttpContext.Response.Cookies.Delete(".AspNetCore.Identity.Application");
-                    response.Redirect("/Identity/Account/Login");
+                    response.Redirect("/Login");
                 }
             });
             app.UseStaticFiles();

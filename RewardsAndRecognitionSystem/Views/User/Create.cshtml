@@ -33,25 +33,25 @@
         <div asp-validation-summary="ModelOnly" class="text-danger"></div>
 
         <div class="form-group mb-3">
-            <label asp-for="Name" class="form-label fw-semibold">Name</label>
+            <label asp-for="Name" class="form-label fw-semibold">Name</label><span class="text-danger">*</span>
             <input asp-for="Name" class="form-control border-dark-subtle" />
             <span asp-validation-for="Name" class="text-danger"></span>
         </div>
 
         <div class="form-group mb-3">
-            <label asp-for="Email" class="form-label fw-semibold">Email</label>
+            <label asp-for="Email" class="form-label fw-semibold">Email</label><span class="text-danger">*</span>
             <input asp-for="Email" class="form-control border-dark-subtle" />
             <span asp-validation-for="Email" class="text-danger"></span>
         </div>
 
         <div class="form-group mb-3">
-            <label asp-for="PasswordHash" class="form-label fw-semibold">Password</label>
+            <label asp-for="PasswordHash" class="form-label fw-semibold">Password</label><span class="text-danger">*</span>
             <input asp-for="PasswordHash" type="password" class="form-control border-dark-subtle" />
             <span asp-validation-for="PasswordHash" class="text-danger"></span>
         </div>
 
         <div class="form-group mb-4">
-            <label asp-for="SelectedRole" class="form-label fw-semibold">Role</label>
+            <label asp-for="SelectedRole" class="form-label fw-semibold">Role</label><span class="text-danger">*</span>
             <select asp-for="SelectedRole" class="form-select border-dark-subtle">
                 <option value="">-- Select Role --</option>
                 @foreach (var role in ViewBag.Roles as List<string>)
@@ -102,16 +102,5 @@
         toggleTeam();
     });
 
-    $("#myForm").on("submit", function (e) {
-        const role = $("#SelectedRole").val();
-        const team = $("select[name='TeamId']").val();
 
-        if (role === "Employee" && !team) {
-            e.preventDefault();
-            alert("You must select a Team for Employee.");
-            $("select[name='TeamId']").focus();
-            return false;
-        }
-
-    });
 </script>

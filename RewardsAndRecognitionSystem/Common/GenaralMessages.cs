@@ -8,14 +8,17 @@
         public static string No_Nominations_This_Quarter = "No nominations were made in this quarter.";
         public static string No_Data_For_Quarter = "No data available for this quarter.";
         public static string Unauthorized_User = "Unauthorized user.";
-        //
+
+        // There are currently no nominations for this quarter.
         public static string NotAvailable_Error = "N/A";
+        public static string No_Valid_Quarter = "❌ No valid quarter found.";
         public static string No_Active_Quarter = "❌ No active quarter is set.";
         public static string Nomation_Approved = "🎉 Your Nomination is Approved!";
         public static string Selected_Award = "🎖️ You Have Been Selected for an Award!";
         public static string Nomination_Reverted = "Nomination Reverted";
+        public static string No_Team_Assigned_TeamLead = "No team assigned to you as Team Lead.";
         //user controller
-       
+
     }
     public static class GeneralMessages_User
     {

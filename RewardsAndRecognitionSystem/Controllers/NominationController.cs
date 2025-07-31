@@ -12,10 +12,12 @@ using RewardsAndRecognitionRepository.Enums;
 using RewardsAndRecognitionRepository.Interfaces;
 using RewardsAndRecognitionRepository.Models;
 using RewardsAndRecognitionRepository.Repos;
+using RewardsAndRecognitionRepository.Repositories;
 using RewardsAndRecognitionRepository.Service;
+using RewardsAndRecognitionSystem.Common;
 using RewardsAndRecognitionSystem.Utilities;
 using RewardsAndRecognitionSystem.ViewModels;
-//Respective Exports for teamlead,manager director,according to selected year and selected quarter
+//Export only for all filter
 namespace RewardsAndRecognitionSystem.Controllers
 {
    
@@ -27,13 +29,15 @@ namespace RewardsAndRecognitionSystem.Controllers
         private readonly ApplicationDbContext _context;
         private readonly UserManager<User> _userManager;
         private readonly IEmailService _emailService;
+        private readonly ICategoryRepo _categoryRepo;
 
         public NominationController(
             IMapper mapper,
             INominationRepo nominationRepo,
             ApplicationDbContext context,
             UserManager<User> userManager,
-            IEmailService emailService)
+            IEmailService emailService,
+            ICategoryRepo categoryRepo)
 
         {
             _nominationRepo = nominationRepo;
@@ -41,6 +45,7 @@ namespace RewardsAndRecognitionSystem.Controllers
             _userManager = userManager;
             _mapper = mapper;
             _emailService = emailService;
+            _categoryRepo = categoryRepo;
         }
 
         // GET: Nomination
@@ -64,7 +69,8 @@ namespace RewardsAndRecognitionSystem.Controllers
 
             if (selectedQuarter == null)
             {
-                TempData["Message"] = "❌ No valid quarter found.";
+                TempData["Message"] = GeneralMessages.No_Valid_Quarter;
+              
                 return View(new List<Nomination>());
             }
             ViewBag.IsQuarterActive = selectedQuarter.IsActive;
@@ -253,7 +259,8 @@ namespace RewardsAndRecognitionSystem.Controllers
         public async Task<IActionResult> Create()
         {
             if (!User.Identity.IsAuthenticated)
-                return RedirectToAction("Identity/Account/Login");
+                //return RedirectToAction("Identity/Account/Login");
+                return RedirectToAction("/Login");
 
             var currentUser = await _userManager.GetUserAsync(User);
             if (currentUser == null) return Unauthorized();
@@ -286,6 +293,17 @@ namespace RewardsAndRecognitionSystem.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(NominationViewModel viewModel)
         {
+            var exists = await _context.Nominations
+                   .AnyAsync(n => n.NomineeId == viewModel.NomineeId
+                   && n.CategoryId == viewModel.CategoryId
+                   && n.YearQuarterId == viewModel.YearQuarterId
+                   && !n.IsDeleted);
+
+           if (exists)
+            {
+                ModelState.AddModelError("CategoryId",
+                "Please select another category — this person is already nominated in the chosen category for this quarter.");
+            }
 
             if (ModelState.IsValid)
             {
@@ -293,6 +311,7 @@ namespace RewardsAndRecognitionSystem.Controllers
                 nomination.Id = Guid.NewGuid();
                 nomination.CreatedAt = DateTime.UtcNow;
                 await _nominationRepo.AddNominationAsync(nomination);
+                TempData["message"] = "Successfully created Nomination";
                 return RedirectToAction(nameof(Index));
             }
             var currentUser = await _userManager.GetUserAsync(User);
@@ -357,6 +376,7 @@ namespace RewardsAndRecognitionSystem.Controllers
             existing.Status = viewModel.Status;
 
             await _nominationRepo.UpdateNominationAsync(existing);
+            TempData["message"] = "Successfully updated Nomination";
             return RedirectToAction(nameof(Index));
         }
 
@@ -371,6 +391,7 @@ namespace RewardsAndRecognitionSystem.Controllers
                 return Forbid();
 
             await _nominationRepo.SoftDeleteNominationAsync(id);
+            TempData["message"] = "Successfully deleted Nomination";
             return RedirectToAction(nameof(Index));
         }
 
@@ -437,7 +458,7 @@ namespace RewardsAndRecognitionSystem.Controllers
                 if (nominator != null)
                 {
                     await _emailService.SendEmailAsync(
-                        subject: "🎉 Your Nomination is Approved!",
+                          subject: GeneralMessages.Nomation_Approved,
                         isHtml: true,
                         body: $@"
                         <body style=""font-family: Arial, sans-serif; margin: 0; padding: 0; background-color: #ffffff;"">
@@ -458,7 +479,7 @@ namespace RewardsAndRecognitionSystem.Controllers
                 if (nominee != null)
                 {
                     await _emailService.SendEmailAsync(
-                        subject: "🎖️ You Have Been Selected for an Award!",
+                          subject: GeneralMessages.Selected_Award,
                         isHtml: true,
                         body: $@"<body style=""font-family: Arial, sans-serif; margin: 0; padding: 0; background-color: #ffffff;"">
                           <div style=""background-color: #ffffff; padding: 10px 20px; max-width: 600px; margin: auto; color: #000;"">
@@ -474,7 +495,7 @@ namespace RewardsAndRecognitionSystem.Controllers
                 }
             }
 
-
+            TempData["message"] = ((nomination.Status == NominationStatus.ManagerApproved) || (nomination.Status == NominationStatus.DirectorApproved)) ? "Sucessfully Approved" : "Rejected Successfully";
             return RedirectToAction(nameof(Index));
         }
 
@@ -501,7 +522,7 @@ namespace RewardsAndRecognitionSystem.Controllers
             if (teamLead != null)
             {
                 await _emailService.SendEmailAsync(
-                    subject: "Nomination Reverted",
+                     subject: GeneralMessages.Nomination_Reverted,
                     isHtml: true,
                     body: $@"
                      <body style=""font-family: Arial, sans-serif; margin: 0; padding: 0; background-color: #ffffff;"">
@@ -515,7 +536,7 @@ namespace RewardsAndRecognitionSystem.Controllers
                     to: teamLead.Email
                 );
             }
-
+            TempData["message"] = "Successfully Reverted the Nomination";
             return RedirectToAction(nameof(Index));
         }
 
@@ -531,11 +552,13 @@ namespace RewardsAndRecognitionSystem.Controllers
                 .Include(n => n.YearQuarter);
 
             // Filter by role (Manager)
-            if (User.IsInRole("Manager"))
+
+            if (User.IsInRole(Roles.Manager.ToString()))
+
             {
                 query = query.Where(n => n.Nominee.Team.ManagerId == user.Id);
             }
-            else if (User.IsInRole("Director"))
+            else if (User.IsInRole(Roles.Director.ToString()))
             {
                 query = query.Where(n =>
                     (n.Nominator.Team.DirectorId == user.Id || n.Nominee.Team.DirectorId == user.Id) &&
@@ -545,7 +568,7 @@ namespace RewardsAndRecognitionSystem.Controllers
                      n.Status == NominationStatus.ManagerRejected));
             }
 
-            else if (User.IsInRole("TeamLead"))
+            else if (User.IsInRole(Roles.TeamLead.ToString()))
             {
                 // TeamLead sees nominations for teams they lead
                 query = query.Where(n => n.Nominee.Team.TeamLeadId == user.Id);
@@ -650,18 +673,18 @@ namespace RewardsAndRecognitionSystem.Controllers
                 .AsQueryable();
 
             // Role-based filtering
-            if (userRoles.Contains("Manager"))
-            {
+          
+            if (userRoles.Contains(nameof(Roles.Manager)))
+                {
                 query = query.Where(n =>
                     n.Nominator.Team.Manager.Id == currentUser.Id &&
                     n.Nominator.TeamId == teamId);
             }
-            else if (userRoles.Contains("Director"))
+            else if (userRoles.Contains(nameof(Roles.Director)))
             {
                 query = query.Where(n =>
                     n.Nominator.Team.Director.Id == currentUser.Id &&
-                    n.Nominator.TeamId == teamId &&
-                    n.Status != NominationStatus.PendingManager);
+                    n.Nominator.TeamId == teamId);
             }
 
             // Year + Quarter filtering
@@ -738,6 +761,154 @@ namespace RewardsAndRecognitionSystem.Controllers
             return File(memStream.ToArray(),
                 "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
                 $"{teamName}_Nominations.xlsx");
+        }
+
+        [HttpGet]
+        public IActionResult DownloadTemplate()
+        {
+            using (var ms = new MemoryStream())
+            {
+                using (var spreadsheet = SpreadsheetDocument.Create(ms, SpreadsheetDocumentType.Workbook))
+                {
+                    var workbookPart = spreadsheet.AddWorkbookPart();
+                    workbookPart.Workbook = new Workbook();
+
+                    var worksheetPart = workbookPart.AddNewPart<WorksheetPart>();
+                    var sheetData = new SheetData();
+
+                    // Define header row
+                    var headerRow = new Row();
+                    string[] headers = { "NomineeEmail", "CategoryName", "YearQuarterName", "Description", "Achievements" };
+                    foreach (var header in headers)
+                    {
+                        headerRow.AppendChild(new Cell
+                        {
+                            DataType = CellValues.String,
+                            CellValue = new CellValue(header)
+                        });
+                    }
+                    sheetData.Append(headerRow);
+
+                    string[] data = { "nominee@zelis.com", "star of the quarter", "Q3,2025", "Good job", "Excellent Job" };
+
+                    var dataRow = new Row();
+
+                    foreach (var d in data)
+                    {
+                        dataRow.AppendChild(new Cell
+                        {
+                            DataType = CellValues.String,
+                            CellValue = new CellValue(d)
+                        });
+                    }
+                    sheetData.Append(dataRow);
+
+                    worksheetPart.Worksheet = new Worksheet(sheetData);
+                    var sheets = spreadsheet.WorkbookPart.Workbook.AppendChild(new Sheets());
+                    sheets.Append(new Sheet
+                    {
+                        Id = spreadsheet.WorkbookPart.GetIdOfPart(worksheetPart),
+                        SheetId = 1,
+                        Name = "Template"
+                    });
+                    workbookPart.Workbook.Save();
+                }
+                ms.Position = 0;
+                return File(ms.ToArray(),
+                    "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                    "BatchNominationTemplate.xlsx");
+            }
+        }
+
+
+        [HttpGet]
+        public IActionResult UploadNomination()
+        {
+            return View();
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> UploadNomination(IFormFile file)
+        {
+            if (file == null || file.Length == 0)
+                return BadRequest("File is empty");
+
+            using var stream = new MemoryStream();
+            await file.CopyToAsync(stream);
+
+            using var document = SpreadsheetDocument.Open(stream, false);
+            var workbookPart = document.WorkbookPart;
+            var sheet = workbookPart.Workbook.Sheets.Elements<Sheet>().First();
+            var worksheetPart = (WorksheetPart)workbookPart.GetPartById(sheet.Id);
+            var rows = worksheetPart.Worksheet.Descendants<Row>().Skip(1); // Skip header
+
+            var nominations = new List<Nomination>();
+            var nominator = await _userManager.GetUserAsync(User);
+            foreach (var row in rows)
+            {
+                var cells = row.Elements<Cell>().ToList();
+                var nomineeEmail = GetCellValue(workbookPart, cells[0]);
+                var categoryName = GetCellValue(workbookPart, cells[1]);
+                var yearQuarterName = GetCellValue(workbookPart, cells[2]);
+                var description = GetCellValue(workbookPart, cells[3]);
+                var achievements = GetCellValue(workbookPart, cells[4]);
+
+                // Resolve foreign keys from DB
+
+                var nominee = await _context.Users.Include(x => x.Team).FirstOrDefaultAsync(x => (x.Email == nomineeEmail) && (x.Team.TeamLeadId == nominator.Id));
+                var category = await _context.Categories.FirstOrDefaultAsync(x => x.Name == categoryName);
+                var yq = yearQuarterName.Split(',');
+                if (yq.Length != 2)
+                {
+                    throw new Exception("Invalid data in excel row");
+                }
+                var quarterString = yq[0];   // "Q1" from Excel
+                var year = int.Parse(yq[1]); // year from Excel
+
+                // Convert string to enum
+                if (!Enum.TryParse<Quarter>(quarterString, true, out var quarterEnum))
+                {
+                    throw new Exception($"Invalid Quarter value '{quarterString}' in Excel");
+                }
+                var yearQuarter = await _context.YearQuarters.FirstOrDefaultAsync(x => x.Year == year && x.Quarter == quarterEnum);
+
+                if (nominator == null || nominee == null || category == null || yearQuarter == null)
+                    throw new Exception("Invalid data in excel row");
+
+                nominations.Add(new Nomination
+                {
+                    Id = Guid.NewGuid(),
+                    NominatorId = nominator.Id,
+                    NomineeId = nominee.Id,
+                    CategoryId = category.Id,
+                    YearQuarterId = yearQuarter.Id,
+                    Description = description,
+                    Achievements = achievements,
+                    Status = NominationStatus.PendingManager,
+                    CreatedAt = DateTime.UtcNow,
+                    IsDeleted = false
+                });
+            }
+
+            // Transaction (rollback if any failure)
+            using var transaction = await _context.Database.BeginTransactionAsync();
+            _context.Nominations.AddRange(nominations);
+            await _context.SaveChangesAsync();
+            await transaction.CommitAsync();
+            return RedirectToAction(nameof(Index));
+        }
+
+        private string GetCellValue(WorkbookPart wbPart, Cell cell)
+        {
+            string value = cell.InnerText;
+            if (cell.DataType == null) return value;
+
+            if (cell.DataType == CellValues.SharedString)
+            {
+                return wbPart.SharedStringTablePart.SharedStringTable
+                    .Elements<SharedStringItem>().ElementAt(int.Parse(value)).InnerText;
+            }
+            return value;
         }
 
     }

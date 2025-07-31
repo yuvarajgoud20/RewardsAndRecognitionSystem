@@ -110,40 +110,54 @@ namespace RewardsAndRecognitionSystem.Areas.Identity.Pages.Account
             return Page(); // ✅ Must return Page only after check
         }
 
+
         public async Task<IActionResult> OnPostAsync(string returnUrl = null)
         {
             returnUrl ??= Url.Content("~/");
 
             ExternalLogins = (await _signInManager.GetExternalAuthenticationSchemesAsync()).ToList();
 
-            if (ModelState.IsValid)
+            // Manual required field validation
+            if (string.IsNullOrWhiteSpace(Input.Email))
             {
-                // This doesn't count login failures towards account lockout
-                // To enable password failures to trigger account lockout, set lockoutOnFailure: true
-                var result = await _signInManager.PasswordSignInAsync(Input.Email, Input.Password, Input.RememberMe, lockoutOnFailure: false);
-                if (result.Succeeded)
-                {
-                    _logger.LogInformation("User logged in.");
-                    return LocalRedirect(returnUrl);
-                }
-                if (result.RequiresTwoFactor)
-                {
-                    return RedirectToPage("./LoginWith2fa", new { ReturnUrl = returnUrl, RememberMe = Input.RememberMe });
-                }
-                if (result.IsLockedOut)
-                {
-                    _logger.LogWarning("User account locked out.");
-                    return RedirectToPage("./Lockout");
-                }
-                else
-                {
-                    ModelState.AddModelError(string.Empty, "Invalid login attempt.");
-                    return Page();
-                }
+                ModelState.AddModelError("Input.Email", "Email is required.");
             }
 
-            // If we got this far, something failed, redisplay form
+            if (string.IsNullOrWhiteSpace(Input.Password))
+            {
+                ModelState.AddModelError("Input.Password", "Password is required.");
+            }
+
+            // If any required field is missing, re-render page with errors
+            if (!ModelState.IsValid)
+            {
+                return Page();
+            }
+
+            // Proceed with login
+            var result = await _signInManager.PasswordSignInAsync(Input.Email, Input.Password, Input.RememberMe, lockoutOnFailure: false);
+
+            if (result.Succeeded)
+            {
+                _logger.LogInformation("User logged in.");
+                return LocalRedirect(returnUrl);
+            }
+
+            if (result.RequiresTwoFactor)
+            {
+                return RedirectToPage("./LoginWith2fa", new { ReturnUrl = returnUrl, RememberMe = Input.RememberMe });
+            }
+
+            if (result.IsLockedOut)
+            {
+                _logger.LogWarning("User account locked out.");
+                return RedirectToPage("./Lockout");
+            }
+
+            // Invalid login credentials
+            ModelState.AddModelError(string.Empty, "Invalid login attempt.");
             return Page();
         }
+
     }
 }

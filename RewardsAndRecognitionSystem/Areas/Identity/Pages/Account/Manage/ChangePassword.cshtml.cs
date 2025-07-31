@@ -97,11 +97,32 @@ namespace RewardsAndRecognitionSystem.Areas.Identity.Pages.Account.Manage
 
         public async Task<IActionResult> OnPostAsync()
         {
-            if (!ModelState.IsValid)
+            // Extra validation: stop if any password is null/empty
+            if (!ModelState.IsValid ||
+                string.IsNullOrEmpty(Input.OldPassword) ||
+                string.IsNullOrEmpty(Input.NewPassword) ||
+                string.IsNullOrEmpty(Input.ConfirmPassword))
             {
+                if (string.IsNullOrEmpty(Input.OldPassword))
+                    ModelState.AddModelError("Input.OldPassword", "Current password is required.");
+
+                if (string.IsNullOrEmpty(Input.NewPassword))
+                    ModelState.AddModelError("Input.NewPassword", "New password is required.");
+
+                if (string.IsNullOrEmpty(Input.ConfirmPassword))
+                    ModelState.AddModelError("Input.ConfirmPassword", "Confirm password is required.");
+
                 return Page();
             }
 
+            // Check if new password equals old password
+            if (Input.OldPassword == Input.NewPassword)
+            {
+                ModelState.AddModelError("Input.NewPassword", "New password cannot be the same as the current password.");
+                return Page();
+            }
+
+            // Check if new password matches confirmation
             if (Input.NewPassword != Input.ConfirmPassword)
             {
                 ModelState.AddModelError("Input.ConfirmPassword", "The new password and confirmation password do not match.");
@@ -130,5 +151,6 @@ namespace RewardsAndRecognitionSystem.Areas.Identity.Pages.Account.Manage
 
             return RedirectToPage();
         }
+
     }
 }

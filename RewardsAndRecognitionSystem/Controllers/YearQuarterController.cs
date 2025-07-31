@@ -97,6 +97,7 @@ namespace RewardsAndRecognitionSystem.Controllers
             yq.Id = Guid.NewGuid();
             var yearQuarter = _mapper.Map<YearQuarter>(yq);
             await _yearQuarterRepo.AddAsync(yearQuarter);
+            TempData["message"] = "Successfully created YearQuarter";
             return RedirectToAction(nameof(Index));
         }
 
@@ -136,6 +137,7 @@ namespace RewardsAndRecognitionSystem.Controllers
             existing.IsActive = yq.IsActive;
 
             await _yearQuarterRepo.UpdateAsync(existing);
+            TempData["message"] = "Successfully updated YearQuarter";
             return RedirectToAction(nameof(Index));
         }
 
@@ -152,6 +154,7 @@ namespace RewardsAndRecognitionSystem.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(Guid id)
         {
+
             var result = await _yearQuarterRepo.SoftDeleteAsync(id); // Your soft-delete logic
 
             if (Request.Headers["X-Requested-With"] == "XMLHttpRequest")
@@ -162,7 +165,7 @@ namespace RewardsAndRecognitionSystem.Controllers
                 }
                 return Json(new { success = false, message = "Failed to delete year quarter." });
             }
-
+            TempData["message"] = "Successfully deleted YearQuarter";
             return RedirectToAction("Index");
         }
 

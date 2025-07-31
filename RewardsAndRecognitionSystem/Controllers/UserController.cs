@@ -147,7 +147,7 @@ namespace RewardsAndRecognitionSystem.Controllers
                           </div>
                         </body>"
                     );
-
+                    TempData["message"] = "Successfully created User";
                     return RedirectToAction(nameof(Index));
                 }
 
@@ -227,7 +227,10 @@ namespace RewardsAndRecognitionSystem.Controllers
 
                 var result = await _userManager.UpdateAsync(user);
                 if (result.Succeeded)
+                {
+                    TempData["message"] = "Successfully updated User";
                     return RedirectToAction(nameof(Index));
+                }
 
                 foreach (var error in result.Errors)
                     ModelState.AddModelError("", error.Description);
@@ -249,6 +252,7 @@ namespace RewardsAndRecognitionSystem.Controllers
             }
 
             var result = await _userManager.DeleteAsync(user);
+            TempData["message"] = "Successfully deleted User";
             return RedirectToAction(nameof(Index));
         }
 

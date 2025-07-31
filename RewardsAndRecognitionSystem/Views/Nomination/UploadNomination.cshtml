@@ -1,0 +1,26 @@
+﻿@{
+    ViewData["Title"] = "Upload Nominations";
+}
+
+<div class="container mt-4">
+    <h2 class="mb-4">Batch Upload Nominations</h2>
+
+    <!-- Download Template Button -->
+    <div class="mb-4">
+        <a class="btn btn-success" asp-action="DownloadTemplate">
+            <i class="bi bi-download"></i> Download Template
+        </a>
+    </div>
+
+    <!-- Upload Form -->
+    <form asp-action="UploadNomination" method="post" enctype="multipart/form-data" class="border p-4 rounded shadow-sm">
+        <div class="form-group mb-3">
+            <label for="file" class="form-label">Select Excel File:</label>
+            <input type="file" name="file" id="file" accept=".xlsx" class="form-control" required />
+        </div>
+
+        <button type="submit" class="btn btn-primary">
+            <i class="bi bi-upload"></i> Upload
+        </button>
+    </form>
+</div>
