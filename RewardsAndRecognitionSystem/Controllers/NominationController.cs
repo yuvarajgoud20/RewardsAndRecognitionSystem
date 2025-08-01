@@ -933,9 +933,9 @@ namespace RewardsAndRecognitionSystem.Controllers
                 }
 
                 var ns = await _nominationRepo.GetAllNominationsAsync();
-                var isValid = ns.Where(n => n.NomineeId == nominee.Id && n.CategoryId == category.Id);
+                bool exists = ns.Any(n => n.NomineeId == nominee.Id && n.CategoryId == category.Id);
 
-                if (isValid != null)
+                if (exists)
                     throw new Exception($"Some nominations in Excel already Exists");
 
                 nominations.Add(new Nomination

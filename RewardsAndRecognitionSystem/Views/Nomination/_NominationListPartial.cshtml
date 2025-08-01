@@ -9,11 +9,28 @@
     var isManager = User.IsInRole("Manager");
     var isDirector = User.IsInRole("Director");
     var isTeamLead = User.IsInRole("TeamLead");
+    
     var selectedFilter2 = ViewBag.FilterForDelete as string ?? "active";
     var currentFilter = selectedFilter2;
     var dashboardFilter = ViewBag.filter;
     var all = "all";
 }
+<style>
+    .truncate-text {
+        overflow: hidden;
+        display: -webkit-box;
+        -webkit-line-clamp: 2; /* Show only 2 lines */
+        -webkit-box-orient: vertical;
+    }
+
+    .read-more-link {
+        color: #3f51b5;
+        cursor: pointer;
+        font-weight: 500;
+        margin-left: 6px;
+        font-size: 0.9rem;
+    }
+</style>
 <div id="nominationListContainer">
     @if (isTeamLead)
     {
@@ -35,12 +52,15 @@
                 </select>
                 @if (isQuarterActive)
                 {
-                    <a asp-action="Create" class="btn btn-indigo" style="white-space: nowrap;">
-                        <i class="bi bi-plus-circle-fill"></i> Create Nomination
-                    </a>
-                    <a asp-action="UploadNomination" class="btn btn-indigo" style="white-space: nowrap;">
-                        <i class="bi bi-plus-circle-fill"></i> Upload from Excel
-                    </a>
+                    @if(ViewBag.currentUser.TeamId != null)
+                    {
+                        <a asp-action="Create" class="btn btn-indigo" style="white-space: nowrap;">
+                            <i class="bi bi-plus-circle-fill"></i> Create Nomination
+                        </a>
+                        <a asp-action="UploadNomination" class="btn btn-indigo" style="white-space: nowrap;">
+                            <i class="bi bi-plus-circle-fill"></i> Upload from Excel
+                        </a>
+                    }
                 }
                 else
                 {
@@ -71,7 +91,7 @@
                         <th>Category</th>
                         <th>Status</th>
                         <th>Created</th>
-                        @if (selectedFilter2 == "active")
+                        @if (selectedFilter2 == "active" )
                         {
                             <th>Actions</th>
                         }
@@ -100,16 +120,19 @@
 
                                     @if (isQuarterActive)
                                     {
-                                        <a asp-action="Edit"
-                                           asp-route-id="@n.Id"
-                                           class="btn btn-indigo btn-sm @( (n.Status == NominationStatus.PendingManager) ? "" : "disabled no-click" )">
-                                            <i class="bi bi-pencil-fill"></i> Edit
-                                        </a>
-                                    
-                                        <button type="button" class="btn btn-danger btn-sm" onclick="confirmDelete('@n.Id')">
-                                            <i class="bi bi-trash-fill"></i> Delete
-                                        </button>
-                                
+                                        if (ViewBag.currentUser.TeamId != null)
+                                        {
+                                            <a asp-action="Edit"
+                                               asp-route-id="@n.Id"
+                                               class="btn btn-indigo btn-sm @( (n.Status == NominationStatus.PendingManager) ? "" : "disabled no-click" )">
+                                                <i class="bi bi-pencil-fill"></i> Edit
+                                            </a>
+
+                                            <button type="button" class="btn btn-danger btn-sm" onclick="confirmDelete('@n.Id')">
+                                                <i class="bi bi-trash-fill"></i> Delete
+                                            </button>
+                                        }
+                                        
                                     }
                                     else
                                     {
