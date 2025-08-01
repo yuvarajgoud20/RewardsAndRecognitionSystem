@@ -7,6 +7,7 @@ using RewardsAndRecognitionRepository.Enums;
 using RewardsAndRecognitionRepository.Interfaces;
 using RewardsAndRecognitionRepository.Models;
 using RewardsAndRecognitionSystem.ViewModels;
+using Superpower.Model;
 
 namespace RewardsAndRecognitionSystem.Controllers
 {
@@ -155,8 +156,10 @@ namespace RewardsAndRecognitionSystem.Controllers
         public async Task<IActionResult> DeleteConfirmed(Guid id)
         {
 
-           await _yearQuarterRepo.SoftDeleteAsync(id);
-           return RedirectToAction(nameof(Index));
+            await _yearQuarterRepo.SoftDeleteAsync(id);
+            TempData["message"] = "Successfully deleted YearQuarter";
+
+            return RedirectToAction(nameof(Index));
         }
 
     }

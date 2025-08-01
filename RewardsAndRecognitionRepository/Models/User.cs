@@ -23,6 +23,8 @@ namespace RewardsAndRecognitionRepository.Models
 
         // Navigation
         public Team? Team { get; set; }
+
+        public bool IsDeleted { get; set; }
         
 
         public ICollection<Nomination>? NominationsGiven { get; set; }

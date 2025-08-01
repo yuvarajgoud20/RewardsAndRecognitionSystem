@@ -1,26 +1,65 @@
-﻿@{
-    ViewData["Title"] = "Upload Nominations";
-}
+﻿@model List<NominationPreviewViewModel>
 
 <div class="container mt-4">
     <h2 class="mb-4">Batch Upload Nominations</h2>
 
-    <!-- Download Template Button -->
-    <div class="mb-4">
-        <a class="btn btn-success" asp-action="DownloadTemplate">
-            <i class="bi bi-download"></i> Download Template
-        </a>
-    </div>
-
-    <!-- Upload Form -->
-    <form asp-action="UploadNomination" method="post" enctype="multipart/form-data" class="border p-4 rounded shadow-sm">
-        <div class="form-group mb-3">
-            <label for="file" class="form-label">Select Excel File:</label>
-            <input type="file" name="file" id="file" accept=".xlsx" class="form-control" required />
+    <!-- Step 1: Upload -->
+    @if (Model == null || !Model.Any())
+    {
+        <!-- Download Template Button -->
+        <div class="mb-4">
+            <a class="btn btn-success" asp-action="DownloadTemplate">
+                <i class="bi bi-download"></i> Download Template
+            </a>
         </div>
 
-        <button type="submit" class="btn btn-primary">
-            <i class="bi bi-upload"></i> Upload
-        </button>
-    </form>
+        <form asp-action="UploadNomination" method="post" enctype="multipart/form-data" class="border p-4 rounded shadow-sm">
+            <div class="form-group mb-3">
+                <label for="file" class="form-label">Select Excel File:</label>
+                <input type="file" name="file" id="file" accept=".xlsx" class="form-control" required />
+            </div>
+
+            <button type="submit" class="btn btn-primary">
+                <i class="bi bi-upload"></i> Upload
+            </button>
+        </form>
+    }
+    else
+    {
+        <!-- Step 2: Preview -->
+        <h4>Preview Data</h4>
+        <table class="table table-bordered table-striped">
+            <thead>
+                <tr >
+                    <th style="color: white;">Nominee Email</th>
+                    <th style="color: white;">Category</th>
+                    <th style="color: white;">Year,Quarter</th>
+                    <th style="color: white;">Description</th>
+                    <th style="color: white;">Achievements</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in Model)
+                {
+                    <tr>
+                        <td>@item.NomineeEmail</td>
+                        <td>@item.CategoryName</td>
+                        <td>@item.YearQuarterName</td>
+                        <td>@item.Description</td>
+                        <td>@item.Achievements</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+
+        <div class="d-flex justify-content-start align-items-center gap-3 mt-3">
+            <form method="post" asp-action="SaveNominations" class="mb-0">
+                <button type="submit" class="btn btn-success px-4">Save</button>
+            </form>
+            <form method="post" asp-action="CancelUpload" class="mb-0">
+                <button type="submit" class="btn btn-danger px-4">Cancel</button>
+            </form>
+        </div>
+
+    }
 </div>
