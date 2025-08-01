@@ -157,8 +157,8 @@ namespace RewardsAndRecognitionSystem.Controllers
         {
 
             await _yearQuarterRepo.SoftDeleteAsync(id);
-            TempData["message"] = "Successfully deleted YearQuarter";
 
+            TempData["message"] = "Successfully deleted YearQuarter";
             return RedirectToAction(nameof(Index));
         }
 

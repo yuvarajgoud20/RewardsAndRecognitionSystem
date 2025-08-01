@@ -258,7 +258,13 @@
     <script src="~/lib/Nominations/xlsx.full.js"></script>
     <script src="~/lib/nominations/sweetalert2.js"></script>
     <script>
-        function confirmDelete(nominationId) {
+               function confirmDelete(nominationId) {
+          // Blur the currently focused delete button
+          const activeBtn = document.activeElement;
+          if (activeBtn) {
+            activeBtn.blur();
+          }
+
           Swal.fire({
             title: 'Are you sure?',
             text: "This action cannot be undone.",
@@ -266,17 +272,27 @@
             showCancelButton: true,
             confirmButtonText: 'Yes, delete it!',
             cancelButtonText: 'No, cancel!',
-            reverseButtons: true
+            reverseButtons: true,
+            focusConfirm: false,
+            focusCancel: false,
+            didOpen: () => {
+              setTimeout(() => document.activeElement?.blur(), 10);
+            },
+            didClose: () => {
+              setTimeout(() => document.activeElement?.blur(), 10);
+            }
           }).then((result) => {
             if (result.isConfirmed) {
               const form = document.createElement('form');
               form.method = 'POST';
               form.action = '/Nomination/DeleteConfirmed';
+
               const idInput = document.createElement('input');
               idInput.type = 'hidden';
               idInput.name = 'id';
               idInput.value = nominationId;
               form.appendChild(idInput);
+
               const tokenInput = document.querySelector('#antiForgeryForm input[name="__RequestVerificationToken"]');
               if (tokenInput) {
                 const clone = tokenInput.cloneNode();
@@ -287,8 +303,10 @@
               form.submit();
             }
           });
+
           return false;
         }
+
     </script>
     <script>
            
