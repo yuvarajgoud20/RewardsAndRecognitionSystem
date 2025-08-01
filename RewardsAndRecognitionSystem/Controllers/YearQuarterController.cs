@@ -7,6 +7,7 @@ using RewardsAndRecognitionRepository.Enums;
 using RewardsAndRecognitionRepository.Interfaces;
 using RewardsAndRecognitionRepository.Models;
 using RewardsAndRecognitionSystem.ViewModels;
+using Superpower.Model;
 
 namespace RewardsAndRecognitionSystem.Controllers
 {
@@ -156,6 +157,8 @@ namespace RewardsAndRecognitionSystem.Controllers
         {
 
             await _yearQuarterRepo.SoftDeleteAsync(id);
+
+            TempData["message"] = "Successfully deleted YearQuarter";
             return RedirectToAction(nameof(Index));
         }
 

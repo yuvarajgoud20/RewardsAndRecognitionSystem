@@ -91,6 +91,7 @@ namespace RewardsAndRecognitionSystem.Controllers
                  .Where(n => n.Nominee.Team.DirectorId == currentUser.Id)
                  .Where(n => n.Status != NominationStatus.PendingManager)
                  .Where(n => n.Approvals != null)
+                 .Where(n => n.IsDeleted == false || n.IsDeleted == null)
                  .ToListAsync();
                 if (filter == "pending")
                 {
@@ -140,6 +141,7 @@ namespace RewardsAndRecognitionSystem.Controllers
                    .Include(n => n.Nominator)
                    .Where(n => n.YearQuarterId == selectedQuarter.Id)
                    .Where(n => n.Nominee.Team.ManagerId == currentUser.Id)
+                   .Where(n => n.IsDeleted == false || n.IsDeleted == null)
                    .ToListAsync();
                 if (filter == "pending")
                 {
@@ -190,15 +192,16 @@ namespace RewardsAndRecognitionSystem.Controllers
                 {
                     nominationsToShow = nominationsToShow.Where(n => n.Status == NominationStatus.PendingManager ||
                                                  n.Status == NominationStatus.ManagerRejected ||
-                                                 n.Status == NominationStatus.ManagerApproved).ToList();
+                                                 n.Status == NominationStatus.ManagerApproved).
+                                                  Where(n=>n.IsDeleted==false || n.IsDeleted==null).ToList();
                 }
                 if (filter == "directorapproved")
                 {
-                    nominationsToShow = nominationsToShow.Where(n => n.Status == NominationStatus.DirectorApproved).ToList();
+                    nominationsToShow = nominationsToShow.Where(n => n.Status == NominationStatus.DirectorApproved).Where(n => n.IsDeleted == false || n.IsDeleted == null).ToList();
                 }
                 if (filter == "directorrejected")
                 {
-                    nominationsToShow = nominationsToShow.Where(n => n.Status == NominationStatus.DirectorRejected).ToList();
+                    nominationsToShow = nominationsToShow.Where(n => n.Status == NominationStatus.DirectorRejected).Where(n => n.IsDeleted == false || n.IsDeleted == null).ToList();
                 }
                 if (FilterForDelete == "deleted")
                 {
@@ -236,6 +239,7 @@ namespace RewardsAndRecognitionSystem.Controllers
                 .Include(n => n.Nominator).ThenInclude(u => u.Team)
                 .Include(n => n.Category)
                 .Where(n => n.YearQuarterId == selectedQuarter.Id)
+                .Where(n => n.IsDeleted == false || n.IsDeleted == null)
                 .ToListAsync();
             }
             var viewModelList = _mapper.Map<List<NominationViewModel>>(nominationsToShow);
@@ -267,6 +271,7 @@ namespace RewardsAndRecognitionSystem.Controllers
 
             var nominees = await _context.Users
            .Where(u => u.TeamId == currentUser.TeamId && u.Id != currentUser.Id && u.Name != null)
+           .Where(n => n.IsDeleted == false || n.IsDeleted == null)
            .ToListAsync();
 
             ViewBag.Nominees = new SelectList(nominees, "Id", "Name");
@@ -765,59 +770,68 @@ namespace RewardsAndRecognitionSystem.Controllers
 
         [HttpGet]
         public IActionResult DownloadTemplate()
+
         {
-            using (var ms = new MemoryStream())
+            // Generate Excel
+            using var memStream = new MemoryStream();
+            using (SpreadsheetDocument document = SpreadsheetDocument.Create(memStream, SpreadsheetDocumentType.Workbook))
             {
-                using (var spreadsheet = SpreadsheetDocument.Create(ms, SpreadsheetDocumentType.Workbook))
+                var workbookPart = document.AddWorkbookPart();
+                workbookPart.Workbook = new Workbook();
+
+                var worksheetPart = workbookPart.AddNewPart<WorksheetPart>();
+                var sheetData = new SheetData();
+                worksheetPart.Worksheet = new Worksheet(sheetData);
+
+                var stylesPart = workbookPart.AddNewPart<WorkbookStylesPart>();
+                stylesPart.Stylesheet = SheetClassesStyles.CreateStylesheet();
+                stylesPart.Stylesheet.Save();
+
+                // Header row
+                string[] headers = { "NomineeEmail", "CategoryName", "YearQuarterName", "Description", "Achievements" };
+
+                var headerRow = new Row();
+                foreach (var header in headers)
+                    headerRow.Append(SheetClassesStyles.CreateStyledCell(header, 2));
+
+                sheetData.Append(headerRow);
+
+                string[] data = { "nominee@zelis.com", "star of the quarter", "Q3,2025", "Good job", "Excellent Job" };
+
+                // Data rows
+                var row = new Row();
+                foreach (var d in data)
                 {
-                    var workbookPart = spreadsheet.AddWorkbookPart();
-                    workbookPart.Workbook = new Workbook();
 
-                    var worksheetPart = workbookPart.AddNewPart<WorksheetPart>();
-                    var sheetData = new SheetData();
+                    row.Append(SheetClassesStyles.CreateStyledCell(d, 1));
 
-                    // Define header row
-                    var headerRow = new Row();
-                    string[] headers = { "NomineeEmail", "CategoryName", "YearQuarterName", "Description", "Achievements" };
-                    foreach (var header in headers)
-                    {
-                        headerRow.AppendChild(new Cell
-                        {
-                            DataType = CellValues.String,
-                            CellValue = new CellValue(header)
-                        });
-                    }
-                    sheetData.Append(headerRow);
 
-                    string[] data = { "nominee@zelis.com", "star of the quarter", "Q3,2025", "Good job", "Excellent Job" };
-
-                    var dataRow = new Row();
-
-                    foreach (var d in data)
-                    {
-                        dataRow.AppendChild(new Cell
-                        {
-                            DataType = CellValues.String,
-                            CellValue = new CellValue(d)
-                        });
-                    }
-                    sheetData.Append(dataRow);
-
-                    worksheetPart.Worksheet = new Worksheet(sheetData);
-                    var sheets = spreadsheet.WorkbookPart.Workbook.AppendChild(new Sheets());
-                    sheets.Append(new Sheet
-                    {
-                        Id = spreadsheet.WorkbookPart.GetIdOfPart(worksheetPart),
-                        SheetId = 1,
-                        Name = "Template"
-                    });
-                    workbookPart.Workbook.Save();
                 }
-                ms.Position = 0;
-                return File(ms.ToArray(),
-                    "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-                    "BatchNominationTemplate.xlsx");
+                sheetData.Append(row);
+
+                // Column width
+                var columns = new Columns(
+                    new Column { Min = 1, Max = 8, Width = 25, CustomWidth = true }
+                );
+                worksheetPart.Worksheet.InsertAt(columns, 0);
+
+                // Sheets
+                Sheets sheets = workbookPart.Workbook.AppendChild(new Sheets());
+                Sheet sheet = new Sheet()
+                {
+                    Id = workbookPart.GetIdOfPart(worksheetPart),
+                    SheetId = 1,
+                    Name = "Template"
+                };
+                sheets.Append(sheet);
+
+                workbookPart.Workbook.Save();
             }
+
+            memStream.Seek(0, SeekOrigin.Begin);
+            return File(memStream.ToArray(),
+                "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                $"NominationsTemplate.xlsx");
         }
 
 
@@ -831,19 +845,21 @@ namespace RewardsAndRecognitionSystem.Controllers
         public async Task<IActionResult> UploadNomination(IFormFile file)
         {
             if (file == null || file.Length == 0)
-                return BadRequest("File is empty");
+            {
+                TempData["Error"] = "Please upload a valid Excel file.";
+                return View("UploadNomination");
+            }
+
+            var previewList = new List<NominationPreviewViewModel>();
 
             using var stream = new MemoryStream();
             await file.CopyToAsync(stream);
-
             using var document = SpreadsheetDocument.Open(stream, false);
             var workbookPart = document.WorkbookPart;
             var sheet = workbookPart.Workbook.Sheets.Elements<Sheet>().First();
             var worksheetPart = (WorksheetPart)workbookPart.GetPartById(sheet.Id);
             var rows = worksheetPart.Worksheet.Descendants<Row>().Skip(1); // Skip header
 
-            var nominations = new List<Nomination>();
-            var nominator = await _userManager.GetUserAsync(User);
             foreach (var row in rows)
             {
                 var cells = row.Elements<Cell>().ToList();
@@ -853,50 +869,20 @@ namespace RewardsAndRecognitionSystem.Controllers
                 var description = GetCellValue(workbookPart, cells[3]);
                 var achievements = GetCellValue(workbookPart, cells[4]);
 
-                // Resolve foreign keys from DB
-
-                var nominee = await _context.Users.Include(x => x.Team).FirstOrDefaultAsync(x => (x.Email == nomineeEmail) && (x.Team.TeamLeadId == nominator.Id));
-                var category = await _context.Categories.FirstOrDefaultAsync(x => x.Name == categoryName);
-                var yq = yearQuarterName.Split(',');
-                if (yq.Length != 2)
+                previewList.Add(new NominationPreviewViewModel
                 {
-                    throw new Exception("Invalid data in excel row");
-                }
-                var quarterString = yq[0];   // "Q1" from Excel
-                var year = int.Parse(yq[1]); // year from Excel
-
-                // Convert string to enum
-                if (!Enum.TryParse<Quarter>(quarterString, true, out var quarterEnum))
-                {
-                    throw new Exception($"Invalid Quarter value '{quarterString}' in Excel");
-                }
-                var yearQuarter = await _context.YearQuarters.FirstOrDefaultAsync(x => x.Year == year && x.Quarter == quarterEnum);
-
-                if (nominator == null || nominee == null || category == null || yearQuarter == null)
-                    throw new Exception("Invalid data in excel row");
-
-                nominations.Add(new Nomination
-                {
-                    Id = Guid.NewGuid(),
-                    NominatorId = nominator.Id,
-                    NomineeId = nominee.Id,
-                    CategoryId = category.Id,
-                    YearQuarterId = yearQuarter.Id,
+                    NomineeEmail = nomineeEmail,
+                    CategoryName = categoryName,
+                    YearQuarterName = yearQuarterName,
                     Description = description,
-                    Achievements = achievements,
-                    Status = NominationStatus.PendingManager,
-                    CreatedAt = DateTime.UtcNow,
-                    IsDeleted = false
+                    Achievements = achievements
                 });
             }
 
-            // Transaction (rollback if any failure)
-            using var transaction = await _context.Database.BeginTransactionAsync();
-            _context.Nominations.AddRange(nominations);
-            await _context.SaveChangesAsync();
-            await transaction.CommitAsync();
-            return RedirectToAction(nameof(Index));
+            TempData["PreviewData"] = System.Text.Json.JsonSerializer.Serialize(previewList);
+            return View("UploadNomination", previewList);  // show preview grid
         }
+
 
         private string GetCellValue(WorkbookPart wbPart, Cell cell)
         {
@@ -909,6 +895,79 @@ namespace RewardsAndRecognitionSystem.Controllers
                     .Elements<SharedStringItem>().ElementAt(int.Parse(value)).InnerText;
             }
             return value;
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> SaveNominations()
+        {
+            if (!TempData.ContainsKey("PreviewData"))
+                return RedirectToAction("UploadNomination");
+
+            var previewJson = TempData["PreviewData"]?.ToString();
+            var previewList = System.Text.Json.JsonSerializer.Deserialize<List<NominationPreviewViewModel>>(previewJson);
+
+            var nominations = new List<Nomination>();
+            var nominator = await _userManager.GetUserAsync(User);
+
+            foreach (var item in previewList)
+            {
+                var nominee = await _context.Users.Include(x => x.Team)
+                    .FirstOrDefaultAsync(x => (x.Email == item.NomineeEmail) && (x.Team.TeamLeadId == nominator.Id));
+                var category = await _context.Categories.FirstOrDefaultAsync(x => x.Name == item.CategoryName);
+
+                var yq = item.YearQuarterName.Split(',');
+                if (yq.Length != 2) throw new Exception("Invalid YearQuarter data");
+
+                var quarterString = yq[0];
+                var year = int.Parse(yq[1]);
+
+                if (!Enum.TryParse<Quarter>(quarterString, true, out var quarterEnum))
+                    throw new Exception($"Invalid Quarter '{quarterString}'");
+
+
+                var yearQuarter = await _context.YearQuarters.FirstOrDefaultAsync(x => x.Year == year && x.Quarter == quarterEnum);
+
+                if (nominee == null || category == null || yearQuarter == null)
+                {
+                    throw new Exception($"Invalid Excel Data");
+                }
+
+                var ns = await _nominationRepo.GetAllNominationsAsync();
+                var isValid = ns.Where(n => n.NomineeId == nominee.Id && n.CategoryId == category.Id);
+
+                if (isValid != null)
+                    throw new Exception($"Some nominations in Excel already Exists");
+
+                nominations.Add(new Nomination
+                {
+                    Id = Guid.NewGuid(),
+                    NominatorId = nominator.Id,
+                    NomineeId = nominee.Id,
+                    CategoryId = category.Id,
+                    YearQuarterId = yearQuarter.Id,
+                    Description = item.Description,
+                    Achievements = item.Achievements,
+                    Status = NominationStatus.PendingManager,
+                    CreatedAt = DateTime.UtcNow,
+                    IsDeleted = false
+                });
+            }
+
+            using var transaction = await _context.Database.BeginTransactionAsync();
+            _context.Nominations.AddRange(nominations);
+            await _context.SaveChangesAsync();
+            await transaction.CommitAsync();
+
+            TempData["Message"] = "Nominations saved successfully.";
+            return RedirectToAction(nameof(Index));
+        }
+
+
+        [HttpPost]
+        public IActionResult CancelUpload()
+        {
+            TempData.Remove("PreviewData");
+            return RedirectToAction("UploadNomination");
         }
 
     }

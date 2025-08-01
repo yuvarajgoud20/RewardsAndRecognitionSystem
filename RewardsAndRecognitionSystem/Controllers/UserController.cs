@@ -45,13 +45,21 @@ namespace RewardsAndRecognitionSystem.Controllers
             _emailService = emailService;
         }
 
-        public async Task<IActionResult> Index(int page = 1)
+        public async Task<IActionResult> Index(string filter = "active",int page = 1)
         {
             int pageSize = 25;
-            var usersQuery = _context.Users
+            IQueryable<User> usersQuery = _context.Users
                     .Include(u => u.Team)
                     .ThenInclude(t => t.Manager)
                     .OrderBy(u => u.Name);
+            if (filter == "deleted")
+            {
+                usersQuery = usersQuery.Where(u => u.IsDeleted == true);
+            }
+            else
+            {
+                usersQuery = usersQuery.Where(u => u.IsDeleted == false || u.IsDeleted == null);
+            }
             var totalRecords = await usersQuery.CountAsync();
             var totalPages = (int)Math.Ceiling(totalRecords / (double)pageSize);
 
@@ -251,7 +259,14 @@ namespace RewardsAndRecognitionSystem.Controllers
                 return NotFound();
             }
 
-            var result = await _userManager.DeleteAsync(user);
+            user.IsDeleted = true;
+            var result = await _userManager.UpdateAsync(user);
+
+            if (!result.Succeeded)
+            {
+                // handle failure (optional)
+                ModelState.AddModelError("", "Unable to soft delete the user.");
+            }
             TempData["message"] = "Successfully deleted User";
             return RedirectToAction(nameof(Index));
         }

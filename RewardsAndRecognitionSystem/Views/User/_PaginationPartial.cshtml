@@ -1,7 +1,5 @@
-﻿@model (int currentPage, int totalPages, string actionName)
 
-
-
+@model (int currentPage, int totalPages, string actionName)
 <div class="container">
     <div class="d-flex justify-content-between align-items-center mt-4">
         <!-- Left: Page info -->
@@ -16,9 +14,8 @@
                 <li class="page-item @(Model.currentPage == 1 ? "disabled" : "")">
                     <a class="page-link"
                        asp-action="@Model.actionName"
-                       asp-route-page="@(Model.currentPage - 1)"
-                       aria-label="Previous">
-                        <i class="bi bi-chevron-left"></i>
+                       asp-route-page="@(Model.currentPage - 1)">
+                        Previous
                     </a>
                 </li>
 
@@ -33,9 +30,8 @@
                 <li class="page-item @(Model.currentPage == Model.totalPages ? "disabled" : "")">
                     <a class="page-link"
                        asp-action="@Model.actionName"
-                       asp-route-page="@(Model.currentPage + 1)"
-                       aria-label="Next">
-                        <i class="bi bi-chevron-right"></i>
+                       asp-route-page="@(Model.currentPage + 1)">
+                        Next
                     </a>
                 </li>
             </ul>
