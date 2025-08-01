@@ -105,24 +105,26 @@
     }
 </style>
 
-<h2 class="mb-4"><i class="bi bi-tags-fill me-2"></i>Categories</h2>
 
 
-<div class="d-flex justify-content-between align-items-start mb-3 flex-wrap gap-2">
-    <div></div> <!-- Empty left to match alignment in future -->
+<div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
+    <h2 class="mb-4"><i class="bi bi-tags-fill me-2"></i>Categories</h2>
 
-    <div class="d-flex flex-column align-items-end">
-        <a asp-action="Create" class="btn btn-indigo d-inline-flex align-items-center gap-2 mb-2">
-            <i class="bi bi-plus-circle-fill"></i> New Category
-        </a>
+    <div></div> <!-- Empty left to maintain spacing symmetry -->
+  
 
-        <div class="form-check form-switch">
+    <div class="d-flex align-items-center gap-3">
+        <div class="form-check form-switch m-0">
             <input class="form-check-input" type="checkbox" role="switch" id="toggleCategoryFilter"
                    @(ViewBag.ShowDeleted ? "checked" : "") />
             <label class="form-check-label ms-2" for="toggleCategoryFilter">
                 Show Deleted
             </label>
         </div>
+
+        <a asp-action="Create" class="btn btn-indigo d-inline-flex align-items-center gap-2">
+            <i class="bi bi-plus-circle-fill"></i> New Category
+        </a>
     </div>
 </div>
 
@@ -134,34 +136,55 @@
 </script>
 
 <script>
-        function confirmDelete(categoryId) {
-      Swal.fire({
-        title: 'Are you sure?',
-        text: "This action cannot be undone.",
-        icon: 'warning',
-        showCancelButton: true,
-        confirmButtonText: 'Yes, delete it!',
-        cancelButtonText: 'No, cancel!',
-        reverseButtons: true
-      }).then((result) => {
-        if (result.isConfirmed) {
-          const form = document.createElement('form');
-          form.method = 'POST';
-          form.action = '/Category/Delete/' + categoryId;
-          const token = document.querySelector('input[name="__RequestVerificationToken"]');
-          if (token) {
-            const hiddenToken = document.createElement('input');
-            hiddenToken.type = 'hidden';
-            hiddenToken.name = '__RequestVerificationToken';
-            hiddenToken.value = token.value;
-            form.appendChild(hiddenToken);
-          }
-
-          document.body.appendChild(form);
-          form.submit();
+                   function confirmDelete(categoryId) {
+        // Force blur the Delete button BEFORE the popup opens
+        const activeBtn = document.activeElement;
+        if (activeBtn) {
+            activeBtn.blur();
         }
-      });
+
+        Swal.fire({
+            title: 'Are you sure?',
+            text: "This action cannot be undone.",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonText: 'Yes, delete it!',
+            cancelButtonText: 'No, cancel!',
+            reverseButtons: true,
+            allowOutsideClick: true,
+            focusConfirm: false,
+            focusCancel: false,
+            didOpen: () => {
+                // Extra guard to make sure nothing stays focused
+                setTimeout(() => document.activeElement?.blur(), 10);
+            },
+            didClose: () => {
+                // Make sure focus does not return to the previously focused Delete button
+                setTimeout(() => document.activeElement?.blur(), 10);
+            }
+        }).then((result) => {
+            if (result.isConfirmed) {
+                const form = document.createElement('form');
+                form.method = 'POST';
+                form.action = '/Category/Delete/' + categoryId;
+
+                const token = document.querySelector('input[name="__RequestVerificationToken"]');
+                if (token) {
+                    const hiddenToken = document.createElement('input');
+                    hiddenToken.type = 'hidden';
+                    hiddenToken.name = '__RequestVerificationToken';
+                    hiddenToken.value = token.value;
+                    form.appendChild(hiddenToken);
+                }
+
+                document.body.appendChild(form);
+                form.submit();
+            }
+        });
     }
+
+
+
 
 </script>
 <script src="~/lib/ValidationScriptsPartial/jquery-3.6.4.min.js"></script>
