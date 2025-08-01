@@ -155,18 +155,8 @@ namespace RewardsAndRecognitionSystem.Controllers
         public async Task<IActionResult> DeleteConfirmed(Guid id)
         {
 
-            var result = await _yearQuarterRepo.SoftDeleteAsync(id); // Your soft-delete logic
-
-            if (Request.Headers["X-Requested-With"] == "XMLHttpRequest")
-            {
-                if (result)
-                {
-                    return Json(new { success = true, message = "Year quarter soft-deleted successfully." });
-                }
-                return Json(new { success = false, message = "Failed to delete year quarter." });
-            }
-            TempData["message"] = "Successfully deleted YearQuarter";
-            return RedirectToAction("Index");
+            await _yearQuarterRepo.SoftDeleteAsync(id);
+            return RedirectToAction(nameof(Index));
         }
 
     }

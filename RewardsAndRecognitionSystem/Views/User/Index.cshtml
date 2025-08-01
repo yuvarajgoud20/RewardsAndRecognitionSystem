@@ -131,7 +131,13 @@
 
 @section Scripts {
     <script>
-        function confirmDelete(userId) {
+                function confirmDelete(userId) {
+          // Blur the currently focused element (e.g., the delete button)
+          const activeBtn = document.activeElement;
+          if (activeBtn) {
+            activeBtn.blur();
+          }
+
           Swal.fire({
             title: 'Are you sure?',
             text: "This action cannot be undone.",
@@ -139,12 +145,21 @@
             showCancelButton: true,
             confirmButtonText: 'Yes, delete it!',
             cancelButtonText: 'No, cancel!',
-            reverseButtons: true
+            reverseButtons: true,
+            focusConfirm: false,
+            focusCancel: false,
+            didOpen: () => {
+              setTimeout(() => document.activeElement?.blur(), 10);
+            },
+            didClose: () => {
+              setTimeout(() => document.activeElement?.blur(), 10);
+            }
           }).then((result) => {
             if (result.isConfirmed) {
               const form = document.createElement('form');
               form.method = 'POST';
               form.action = '/User/Delete/' + userId;
+
               const token = document.querySelector('input[name="__RequestVerificationToken"]');
               if (token) {
                 const hiddenToken = document.createElement('input');
@@ -153,11 +168,13 @@
                 hiddenToken.value = token.value;
                 form.appendChild(hiddenToken);
               }
+
               document.body.appendChild(form);
               form.submit();
             }
           });
         }
+
     </script>
     <script src="~/js/Nomination.js">
 
