@@ -17,6 +17,7 @@
         public static string Selected_Award = "🎖️ You Have Been Selected for an Award!";
         public static string Nomination_Reverted = "Nomination Reverted";
         public static string No_Team_Assigned_TeamLead = "No team assigned to you as Team Lead.";
+       
         //user controller
 
     }
@@ -29,5 +30,51 @@
         public const string EmailSubjectWelcome = "🎉 Welcome to Rewards and Recognition!";
         public const string EmailFooter = "— This email was sent from the Rewards & Recognition system";
         public const string LoginInstructions = "Please log in and change your password immediately to secure your account.";
+    }
+
+    public static class ToastMessages_User
+    {
+        public const string CreateUser = "Successfully Created User";
+        public const string UpdateUser = "Successfully Updates User";
+        public const string DeleteUser = "Successfully Deleted User";       
+    }
+
+    public static class ToastMessages_Team
+    {
+        public const string CreateTeam = "Successfully Created Team";
+        public const string UpdateTeam = "Successfully Updated Team";
+        public const string DeleteTeam = "Successfully Deleted Team";
+
+    }
+
+    public static class ToastMessages_Category
+    {
+        public const string CreateCategory = "Successfully Created Category";
+        public const string UpdateCategory = "Successfully Updated Category";
+        public const string DeleteCategory = "Successfully Deleted Category";
+
+    }
+
+    public static class ToastMessages_YearQuarter
+    {
+        public const string CreateYearQuarter = "Successfully Created YearQuarter";
+        public const string UpdateYearQuarter = "Successfully Updated YearQuarter";
+        public const string DeleteYearQuarter = "Successfully Deleted YearQuartery";
+    }
+
+    public static class ToastMessages_Nomination
+    {
+        public const string CreateNomination = "Successfully Created Nomination";
+        public const string UpdateNomination = "Successfully Updated Nomination";
+        public const string DeleteNomination = "Successfully Deleted Nomination";
+        public const string ApproveNomination = "Successfully Approved Nomination";
+        public const string RejectNomination = "Successfully Rejected Nomination";
+        public const string RevertNomination = "Successfully Reverted Nomination";
+    }
+
+    public static class Excel_Messages
+    {
+        public const string ValidExcel = "Please upload a valid Excel file.";
+        public const string SaveExcelData = "Nominations saved successfully.";
     }
 }
