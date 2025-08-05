@@ -1,106 +1,157 @@
 ﻿@using RewardsAndRecognitionSystem.ViewModels
 @model UserViewModel
+
 @{
     ViewData["Title"] = "Create User";
 }
-<style>
-    .btn-indigo {
-        background: #303f9f;
-        color: white;
-    }
 
-        .btn-indigo:hover {
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <title>@ViewData["Title"] - Rewards and Recognition</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <!-- Bootstrap -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" />
+
+    <!-- Font Awesome (for eye icon) -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet" />
+
+    <style>
+        .btn-indigo {
             background: #303f9f;
             color: white;
         }
 
-    .btn-danger {
-        background: #c62828;
-        color: white;
-    }
+            .btn-indigo:hover {
+                background: #303f9f;
+                color: white;
+            }
 
-        .btn-danger:hover {
-            background: #b71c1c;
+        .btn-danger {
+            background: #c62828;
             color: white;
         }
-</style>
 
-<h2 class="mb-4">Create New User</h2>
-
-<div class="card shadow-sm border-0 p-4" style="max-width: 600px; margin: auto;">
-    <form asp-action="Create" id="myForm" method="post">
-        @Html.AntiForgeryToken()
-        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-
-        <div class="form-group mb-3">
-            <label asp-for="Name" class="form-label fw-semibold">Name</label><span class="text-danger">*</span>
-            <input asp-for="Name" class="form-control border-dark-subtle" />
-            <span asp-validation-for="Name" class="text-danger"></span>
-        </div>
-
-        <div class="form-group mb-3">
-            <label asp-for="Email" class="form-label fw-semibold">Email</label><span class="text-danger">*</span>
-            <input asp-for="Email" class="form-control border-dark-subtle" />
-            <span asp-validation-for="Email" class="text-danger"></span>
-        </div>
-
-        <div class="form-group mb-3">
-            <label asp-for="PasswordHash" class="form-label fw-semibold">Password</label><span class="text-danger">*</span>
-            <input asp-for="PasswordHash" type="password" class="form-control border-dark-subtle" />
-            <span asp-validation-for="PasswordHash" class="text-danger"></span>
-        </div>
-
-        <div class="form-group mb-4">
-            <label asp-for="SelectedRole" class="form-label fw-semibold">Role</label><span class="text-danger">*</span>
-            <select asp-for="SelectedRole" class="form-select border-dark-subtle">
-                <option value="">-- Select Role --</option>
-                @foreach (var role in ViewBag.Roles as List<string>)
-                {
-                    <option value="@role">@role</option>
-                }
-            </select>
-            <span asp-validation-for="SelectedRole" class="text-danger"></span>
-        </div>
-
-        <div class="form-group mb-3">
-            <label asp-for="TeamId" class="form-label fw-semibold">Team</label>
-            <select asp-for="TeamId" asp-items="ViewBag.Teams" class="form-select border-dark-subtle">
-                <option value="">-- Select Team --</option>
-            </select>
-            <span asp-validation-for="TeamId" class="text-danger"></span>
-        </div>
-
-        <div class="d-flex justify-content-between">
-            <a asp-action="Index" class="btn btn-danger px-4">Cancel</a>
-            <button type="submit" class="btn btn-indigo px-4">Create</button>
-        </div>
-    </form>
-</div>
-
-@section Scripts {
-    @await Html.PartialAsync("_ValidationScriptsPartial")
-}
-
- 
- <script src="~/lib/jquery/dist/jquery.min.js"></script>
-<script>
-    $(function () {
-        function toggleTeam() {
-            const role = $("#SelectedRole").val();
-            const disable = (role != "Employee");
-            const $team = $("select[name='TeamId']");
-
-            if (disable) {
-                $team.val("");
-                $team.prop("disabled", true);
-            } else {
-                $team.prop("disabled", false);
+            .btn-danger:hover {
+                background: #b71c1c;
+                color: white;
             }
+
+        #togglePassword {
+            top: 50%;
+            right: 15px;
+            transform: translateY(-50%);
+            cursor: pointer;
+            color: #999;
         }
 
-        $("#SelectedRole").change(toggleTeam);
-        toggleTeam();
-    });
+            #togglePassword:hover {
+                color: #303f9f;
+            }
+    </style>
+</head>
+<body>
+    <div class="container py-5">
+        <h2 class="mb-4 text-center">Create New User</h2>
 
+        <div class="card shadow-sm border-0 p-4" style="max-width: 600px; margin: auto;">
+            <form asp-action="Create" id="myForm" method="post">
+                @Html.AntiForgeryToken()
+                <div asp-validation-summary="ModelOnly" class="text-danger"></div>
 
-</script>
+                <div class="form-group mb-3">
+                    <label asp-for="Name" class="form-label fw-semibold">Name</label><span class="text-danger">*</span>
+                    <input asp-for="Name" class="form-control border-dark-subtle" />
+                    <span asp-validation-for="Name" class="text-danger"></span>
+                </div>
+
+                <div class="form-group mb-3">
+                    <label asp-for="Email" class="form-label fw-semibold">Email</label><span class="text-danger">*</span>
+                    <input asp-for="Email" class="form-control border-dark-subtle" />
+                    <span asp-validation-for="Email" class="text-danger"></span>
+                </div>
+
+                <div class="form-group mb-3 position-relative">
+                    <label asp-for="PasswordHash" class="form-label fw-semibold">Password</label><span class="text-danger">*</span>
+
+                    <div class="position-relative">
+                        <input asp-for="PasswordHash" type="password" class="form-control border-dark-subtle" id="passwordField" />
+                        <i class="fa fa-eye position-absolute" id="togglePassword"></i>
+                    </div>
+
+                    <span asp-validation-for="PasswordHash" class="text-danger"></span>
+                </div>
+
+                <div class="form-group mb-4">
+                    <label asp-for="SelectedRole" class="form-label fw-semibold">Role</label><span class="text-danger">*</span>
+                    <select asp-for="SelectedRole" class="form-select border-dark-subtle" id="SelectedRole">
+                        <option value="">-- Select Role --</option>
+                        @foreach (var role in ViewBag.Roles as List<string>)
+                        {
+                            <option value="@role">@role</option>
+                        }
+                    </select>
+                    <span asp-validation-for="SelectedRole" class="text-danger"></span>
+                </div>
+
+                <div class="form-group mb-3">
+                    <label asp-for="TeamId" class="form-label fw-semibold">Team</label>
+                    <select asp-for="TeamId" asp-items="ViewBag.Teams" class="form-select border-dark-subtle">
+                        <option value="">-- Select Team --</option>
+                    </select>
+                    <span asp-validation-for="TeamId" class="text-danger"></span>
+                </div>
+
+                <div class="d-flex justify-content-between">
+                    <a asp-action="Index" class="btn btn-danger px-4">Cancel</a>
+                    <button type="submit" class="btn btn-indigo px-4">Create</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- JS Scripts -->
+    <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
+    <!-- Password Toggle Script -->
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const toggle = document.getElementById("togglePassword");
+            const password = document.getElementById("passwordField");
+
+            toggle.addEventListener("click", function () {
+                const type = password.getAttribute("type") === "password" ? "text" : "password";
+                password.setAttribute("type", type);
+                this.classList.toggle("fa-eye");
+                this.classList.toggle("fa-eye-slash");
+            });
+        });
+    </script>
+
+    <!-- Role -> Team toggle logic -->
+    <script>
+        $(function () {
+            function toggleTeam() {
+                const role = $("#SelectedRole").val();
+                const disable = (role != "Employee");
+                const $team = $("select[name='TeamId']");
+
+                if (disable) {
+                    $team.val("");
+                    $team.prop("disabled", true);
+                } else {
+                    $team.prop("disabled", false);
+                }
+            }
+
+            $("#SelectedRole").change(toggleTeam);
+            toggleTeam();
+        });
+    </script>
+
+    @await Html.PartialAsync("_ValidationScriptsPartial")
+</body>
+</html>

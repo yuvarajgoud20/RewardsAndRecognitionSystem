@@ -19,7 +19,7 @@ using RewardsAndRecognitionSystem.ViewModels;
 
 namespace RewardsAndRecognitionSystem.Controllers
 {
-    [Authorize(Roles = nameof(Roles.Admin))]
+    //[Authorize(Roles = nameof(Roles.Admin))]
     public class UserController : Controller
     {
         private readonly IMapper _mapper;

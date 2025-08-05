@@ -428,6 +428,8 @@
 
     </script>
 }
+@if(Model.Any())
+{
 <div class="d-flex justify-content-between align-items-center mt-4 mb-2" style="min-height: 50px;">
 
     <!-- Left: Page info -->
@@ -465,7 +467,7 @@
     </nav>
 </div>
 
-
+}
 @*  <style>
     .form-check-input:checked {
         background-color: var(--danger);

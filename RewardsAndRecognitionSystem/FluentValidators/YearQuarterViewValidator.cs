@@ -1,5 +1,7 @@
 ﻿using FluentValidation;
+using RewardsAndRecognitionRepository.Enums;
 using RewardsAndRecognitionSystem.ViewModels;
+using System;
 
 namespace RewardsAndRecognitionSystem.FluentValidators
 {
@@ -15,7 +17,6 @@ namespace RewardsAndRecognitionSystem.FluentValidators
             RuleFor(x => x.Quarter)
                 .NotNull().WithMessage("Quarter is required.");
 
-            // Start date validation
             RuleFor(x => x.StartDate)
                 .NotNull().WithMessage("Start Date is required.")
                 .Must((model, startDate) =>
@@ -23,18 +24,27 @@ namespace RewardsAndRecognitionSystem.FluentValidators
                     return startDate?.Year == model.Year;
                 }).WithMessage("Start Date must be within the selected year.");
 
-            // End date validation
             RuleFor(x => x.EndDate)
                 .NotNull().WithMessage("End Date is required.")
-                .GreaterThan(x => x.StartDate)
-
-                .WithMessage("End Date must be after Start Date.")
+                .GreaterThan(x => x.StartDate).WithMessage("End Date must be after Start Date.")
                 .Must((model, endDate) =>
                 {
                     return endDate?.Year == model.Year;
                 }).WithMessage("End Date must be within the selected year.");
-        }
 
+            // ✅ Enforce exact 3-month (approx. quarter) range
+            RuleFor(x => x.EndDate)
+       .Must((model, endDate) =>
+       {
+           if (model.StartDate == null || endDate == null)
+               return true; // Skip this check if dates are missing
+
+           var diffInDays = (endDate.Value - model.StartDate.Value).TotalDays + 1;
+           return diffInDays >= 89 && diffInDays <= 92;
+       })
+       .WithMessage("Date range must be approximately 3 months long.")
+       .When(x => x.StartDate != null && x.EndDate != null); // ✅ Add this guard
+
+        }
     }
 }
-

@@ -12,8 +12,8 @@ using RewardsAndRecognitionRepository.Models;
 namespace RewardsAndRecognitionRepository.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20250722123750_SoftDelete")]
-    partial class SoftDelete
+    [Migration("20250801071127_initial")]
+    partial class initial
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -283,6 +283,9 @@ namespace RewardsAndRecognitionRepository.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(450)");
 
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
                     b.Property<string>("ManagerId")
                         .IsRequired()
                         .HasColumnType("nvarchar(450)");
@@ -334,6 +337,9 @@ namespace RewardsAndRecognitionRepository.Migrations
                         .HasColumnType("bit");
 
                     b.Property<bool?>("IsActive")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("IsDeleted")
                         .HasColumnType("bit");
 
                     b.Property<bool>("LockoutEnabled")
@@ -403,6 +409,9 @@ namespace RewardsAndRecognitionRepository.Migrations
                         .HasColumnType("datetime2");
 
                     b.Property<bool>("IsActive")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("IsDeleted")
                         .HasColumnType("bit");
 
                     b.Property<string>("Quarter")
