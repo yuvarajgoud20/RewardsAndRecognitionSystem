@@ -11,6 +11,7 @@ using RewardsAndRecognitionRepository.Service;
 using RewardsAndRecognitionSystem.Common;
 using RewardsAndRecognitionSystem.Utilities;
 using RewardsAndRecognitionSystem.ViewModels;
+using RewardsAndRecognitionSystem.Common;
 
 namespace RewardsAndRecognitionSystem.Controllers
 {
@@ -98,7 +99,7 @@ namespace RewardsAndRecognitionSystem.Controllers
                 category.CreatedAt = DateTime.UtcNow;
 
                 await _categoryRepo.AddAsync(category);
-                TempData["message"] = "Successfully created Category";
+                TempData["message"] = ToastMessages_Category.CreateCategory;
                 return RedirectToAction(nameof(Index));
             }
 
@@ -137,7 +138,7 @@ namespace RewardsAndRecognitionSystem.Controllers
             existing.CreatedAt = viewModel.CreatedAt;
 
             await _categoryRepo.UpdateAsync(existing);
-            TempData["message"] = "Successfully updated Category";
+            TempData["message"] = ToastMessages_Category.UpdateCategory;
             return RedirectToAction(nameof(Index));
         }
 
@@ -162,7 +163,7 @@ namespace RewardsAndRecognitionSystem.Controllers
                 return NotFound();
             }
             await _categoryRepo.SoftDeleteAsync(id);
-            TempData["message"] = "Successfully deleted Category";
+            TempData["message"] = ToastMessages_Category.DeleteCategory;
             return RedirectToAction(nameof(Index));
         }
 

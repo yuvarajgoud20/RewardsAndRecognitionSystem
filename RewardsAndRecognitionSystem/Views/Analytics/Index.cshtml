@@ -56,6 +56,15 @@
         width: 100%;
         margin-bottom: 20px;
     }
+    /* Ensure all charts inside cards have the same height */
+    .card-body {
+        height: 450px; /* Fixed height for card body */
+    }
+
+    canvas {
+        height: 100% !important; /* Ensure canvas takes up the full height of its container */
+        width: 100% !important; /* Ensure canvas fills the container width */
+    }
 
     #teamPieChart {
         width: 400px !important; 
@@ -441,24 +450,30 @@
             Object.entries(grouped).forEach(([category, list], index) => {
                 const canvasId = `categoryChart_${index}`;
 
-                container.append(`
-                    <div class="col">
-                        <div class="card shadow-sm h-100">
-                            <div class="card-body">
-                                <div class="d-flex justify-content-between align-items-center mb-2">
-                                    <h5 class="card-title">${category}</h5>
-                                    <div>
-                                        <button class="btn btn-sm btn-outline-secondary me-2" onclick="maximizeChart('${category}', ${JSON.stringify(list).replace(/"/g, '&quot;')})">🔍 Maximize</button>
-                                        <button class="btn btn-sm btn-outline-secondary" onclick="showTeamModal('${category}', ${JSON.stringify(list).replace(/"/g, '&quot;')})">📊 View More</button>
-                                    </div>
-                                </div>
-                                <div class="scroll-wrapper">
-                                    <canvas id="${canvasId}" height="320"></canvas>
-                                </div>
+                    // Check if scroll is needed
+        const needsScroll = list.length > 4;
+        const scrollClass = needsScroll ? 'scroll-wrapper' : '';
+
+            container.append(`
+            <div class="col">
+                <div class="card shadow-sm h-100">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <h5 class="card-title">${category}</h5>
+                            <div>
+                                <button class="btn btn-sm btn-outline-secondary me-2" onclick="maximizeChart('${category}', ${JSON.stringify(list).replace(/"/g, '&quot;')})">🔍 Maximize</button>
+                                <button class="btn btn-sm btn-outline-secondary" onclick="showTeamModal('${category}', ${JSON.stringify(list).replace(/"/g, '&quot;')})">📊 View More</button>
                             </div>
                         </div>
+                        <div class="${scrollClass}">
+                            <canvas id="${canvasId}" height="320"></canvas> <!-- Ensure all charts have the same height -->
+                        </div>
                     </div>
-                `);
+                </div>
+            </div>
+        `);
+
+
 
                 const teams = list.map(d => d.team);
                 const maxCount = Math.max(...list.map(d => d.approvedCount + d.pendingCount + d.rejectedCount), 1);

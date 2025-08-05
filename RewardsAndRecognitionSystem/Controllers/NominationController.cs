@@ -320,7 +320,7 @@ namespace RewardsAndRecognitionSystem.Controllers
                 nomination.Id = Guid.NewGuid();
                 nomination.CreatedAt = DateTime.UtcNow;
                 await _nominationRepo.AddNominationAsync(nomination);
-                TempData["message"] = "Successfully created Nomination";
+                TempData["message"] = ToastMessages_Nomination.CreateNomination;
                 return RedirectToAction(nameof(Index));
             }
             var currentUser = await _userManager.GetUserAsync(User);
@@ -385,7 +385,7 @@ namespace RewardsAndRecognitionSystem.Controllers
             existing.Status = viewModel.Status;
 
             await _nominationRepo.UpdateNominationAsync(existing);
-            TempData["message"] = "Successfully updated Nomination";
+            TempData["message"] = ToastMessages_Nomination.UpdateNomination;
             return RedirectToAction(nameof(Index));
         }
 
@@ -400,7 +400,7 @@ namespace RewardsAndRecognitionSystem.Controllers
                 return Forbid();
 
             await _nominationRepo.SoftDeleteNominationAsync(id);
-            TempData["message"] = "Successfully deleted Nomination";
+            TempData["message"] = ToastMessages_Nomination.DeleteNomination;
             return RedirectToAction(nameof(Index));
         }
 
@@ -504,7 +504,7 @@ namespace RewardsAndRecognitionSystem.Controllers
                 }
             }
 
-            TempData["message"] = ((nomination.Status == NominationStatus.ManagerApproved) || (nomination.Status == NominationStatus.DirectorApproved)) ? "Sucessfully Approved" : "Rejected Successfully";
+            TempData["message"] = ((nomination.Status == NominationStatus.ManagerApproved) || (nomination.Status == NominationStatus.DirectorApproved)) ? ToastMessages_Nomination.ApproveNomination : ToastMessages_Nomination.RejectNomination;
             return RedirectToAction(nameof(Index));
         }
 
@@ -545,7 +545,7 @@ namespace RewardsAndRecognitionSystem.Controllers
                     to: teamLead.Email
                 );
             }
-            TempData["message"] = "Successfully Reverted the Nomination";
+            TempData["message"] = ToastMessages_Nomination.RevertNomination;
             return RedirectToAction(nameof(Index));
         }
 
@@ -850,7 +850,7 @@ namespace RewardsAndRecognitionSystem.Controllers
         {
             if (file == null || file.Length == 0)
             {
-                TempData["Error"] = "Please upload a valid Excel file.";
+                TempData["Error"] = Excel_Messages.ValidExcel;
                 return View("UploadNomination");
             }
 
@@ -937,9 +937,9 @@ namespace RewardsAndRecognitionSystem.Controllers
                 }
 
                 var ns = await _nominationRepo.GetAllNominationsAsync();
-                var isValid = ns.Where(n => n.NomineeId == nominee.Id && n.CategoryId == category.Id);
+                bool exists = ns.Any(n => n.NomineeId == nominee.Id && n.CategoryId == category.Id);
 
-                if (isValid != null)
+                if (exists)
                     throw new Exception($"Some nominations in Excel already Exists");
 
                 nominations.Add(new Nomination
@@ -962,7 +962,7 @@ namespace RewardsAndRecognitionSystem.Controllers
             await _context.SaveChangesAsync();
             await transaction.CommitAsync();
 
-            TempData["Message"] = "Nominations saved successfully.";
+            TempData["Message"] = Excel_Messages.SaveExcelData;
             return RedirectToAction(nameof(Index));
         }
 

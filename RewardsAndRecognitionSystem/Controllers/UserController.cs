@@ -158,7 +158,7 @@ namespace RewardsAndRecognitionSystem.Controllers
                           </div>
                         </body>"
                     );
-                    TempData["message"] = "Successfully created User";
+                    TempData["message"] = ToastMessages_User.CreateUser; 
                     return RedirectToAction(nameof(Index));
                 }
 
@@ -239,7 +239,7 @@ namespace RewardsAndRecognitionSystem.Controllers
                 var result = await _userManager.UpdateAsync(user);
                 if (result.Succeeded)
                 {
-                    TempData["message"] = "Successfully updated User";
+                    TempData["message"] =ToastMessages_User.UpdateUser;
                     return RedirectToAction(nameof(Index));
                 }
 
@@ -270,7 +270,7 @@ namespace RewardsAndRecognitionSystem.Controllers
                 // handle failure (optional)
                 ModelState.AddModelError("", "Unable to soft delete the user.");
             }
-            TempData["message"] = "Successfully deleted User";
+            TempData["message"] = ToastMessages_User.DeleteUser;
             return RedirectToAction(nameof(Index));
         }
 
@@ -343,8 +343,10 @@ namespace RewardsAndRecognitionSystem.Controllers
 
         private async Task PopulateDropDowns()
         {
-            var teams = await _teamRepo.GetAllAsync();
-            var managers = await _userRepo.GetAllManagersAsync();
+            var teamsQuery = await _teamRepo.GetAllAsync();
+            var teams = teamsQuery.Where(t => t.IsDeleted == false);
+            var managersQuery = await _userRepo.GetAllManagersAsync();
+            var managers = managersQuery.Where(u => u.IsDeleted == false);
             var roles = new List<string> { "Admin", "TeamLead", "Manager", "Director", "Employee" };
 
             ViewBag.Teams = new SelectList(teams, "Id", "Name");
