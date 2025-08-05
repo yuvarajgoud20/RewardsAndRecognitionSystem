@@ -19,7 +19,7 @@ using RewardsAndRecognitionSystem.ViewModels;
 
 namespace RewardsAndRecognitionSystem.Controllers
 {
-    [Authorize(Roles = nameof(Roles.Admin))]
+    //[Authorize(Roles = nameof(Roles.Admin))]
     public class UserController : Controller
     {
         private readonly IMapper _mapper;
@@ -340,8 +340,10 @@ namespace RewardsAndRecognitionSystem.Controllers
 
         private async Task PopulateDropDowns()
         {
-            var teams = await _teamRepo.GetAllAsync();
-            var managers = await _userRepo.GetAllManagersAsync();
+            var teamsQuery = await _teamRepo.GetAllAsync();
+            var teams = teamsQuery.Where(t => t.IsDeleted == false);
+            var managersQuery = await _userRepo.GetAllManagersAsync();
+            var managers = managersQuery.Where(u => u.IsDeleted == false);
             var roles = new List<string> { "Admin", "TeamLead", "Manager", "Director", "Employee" };
 
             ViewBag.Teams = new SelectList(teams, "Id", "Name");

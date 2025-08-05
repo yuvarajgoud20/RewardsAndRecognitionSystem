@@ -102,6 +102,9 @@ internal class Program
             builder.Services.AddTransient<IValidator<YearQuarterViewModel>, YearQuarterViewValidator>();
             builder.Services.AddTransient<IValidator<NominationViewModel>, NominationViewValidator>();
 
+            // Background Service
+            builder.Services.AddHostedService<PendingNominationBackgroundService>();
+
             builder.Services.AddRazorPages();
             builder.Services.ConfigureApplicationCookie(options =>
             {
@@ -114,7 +117,7 @@ internal class Program
             builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 
             builder.Services.Configure<EmailSettings>(builder.Configuration.GetSection("EmailSettings"));
-            builder.Services.AddScoped<IEmailService, EmailService>();
+            builder.Services.AddTransient<IEmailService, EmailService>();
 
             builder.Services.AddIdentity<User, IdentityRole>()
                 .AddEntityFrameworkStores<ApplicationDbContext>()
@@ -130,6 +133,8 @@ internal class Program
             builder.Services.AddScoped<ICategoryRepo, CategoryRepo>();
             builder.Services.AddScoped<IApprovalRepo, ApprovalRepo>();
             builder.Services.AddScoped<IYearQuarterRepo, YearQuarterRepo>();
+
+            //
 
             builder.Services.AddScoped<ICategoryService, CategoryService>();
             builder.Services.ConfigureApplicationCookie(options =>

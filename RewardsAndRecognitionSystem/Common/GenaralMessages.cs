@@ -5,7 +5,7 @@
         //Analytics controller
         public static string Analytics_Error = "No active quarter is set in the system.";
         public static string Quarter_Not_Selected = "No quarter selected.";
-        public static string No_Nominations_This_Quarter = "No nominations were made in this quarter.";
+        public static string No_Nominations_This_Quarter = "No Graphs to Display";
         public static string No_Data_For_Quarter = "No data available for this quarter.";
         public static string Unauthorized_User = "Unauthorized user.";
 
