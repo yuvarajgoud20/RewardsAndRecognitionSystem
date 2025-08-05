@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using RewardsAndRecognitionRepository.Enums;
 using RewardsAndRecognitionRepository.Interfaces;
 using RewardsAndRecognitionRepository.Models;
+using RewardsAndRecognitionSystem.Common;
 using RewardsAndRecognitionSystem.ViewModels;
 using Superpower.Model;
 
@@ -126,7 +127,8 @@ namespace RewardsAndRecognitionSystem.Controllers
             var yearQuarter = _mapper.Map<YearQuarter>(yq);
             await _yearQuarterRepo.AddAsync(yearQuarter);
 
-            TempData["message"] = "Successfully created YearQuarter";
+            TempData["message"] = ToastMessages_YearQuarter.CreateYearQuarter;
+
             return RedirectToAction(nameof(Index));
         }
 
@@ -199,7 +201,7 @@ namespace RewardsAndRecognitionSystem.Controllers
             existing.IsActive = yq.IsActive;
 
             await _yearQuarterRepo.UpdateAsync(existing);
-            TempData["message"] = "Successfully updated YearQuarter";
+            TempData["message"] = ToastMessages_YearQuarter.UpdateYearQuarter;
             return RedirectToAction(nameof(Index));
         }
 
@@ -219,7 +221,7 @@ namespace RewardsAndRecognitionSystem.Controllers
 
             await _yearQuarterRepo.SoftDeleteAsync(id);
 
-            TempData["message"] = "Successfully deleted YearQuarter";
+            TempData["message"] = ToastMessages_YearQuarter.DeleteYearQuarter;
             return RedirectToAction(nameof(Index));
         }
 
