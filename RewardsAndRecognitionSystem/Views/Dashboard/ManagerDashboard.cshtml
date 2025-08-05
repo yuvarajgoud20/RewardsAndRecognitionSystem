@@ -184,16 +184,27 @@
     var chartIndex = 0;
     var teamChartData = ViewBag.TeamStatusData;
 }
+@{
+    var data = teamChartData as IEnumerable<dynamic>;
+    var hasData = data != null && data.Any(t =>
+    Convert.ToInt32(t.Approved) +
+    Convert.ToInt32(t.Rejected) +
+    Convert.ToInt32(t.Pending) > 0);
+}
 
 <div class="d-flex justify-content-between align-items-center mb-3">
     <h4 class="mt-5"><i class="bi bi-bar-chart-line-fill"></i> Team Wise Statistics</h4>
-    <a asp-controller="Analytics"
-       asp-action="Index"
-       asp-route-yearQuarterId="@ViewBag.CurrentQuarterId"
-       class="btn btn-info analytics-btn mt-5">
-        <i class="bi bi-graph-up-arrow"></i> View Analytics
-    </a>
+    @if (hasData)
+    {
+        <a asp-controller="Analytics"
+           asp-action="Index"
+           asp-route-yearQuarterId="@ViewBag.CurrentQuarterId"
+           class="btn btn-info analytics-btn mt-5">
+            <i class="bi bi-graph-up-arrow"></i> View Analytics
+        </a>
+    }
 </div>
+
 
 
 <!-- Chart CSS -->
@@ -289,13 +300,7 @@
             chartIndex++;
         }
         @* Show message if no team has nominations *@
-        @{
-            var data = teamChartData as IEnumerable<dynamic>;
-            var hasData = data != null && data.Any(t =>
-            Convert.ToInt32(t.Approved) +
-            Convert.ToInt32(t.Rejected) +
-            Convert.ToInt32(t.Pending) > 0);
-        }
+      
         @if (!hasData)
         {
             <div class="col-12">
