@@ -108,9 +108,12 @@ namespace RewardsAndRecognitionSystem.Controllers
                 return NotFound();
             }
 
-            var managers = await _userRepo.GetAllManagersAsync();
-            var leads = await _userRepo.GetLeadsAsync(team.TeamLeadId);
-            var directors = await _userRepo.GetAllDirectorsAsync();
+            var managersQuery = await _userRepo.GetAllManagersAsync();
+            var managers = managersQuery.Where(m => m.IsDeleted == false);
+            var leadsQuery = await _userRepo.GetLeadsAsync(team.TeamLeadId);
+            var leads = leadsQuery.Where(m => m.IsDeleted == false);
+            var directorsQuery = await _userRepo.GetAllDirectorsAsync();
+            var directors = directorsQuery.Where(m => m.IsDeleted == false);
 
             ViewBag.Managers = new SelectList(managers, "Id", "Name", team.ManagerId);
             ViewBag.TeamLeads = new SelectList(leads, "Id", "Name", team.TeamLeadId);
@@ -216,9 +219,12 @@ namespace RewardsAndRecognitionSystem.Controllers
 
         private async Task LoadDropdownsAsync()
         {
-            var managers = await _userRepo.GetAllManagersAsync();
-            var leads = await _userRepo.GetLeadsAsync();
-            var directors = await _userRepo.GetAllDirectorsAsync();
+            var managersQuery = await _userRepo.GetAllManagersAsync();
+            var managers = managersQuery.Where(m => m.IsDeleted == false);
+            var leadsQuery = await _userRepo.GetLeadsAsync();
+            var leads = leadsQuery.Where(m => m.IsDeleted == false);
+            var directorsQuery = await _userRepo.GetAllDirectorsAsync();
+            var directors = directorsQuery.Where(m => m.IsDeleted == false);
 
             ViewBag.Managers = new SelectList(managers, "Id", "Name");
             ViewBag.TeamLeads = new SelectList(leads, "Id", "Name");
