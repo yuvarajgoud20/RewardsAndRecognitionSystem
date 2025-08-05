@@ -139,7 +139,7 @@ namespace RewardsAndRecognitionSystem.Areas.Identity.Pages.Account
 
             if (result.Succeeded)
             {
-                TempData["message"] = "Successfully logged in.";
+                
                 _logger.LogInformation("User logged in.");
                 return LocalRedirect(returnUrl);
             }

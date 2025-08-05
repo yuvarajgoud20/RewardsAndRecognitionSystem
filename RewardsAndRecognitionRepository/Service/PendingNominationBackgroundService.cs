@@ -31,7 +31,7 @@ namespace RewardsAndRecognitionRepository.Service
             while (!stoppingToken.IsCancellationRequested)
             {
                 var now = DateTime.Now;
-                var targetTime = DateTime.Today.AddHours(14).AddMinutes(2);
+                var targetTime = DateTime.Today.AddHours(8).AddMinutes(0);
 
                 if (now >= targetTime && now < targetTime.AddMinutes(1))
                 {
@@ -86,8 +86,9 @@ namespace RewardsAndRecognitionRepository.Service
                                     <tbody>
                                         {string.Join("", pendingNominations.Select(n => $@"
                                             <tr>
-                                                <td style=""border: 1px solid #ddd; padding: 8px;"">{n.Nominee.Email}</td>
+                                                <td style=""border: 1px solid #ddd; padding: 8px;"">{n.Nominee.Name}</td>
                                                 <td style=""border: 1px solid #ddd; padding: 8px;"">{n.Category.Name}</td>
+                                                <td style=""border: 1px solid #ddd; padding: 8px;"">{n.Nominee.Team.Name}</td>
                                             </tr>"))}
                                     </tbody>
                                 </table>
