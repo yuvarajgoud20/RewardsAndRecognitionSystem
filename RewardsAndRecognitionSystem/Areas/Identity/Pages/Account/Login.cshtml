@@ -125,11 +125,13 @@
                     <span asp-validation-for="Input.Email" class="text-danger"></span>
                 </div>
 
-                <div class="form-floating mb-3">
-                    <input asp-for="Input.Password" type="password" class="form-control" autocomplete="current-password" placeholder="Password" />
+                <div class="form-floating mb-3 position-relative">
+                    <input asp-for="Input.Password" type="password" class="form-control" id="password" autocomplete="current-password" placeholder="Password" />
                     <label asp-for="Input.Password">Password</label>
                     <span asp-validation-for="Input.Password" class="text-danger"></span>
+                    <i class="fa fa-eye position-absolute" id="togglePassword" style="top: 50%; right: 15px; transform: translateY(-50%); cursor: pointer;"></i>
                 </div>
+
 
                 <div class="checkbox mb-3">
                     <label>
@@ -147,6 +149,21 @@
     <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
     <partial name="_ValidationScriptsPartial" />
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const togglePassword = document.getElementById("togglePassword");
+            const passwordInput = document.getElementById("password");
+
+            togglePassword.addEventListener("click", function () {
+                const type = passwordInput.getAttribute("type") === "password" ? "text" : "password";
+                passwordInput.setAttribute("type", type);
+                this.classList.toggle("fa-eye");
+                this.classList.toggle("fa-eye-slash");
+            });
+        });
+    </script>
+
 </body>
 </html>
 
@@ -156,6 +173,9 @@
         <script>
             // ⛔ Prevent rendering login if user already logged in (client-side fallback)
             window.location.href = "/";
+                  
+           
+        
         </script>
     }
 
