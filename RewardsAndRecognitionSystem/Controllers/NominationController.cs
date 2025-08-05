@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
 using RewardsAndRecognitionRepository.Enums;
 using RewardsAndRecognitionRepository.Interfaces;
 using RewardsAndRecognitionRepository.Models;
@@ -30,6 +31,7 @@ namespace RewardsAndRecognitionSystem.Controllers
         private readonly UserManager<User> _userManager;
         private readonly IEmailService _emailService;
         private readonly ICategoryRepo _categoryRepo;
+        private readonly PaginationSettings _paginationSettings;
 
         public NominationController(
             IMapper mapper,
@@ -37,7 +39,8 @@ namespace RewardsAndRecognitionSystem.Controllers
             ApplicationDbContext context,
             UserManager<User> userManager,
             IEmailService emailService,
-            ICategoryRepo categoryRepo)
+            ICategoryRepo categoryRepo,
+             IOptions<PaginationSettings> paginationOptions)
 
         {
             _nominationRepo = nominationRepo;
@@ -46,6 +49,7 @@ namespace RewardsAndRecognitionSystem.Controllers
             _mapper = mapper;
             _emailService = emailService;
             _categoryRepo = categoryRepo;
+            _paginationSettings = paginationOptions.Value;
         }
 
         // GET: Nomination
@@ -55,7 +59,7 @@ namespace RewardsAndRecognitionSystem.Controllers
             ViewBag.filter = filter;
 
 
-            int pageSize = 25;
+            int pageSize = _paginationSettings.DefaultPageSize;
 
             var currentUser = await _userManager.GetUserAsync(User);
             if (currentUser == null)

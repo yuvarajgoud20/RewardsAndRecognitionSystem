@@ -137,6 +137,8 @@ internal class Program
             //
 
             builder.Services.AddScoped<ICategoryService, CategoryService>();
+            builder.Services.Configure<PaginationSettings>(builder.Configuration.GetSection("PaginationSettings"));
+
             builder.Services.ConfigureApplicationCookie(options =>
             {
                 options.LoginPath = "/Login";

@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.Extensions.Options;
 using RewardsAndRecognitionRepository.Enums;
 using RewardsAndRecognitionRepository.Interfaces;
 using RewardsAndRecognitionRepository.Models;
@@ -17,16 +18,19 @@ namespace RewardsAndRecognitionSystem.Controllers
     {
         private readonly IYearQuarterRepo _yearQuarterRepo;
         private readonly IMapper _mapper;
+        private readonly PaginationSettings _paginationSettings;
 
-        public YearQuarterController(IMapper mapper, IYearQuarterRepo yearQuarterRepo)
+
+        public YearQuarterController(IMapper mapper, IYearQuarterRepo yearQuarterRepo, IOptions<PaginationSettings> paginationOptions)
         {
             _mapper = mapper;
             _yearQuarterRepo = yearQuarterRepo;
+            _paginationSettings = paginationOptions.Value;
         }
 
         public async Task<IActionResult> Index(string filter = "active", int page = 1)
         {
-            int pageSize = 25;
+            int pageSize = _paginationSettings.DefaultPageSize;
             IEnumerable<YearQuarter> allQuarters;
 
             if (filter == "deleted")

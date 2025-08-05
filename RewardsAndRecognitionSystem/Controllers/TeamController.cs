@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
 using RewardsAndRecognitionRepository.Enums;
 using RewardsAndRecognitionRepository.Interfaces;
 using RewardsAndRecognitionRepository.Models;
@@ -21,8 +22,9 @@ namespace RewardsAndRecognitionSystem.Controllers
         private readonly ApplicationDbContext _context;
         private readonly IUserRepo _userRepo;
         private readonly UserManager<User> _userManager;
+        private readonly PaginationSettings _paginationSettings;
 
-        public TeamController(IMapper mapper, ITeamRepo teamRepo, IUserRepo userRepo, UserManager<User> userManager, ApplicationDbContext context)
+        public TeamController(IMapper mapper, ITeamRepo teamRepo, IUserRepo userRepo, UserManager<User> userManager, ApplicationDbContext context, IOptions<PaginationSettings> paginationOptions)
 
         {
             _mapper = mapper;
@@ -30,12 +32,12 @@ namespace RewardsAndRecognitionSystem.Controllers
             _userRepo = userRepo;
             _context = context;
             _userManager = userManager;
+            _paginationSettings = paginationOptions.Value;
         }
 
         public async Task<IActionResult> Index(int page = 1, bool showDeleted = false)
         {
-            int pageSize = 25;
-
+            int pageSize = _paginationSettings.DefaultPageSize;
             var teamsQuery = (await _teamRepo.GetAllAsync(showDeleted))
                              .OrderBy(t => t.Name)
                               .ToList();
