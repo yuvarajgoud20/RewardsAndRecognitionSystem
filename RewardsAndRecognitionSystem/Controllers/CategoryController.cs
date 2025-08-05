@@ -1,14 +1,16 @@
-﻿using AutoMapper;
+﻿using System.Linq;
+using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
-using System.Linq;
+using RewardsAndRecognitionRepository.Enums;
 using RewardsAndRecognitionRepository.Interfaces;
 using RewardsAndRecognitionRepository.Models;
 using RewardsAndRecognitionRepository.Service;
-using RewardsAndRecognitionSystem.ViewModels;
-using RewardsAndRecognitionRepository.Enums;
+using RewardsAndRecognitionSystem.Common;
 using RewardsAndRecognitionSystem.Utilities;
+using RewardsAndRecognitionSystem.ViewModels;
 
 namespace RewardsAndRecognitionSystem.Controllers
 {
@@ -19,20 +21,22 @@ namespace RewardsAndRecognitionSystem.Controllers
         private readonly ICategoryRepo _categoryRepo;
         private readonly INominationRepo _nominationRepo;
         private readonly ICategoryService _categoryService;
+        private readonly PaginationSettings _paginationSettings;
 
-        public CategoryController(IMapper mapper, ICategoryRepo categoryRepo, INominationRepo nominationRepo, ICategoryService service)
+        public CategoryController(IMapper mapper, ICategoryRepo categoryRepo, INominationRepo nominationRepo, ICategoryService service, IOptions<PaginationSettings> paginationOptions)
         {
             _mapper = mapper;
             _categoryRepo = categoryRepo;
             _nominationRepo = nominationRepo;
             _categoryService = service;
+            _paginationSettings = paginationOptions.Value;
         }
 
         public async Task<IActionResult> Index(int page = 1, bool showDeleted = false)
         {
 
-     
-            int pageSize = 25;
+
+            int pageSize = _paginationSettings.DefaultPageSize;
 
             var allCategoriesEnumerable = await _categoryRepo.GetAllAsync(showDeleted);
             var allCategories = allCategoriesEnumerable

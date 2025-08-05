@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
 using RewardsAndRecognitionRepository;
 using RewardsAndRecognitionRepository.Enums;
 using RewardsAndRecognitionRepository.Interfaces;
@@ -28,14 +29,15 @@ namespace RewardsAndRecognitionSystem.Controllers
         private readonly ITeamRepo _teamRepo;
         private readonly ApplicationDbContext _context;
         private readonly IEmailService _emailService;
-
+        private readonly PaginationSettings _paginationSettings;
         public UserController(
             IMapper mapper,
             IUserRepo userRepo,
             UserManager<User> userManager,
             ITeamRepo teamRepo,
             ApplicationDbContext context,
-            IEmailService emailService)
+            IEmailService emailService,
+            IOptions<PaginationSettings> paginationOptions)
         {
             _mapper = mapper;
             _userRepo = userRepo;
@@ -43,11 +45,12 @@ namespace RewardsAndRecognitionSystem.Controllers
             _teamRepo = teamRepo;
             _context = context;
             _emailService = emailService;
+            _paginationSettings = paginationOptions.Value;
         }
 
         public async Task<IActionResult> Index(string filter = "active",int page = 1)
         {
-            int pageSize = 25;
+            int pageSize = _paginationSettings.DefaultPageSize;
             IQueryable<User> usersQuery = _context.Users
                     .Include(u => u.Team)
                     .ThenInclude(t => t.Manager)

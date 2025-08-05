@@ -278,6 +278,7 @@ namespace RewardsAndRecognitionSystem.Controllers
                     .ThenInclude(u => u.Team)
                 .Include(n => n.Category)
                 .Where(n =>
+                !n.IsDeleted&&
                     n.YearQuarterId == yearQuarterId &&
                     n.Nominator.Team != null &&
                     n.Category != null &&

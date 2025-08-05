@@ -113,6 +113,7 @@ public class DashboardController : Controller
                 .OrderByDescending(yq => yq.Year)
                 .ThenByDescending(yq => yq.Quarter)
                 .FirstOrDefaultAsync();
+                 
 
             if (currentYQ == null)
             {
@@ -165,7 +166,7 @@ public class DashboardController : Controller
                 .Include(n => n.Category)
                 .Include(n => n.Approvals)
                 .Include(n => n.Nominator)
-                .Where(n => teamUserIds.Contains(n.NomineeId) && n.YearQuarterId == yearQuarterId)
+                .Where(n => !n.IsDeleted && teamUserIds.Contains(n.NomineeId) && n.YearQuarterId == yearQuarterId)
                 .ToListAsync();
 
             // Breakdown nominations per team (for pie/bar chart)
@@ -237,6 +238,7 @@ public class DashboardController : Controller
                 .Include(n => n.Approvals)
                 .Include(n => n.Nominator)
                 .Where(n =>
+                    !n.IsDeleted&&
                     nomineeIds.Contains(n.NomineeId) && // 🟢 This line restricts data to this Director only
                     n.YearQuarterId == yearQuarterId &&
                     n.Status != NominationStatus.PendingManager)
@@ -348,7 +350,7 @@ public class DashboardController : Controller
             var nomineeIds = team.Users.Select(u => u.Id).ToList();
 
             var teamLeadNominations = nominations
-                .Where(n => nomineeIds.Contains(n.NomineeId) && n.YearQuarterId == yearQuarterId)
+                .Where(n =>!n.IsDeleted && nomineeIds.Contains(n.NomineeId) && n.YearQuarterId == yearQuarterId)
                 .ToList();
 
             ViewBag.TotalNominations = teamLeadNominations.Count;
