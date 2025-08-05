@@ -1,13 +1,10 @@
-﻿
-@model RewardsAndRecognitionSystem.ViewModels.YearQuarterViewModel
+﻿@model RewardsAndRecognitionSystem.ViewModels.YearQuarterViewModel
 
 @{
-
     ViewData["Title"] = "Create Year Quarter";
-
 }
-<style>
 
+<style>
     .btn-indigo {
         background: #303f9f;
         color: white;
@@ -25,14 +22,20 @@
 
         .btn-danger:hover {
             background: #b71c1c;
-            color: white
+            color: white;
         }
 </style>
+
 <h2 class="mb-4">Create Year Quarter</h2>
 
 <div class="card p-4 shadow-sm" style="max-width: 600px; margin: auto;">
     <form asp-action="Create" method="post">
         @Html.AntiForgeryToken()
+
+        <!-- Validation summary for general errors -->
+        @Html.ValidationSummary(true, "", new { @class = "text-danger mb-3" })
+
+
         <div class="mb-3">
             <label asp-for="Year" class="form-label">Year</label><span class="text-danger">*</span>
             <input asp-for="Year" class="form-control" />
@@ -70,8 +73,3 @@
         </div>
     </form>
 </div>
-
-
-
-
-

@@ -4,38 +4,39 @@
     int totalPages = Model.TotalPages;
     string action = Model.ActionName;
     var showDeleted = Context.Request.Query["showDeleted"].ToString();
+    
+
 }
+    <div class="d-flex justify-content-between align-items-center pt-3 border-top">
+        <!-- Page info (left) -->
+        <div>
+            Showing Page @currentPage of @totalPages
+        </div>
 
-<div class="d-flex justify-content-between align-items-center pt-3 border-top">
-    <!-- Page info (left) -->
-    <div>
-        Showing Page @currentPage of @totalPages
+        <!-- Pagination (right) -->
+        <nav>
+            <ul class="pagination mb-0">
+                <li class="page-item @(currentPage <= 1 ? "disabled" : "")">
+                    <a class="page-link"
+                       asp-action="@action"
+                       asp-route-page="@(currentPage - 1)"
+                       asp-route-showDeleted="@showDeleted">
+                        Previous
+                    </a>
+                </li>
+
+                <li class="page-item active">
+                    <span class="page-link">@currentPage</span>
+                </li>
+
+                <li class="page-item @(currentPage >= totalPages ? "disabled" : "")">
+                    <a class="page-link"
+                       asp-action="@action"
+                       asp-route-page="@(currentPage + 1)"
+                       asp-route-showDeleted="@showDeleted">
+                        Next
+                    </a>
+                </li>
+            </ul>
+        </nav>
     </div>
-
-    <!-- Pagination (right) -->
-    <nav>
-        <ul class="pagination mb-0">
-            <li class="page-item @(currentPage <= 1 ? "disabled" : "")">
-                <a class="page-link"
-                   asp-action="@action"
-                   asp-route-page="@(currentPage - 1)"
-                   asp-route-showDeleted="@showDeleted">
-                    Previous
-                </a>
-            </li>
-
-            <li class="page-item active">
-                <span class="page-link">@currentPage</span>
-            </li>
-
-            <li class="page-item @(currentPage >= totalPages ? "disabled" : "")">
-                <a class="page-link"
-                   asp-action="@action"
-                   asp-route-page="@(currentPage + 1)"
-                   asp-route-showDeleted="@showDeleted">
-                    Next
-                </a>
-            </li>
-        </ul>
-    </nav>
-</div>

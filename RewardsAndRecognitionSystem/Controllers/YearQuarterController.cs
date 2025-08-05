@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using RewardsAndRecognitionRepository.Enums;
 using RewardsAndRecognitionRepository.Interfaces;
 using RewardsAndRecognitionRepository.Models;
+using RewardsAndRecognitionSystem.Common;
 using RewardsAndRecognitionSystem.ViewModels;
 using Superpower.Model;
 
@@ -84,23 +85,54 @@ namespace RewardsAndRecognitionSystem.Controllers
         public async Task<IActionResult> Create(YearQuarterViewModel yq)
         {
             var yqs = await _yearQuarterRepo.GetAllAsync();
-            if (yqs.Any(yearquarter => yearquarter.Year == yq.Year && yearquarter.Quarter == yq.Quarter))
+
+            // Check for duplicate Year + Quarter (non-deleted only)
+            if (yqs.Any(q => q.Year == yq.Year && q.Quarter == yq.Quarter && q.IsDeleted == false))
             {
-                ModelState.AddModelError("Quarter", " Year + Quarter Combination already Exists.please select another quarter");
+                ModelState.AddModelError("Quarter", "Year + Quarter combination already exists. Please select another.");
             }
+
+            // Ensure both dates are entered before checking overlaps
+            if (yq.StartDate.HasValue && yq.EndDate.HasValue)
+            {
+                var start = yq.StartDate.Value.Date;
+                var end = yq.EndDate.Value.Date;
+
+               
+                
+                // Overlap check with all non-deleted quarters
+                bool overlaps = yqs.Any(q =>
+                    q.IsDeleted == false &&
+                    q.StartDate.HasValue && q.EndDate.HasValue &&
+                    (
+                        (start >= q.StartDate.Value.Date && start <= q.EndDate.Value.Date) ||       // Starts inside
+                        (end >= q.StartDate.Value.Date && end <= q.EndDate.Value.Date) ||           // Ends inside
+                        (start <= q.StartDate.Value.Date && end >= q.EndDate.Value.Date)            // Fully encloses
+                    )
+                );
+
+                if (overlaps)
+                {
+                    ModelState.AddModelError("", "A quarter already exists within this date range.");
+                }
+            }
+
             if (!ModelState.IsValid)
             {
                 ViewBag.Quarters = new SelectList(Enum.GetValues(typeof(Quarter)));
-                ModelState.Remove("Year");
                 return View(yq);
             }
 
             yq.Id = Guid.NewGuid();
             var yearQuarter = _mapper.Map<YearQuarter>(yq);
             await _yearQuarterRepo.AddAsync(yearQuarter);
-            TempData["message"] = "Successfully created YearQuarter";
+
+            TempData["message"] = ToastMessages_YearQuarter.CreateYearQuarter;
+
             return RedirectToAction(nameof(Index));
         }
+
+        [HttpGet]
 
         public async Task<IActionResult> Edit(Guid id)
         {
@@ -124,13 +156,44 @@ namespace RewardsAndRecognitionSystem.Controllers
             if (existing == null)
                 return NotFound();
 
+            var yqs = await _yearQuarterRepo.GetAllAsync();
+
+            // Duplicate year + quarter (excluding itself)
+            if (yqs.Any(q => q.Id != yq.Id && q.Year == yq.Year && q.Quarter == yq.Quarter && q.IsDeleted == false))
+            {
+                ModelState.AddModelError("Quarter", "Year + Quarter combination already exists. Please select another.");
+            }
+
+            // Check overlapping date ranges (excluding itself)
+            if (yq.StartDate.HasValue && yq.EndDate.HasValue)
+            {
+                var start = yq.StartDate.Value.Date;
+                var end = yq.EndDate.Value.Date;
+
+                bool overlaps = yqs.Any(q =>
+                    q.Id != yq.Id &&
+                    q.IsDeleted == false &&
+                    q.Year == yq.Year &&
+                    (
+                        (start >= q.StartDate && start <= q.EndDate) ||       // Start overlaps
+                        (end >= q.StartDate && end <= q.EndDate) ||           // End overlaps
+                        (start <= q.StartDate && end >= q.EndDate)            // Fully encloses another
+                    )
+                );
+
+                if (overlaps)
+                {
+                    ModelState.AddModelError("", "A quarter already exists within this date range.");
+                }
+            }
+
             if (!ModelState.IsValid)
             {
                 ViewBag.Quarters = new SelectList(Enum.GetValues(typeof(Quarter)));
-                var existingYearQuarter = _mapper.Map<YearQuarterViewModel>(existing);
-                return View(existingYearQuarter);
+                return View(yq);
             }
 
+            // Update the existing entity
             existing.Quarter = yq.Quarter;
             existing.Year = yq.Year;
             existing.StartDate = yq.StartDate;
@@ -138,7 +201,7 @@ namespace RewardsAndRecognitionSystem.Controllers
             existing.IsActive = yq.IsActive;
 
             await _yearQuarterRepo.UpdateAsync(existing);
-            TempData["message"] = "Successfully updated YearQuarter";
+            TempData["message"] = ToastMessages_YearQuarter.UpdateYearQuarter;
             return RedirectToAction(nameof(Index));
         }
 
@@ -158,7 +221,7 @@ namespace RewardsAndRecognitionSystem.Controllers
 
             await _yearQuarterRepo.SoftDeleteAsync(id);
 
-            TempData["message"] = "Successfully deleted YearQuarter";
+            TempData["message"] = ToastMessages_YearQuarter.DeleteYearQuarter;
             return RedirectToAction(nameof(Index));
         }
 

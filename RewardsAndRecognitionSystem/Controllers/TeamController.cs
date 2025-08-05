@@ -90,7 +90,7 @@ namespace RewardsAndRecognitionSystem.Controllers
                 User user = await _userRepo.GetByIdAsync(team.TeamLeadId);
                 user.TeamId = team.Id;
                 await _userManager.UpdateAsync(user);
-                TempData["message"] = "Successfully created Team";
+                TempData["message"] = ToastMessages_Team.CreateTeam;
                 return RedirectToAction(nameof(Index));
             }
 
@@ -177,7 +177,7 @@ namespace RewardsAndRecognitionSystem.Controllers
             existingTeam.DirectorId = updatedTeam.DirectorId;
 
             await _teamRepo.UpdateAsync(existingTeam);
-            TempData["message"] = "Successfully updated Team";
+            TempData["message"] = ToastMessages_Team.UpdateTeam;
             return RedirectToAction(nameof(Index));
         }
 
@@ -212,7 +212,7 @@ namespace RewardsAndRecognitionSystem.Controllers
 
             await _teamRepo.SoftDeleteAsync(id); 
 
-            TempData["message"] = "Successfully deleted Team";
+            TempData["message"] = ToastMessages_Team.DeleteTeam;
             return RedirectToAction(nameof(Index));
         }
 
