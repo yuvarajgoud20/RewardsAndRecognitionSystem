@@ -8,7 +8,7 @@
         public static string No_Nominations_This_Quarter = "No Graphs to Display";
         public static string No_Data_For_Quarter = "No data available for this quarter.";
         public static string Unauthorized_User = "Unauthorized user.";
-
+        public static string No_Nominations_Found = "No nominations found.";
         // There are currently no nominations for this quarter.
         public static string NotAvailable_Error = "N/A";
         public static string No_Valid_Quarter = "❌ No valid quarter found.";
