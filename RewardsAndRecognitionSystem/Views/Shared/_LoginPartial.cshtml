@@ -8,17 +8,7 @@
 <ul class="navbar-nav">
     @if (SignInManager.IsSignedIn(User))
     {
-        @* <li class="nav-item d-flex align-items-center">
-            <a class="nav-link text-light pe-2" asp-area="Identity" asp-page="/Account/Manage/Index" title="Manage">
-                Hello, @displayName!
-            </a>
-        </li>
-        <li class="nav-item d-flex align-items-center">
-            <form class="form-inline m-0" asp-area="Identity" asp-page="/Account/Logout"
-                  asp-route-returnUrl="@Url.Action("Index", "Home", new { area = "" })">
-                <button type="submit" class="nav-link btn btn-link text-light p-0">Logout</button>
-            </form>
-        </li> *@
+       
         <li class="nav-item dropdown d-flex align-items-center">
             <a class="nav-link dropdown-toggle text-light d-flex align-items-center" href="#" id="profileDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                 <!-- Profile Icon (can be an avatar or Font Awesome icon) -->
