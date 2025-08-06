@@ -78,14 +78,14 @@
     transition: color 0.3s ease;
      }
 
-.nav-link:hover {
-    color: #ffd54f !important;
-}
+    .nav-link:hover {
+        color: #ffd54f !important;
+    }
 
-            .nav-link.active-link {
+   .nav-link.active-link {
                 color: #ffd54f !important;
                 border-bottom: 2px solid #ffd54f;
-            }
+   }
 
 
         .container {
@@ -170,8 +170,7 @@
                                 <a class="nav-link @(ViewContext.RouteData.Values["controller"]?.ToString() == "Nomination" ? "active-link" : "")" asp-controller="Nomination" asp-action="Index">
                                     <i class="bi bi-award"></i> Nominations
                                 </a>
-                            </li>
-                           
+                            </li>                           
                         }
 
                         @if (User.IsInRole(nameof(Roles.Admin)))
@@ -203,24 +202,18 @@
                                     </li>
                                 </ul>
                             </li>
-                        }
-                    
+                        }                    
                     </ul>
-
                     <partial name="_LoginPartial" />
                 </div>
             </div>
         </nav>
     </header>
-
     <div class="container">
         <main role="main" class="pb-4">
             @RenderBody()
         </main>
     </div>
-
-   
-
     <!-- Scripts -->
     <script src="~/lib/Layout/bootstrap.bundle.min.js"></script>
     <script src="~/lib/jquery/dist/jquery.min.js"></script>

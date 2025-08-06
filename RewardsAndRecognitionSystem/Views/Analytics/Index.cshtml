@@ -117,14 +117,9 @@
     <div class="modal-dialog modal-lg modal-dialog-centered">
         <div class="modal-content">
             <div class="modal-header">
-                @* <h5 class="modal-title fw-semibold text-dark" id="maximizeChartLabel"></h5> *@
                 <h5 id="maximizeChartLabel" class="modal-title fw-semibold d-flex align-items-center gap-2 border-bottom pb-2" style="color: #000;">
                     <i class="bi bi-bar-chart-fill text-primary fs-5"></i>
-
                 </h5>
-
-
-
                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
             <div class="modal-body">
@@ -133,8 +128,6 @@
         </div>
     </div>
 </div>
-
-
 
 <!-- Team Details Modal -->
 <div class="modal fade" id="teamModal" tabindex="-1" aria-labelledby="teamModalLabel" aria-hidden="true">
@@ -151,22 +144,19 @@
     </div>
 </div>
 
-
 <!-- Include existing modals -->
 @section Scripts {
     <script src="~/lib/Charts/chart.js"></script>
     <script src="~/lib/Charts/chartjs-plugin-datalabels.js"></script>
     <script src="~/lib/Charts/html2canvas.min.js"></script>
     <script src="~/lib/Charts/jspdf.umd.min.js"></script>
-
-
     <script>
                 const teamColors = {}, charts = [];
                 const colorPalette = ['#4e79a7','#f28e2b','#e15759','#76b7b2','#59a14f','#edc949','#af7aa1','#ff9da7','#9c755f','#bab0ab','#2c3e50','#3498db'];
                 let teamPieChartInstance = null, fullscreenChartInstance = null;
                 const preselectedYearQuarterId = '@selectedYQId';
 
-                $(document).ready(function () {
+           $(document).ready(function () {
                     fetchYears().then(() => {
                         if (preselectedYearQuarterId) {
                             loadActiveQuarterData(preselectedYearQuarterId);
@@ -195,7 +185,9 @@
                         }
                     });
                 });
-                function maximizeChart(category, data) {
+
+           function maximizeChart(category, data) 
+           {
                     const canvas = document.getElementById('fullscreenChartCanvas');
                     const ctx = canvas.getContext('2d');
                     if (fullscreenChartInstance) {
@@ -234,7 +226,6 @@
                             barThickness: 40
                         }
                     ];
-
                     // Create chart
                     fullscreenChartInstance = new Chart(ctx, {
                         type: 'bar',
@@ -275,7 +266,6 @@
                         },
                         plugins: [ChartDataLabels]
                     });
-
                     // Set dynamic modal title with icon
                     document.getElementById('maximizeChartLabel').innerHTML = `
                         <div class="d-flex align-items-center gap-2">
@@ -283,31 +273,24 @@
                             <span>Category: ${category}</span>
                         </div>
                     `;
-
                     // Show modal
                     new bootstrap.Modal(document.getElementById('maximizeChartModal')).show();
-                }
-
-
-
-                function resetAll() {
+           }
+           function resetAll() 
+           {
                     $('#chartsHeader').text('');
                     $('#quarterDropdown').prop('disabled', true).html('<option>-- Select Quarter --</option>');
                     $('#chartsContainer').empty();
                     $('#teamPieContainer').hide();
-                }
+           }
 
-                function resetQuarter() {
+           function resetQuarter() {
                     charts.forEach(chart => chart.destroy());
-                    charts.length = 0;
-
-                 
+                    charts.length = 0;                 
                     if (teamPieChartInstance) {
                         teamPieChartInstance.destroy();
                         teamPieChartInstance = null;
-                    }
-
-                 
+                    }                 
                     if (fullscreenChartInstance) {
                         fullscreenChartInstance.destroy();
                         fullscreenChartInstance = null;
@@ -316,39 +299,43 @@
                     $('#chartsContainer').empty();
                     $('#teamPieContainer').hide();
                     $('#chartsHeader').text('');
-                }
+           }
 
-
-                function showLoading() {
+           function showLoading() 
+           {
                     $('#chartsContainer').html('<p class="text-muted">Loading charts...</p>');
                     $('#teamPieContainer').hide();
-                }
-
-                function hideLoading() {
+           }
+           function hideLoading() 
+           {
                     
-                }
+           }
 
-                function fetchYears() {
+           function fetchYears() 
+           {
                     return $.get('/Analytics/GetYears', data => {
                         $('#yearDropdown').html('<option>-- Select Year --</option>' + data.map(y => `<option>${y}</option>`));
                     });
-                }
+           }
 
-                function fetchQuarters(year) {
+           function fetchQuarters(year) 
+           {
                     return $.get(`/Analytics/GetQuarters?year=${year}`, data => {
                         $('#quarterDropdown').prop('disabled', false)
                             .html('<option>-- Select Quarter --</option>' + data.map(q => `<option value="${q.id}">${q.name}</option>`));
                     });
-                }
+           }
 
-                async function loadActiveQuarterData(id) {
+            async function loadActiveQuarterData(id) 
+            {
                     const res = await fetch(`/Analytics/GetYears`);
                     const years = await res.json();
 
                     for (const year of years) {
                         const qData = await fetch(`/Analytics/GetQuarters?year=${year}`).then(r => r.json());
                         const match = qData.find(q => q.id === id);
-                        if (match) {
+                        if (match) 
+                        {
                             $('#yearDropdown').val(year);
                             $('#quarterDropdown').html('<option>-- Select Quarter --</option>' +
                                 qData.map(q => `<option value="${q.id}" ${q.id === id ? 'selected' : ''}>${q.name}</option>`));
@@ -358,34 +345,39 @@
                             resetQuarter();  
                             showLoading();  
                                     Promise.all([
-                    fetchAnalyticsData(id),
-                    fetchTeamSummary(id)
-                ]);
+                                fetchAnalyticsData(id),
+                                fetchTeamSummary(id)
+                            ]);
                             hideLoading();
                             break;
                         }
                     }
-                }
+            }
 
-                function fetchAnalyticsData(id) {
-                    return $.get(`/Analytics/GetAnalyticsData?yearQuarterId=${id}`, data => {
-                              if (data.categoryTeamData?.length) {
-                    renderCategoryTeamCharts(data.categoryTeamData);
-                } else {
-                    $('#chartsContainer').html(`
-                        <div class="col">
-                            <div class="card shadow-sm text-center p-4">
-                                <h5 class="text-muted mb-2">📉 No Analytics Data</h5>
-                                <p class="mb-0">There are no nominations or team analytics available for the selected quarter.</p>
-                            </div>
-                        </div>
-                    `);
-                }
-
+           function fetchAnalyticsData(id) 
+           {
+                    return $.get(`/Analytics/GetAnalyticsData?yearQuarterId=${id}`, data =>
+                    {
+                        if (data.categoryTeamData?.length) 
+                        {
+                            renderCategoryTeamCharts(data.categoryTeamData);                
+                        } 
+                        else 
+                        {
+                            $('#chartsContainer').html(`
+                                <div class="col">
+                                    <div class="card shadow-sm text-center p-4">
+                                        <h5 class="text-muted mb-2">📉 No Analytics Data</h5>
+                                        <p class="mb-0">There are no nominations or team analytics available for the selected quarter.</p>
+                                    </div>
+                                </div>
+                            `);
+                        }
                     });
-                }
+           }
 
-                function fetchTeamSummary(id) {
+          function fetchTeamSummary(id) 
+          {
                     return $.get(`/Analytics/GetQuarterTeamSummary?yearQuarterId=${id}`, data => {
                         if (data.length) {
                             $('#teamPieContainer').show();
@@ -394,9 +386,10 @@
                             $('#teamPieContainer').hide();
                         }
                     });
-                }
+          }
 
-                function renderPie(data, ctxId, instance, labelKey) {
+         function renderPie(data, ctxId, instance, labelKey)
+         {
                     const ctx = document.getElementById(ctxId).getContext('2d');
                     const labels = data.map(d => d[labelKey]);
                     const counts = data.map(d => d.count);
@@ -430,54 +423,51 @@
                         },
                         plugins: [ChartDataLabels]
                     });
-                }
+         }
 
-                                      function renderCategoryTeamCharts(data) {
-            const container = $('#chartsContainer');
-            container.empty();
-            charts.length = 0;
+        function renderCategoryTeamCharts(data)
+        {
+                const container = $('#chartsContainer');
+                container.empty();
+                charts.length = 0;
 
-            const grouped = data.reduce((acc, d) => {
-                (acc[d.category] ||= []).push({
-                    team: d.team,
-                    approvedCount: d.approvedCount,
-                    pendingCount: d.pendingCount,
-                    rejectedCount: d.rejectedCount
-                });
-                return acc;
-            }, {});
+                const grouped = data.reduce((acc, d) => {
+                    (acc[d.category] ||= []).push({
+                        team: d.team,
+                        approvedCount: d.approvedCount,
+                        pendingCount: d.pendingCount,
+                        rejectedCount: d.rejectedCount
+                    });
+                    return acc;
+                }, {});
 
-            Object.entries(grouped).forEach(([category, list], index) => {
-                const canvasId = `categoryChart_${index}`;
+                Object.entries(grouped).forEach(([category, list], index) => {
+                    const canvasId = `categoryChart_${index}`;
 
                     // Check if scroll is needed
-        const needsScroll = list.length > 4;
-        const scrollClass = needsScroll ? 'scroll-wrapper' : '';
+                const needsScroll = list.length > 4;
+                const scrollClass = needsScroll ? 'scroll-wrapper' : '';
 
-            container.append(`
-            <div class="col">
-                <div class="card shadow-sm h-100">
-                    <div class="card-body">
-                        <div class="d-flex justify-content-between align-items-center mb-2">
-                            <h5 class="card-title">${category}</h5>
-                            <div>
-                                <button class="btn btn-sm btn-outline-secondary me-2" onclick="maximizeChart('${category}', ${JSON.stringify(list).replace(/"/g, '&quot;')})">🔍 Maximize</button>
-                                <button class="btn btn-sm btn-outline-secondary" onclick="showTeamModal('${category}', ${JSON.stringify(list).replace(/"/g, '&quot;')})">📊 View More</button>
+                    container.append(`
+                    <div class="col">
+                        <div class="card shadow-sm h-100">
+                            <div class="card-body">
+                                <div class="d-flex justify-content-between align-items-center mb-2">
+                                    <h5 class="card-title">${category}</h5>
+                                    <div>
+                                        <button class="btn btn-sm btn-outline-secondary me-2" onclick="maximizeChart('${category}', ${JSON.stringify(list).replace(/"/g, '&quot;')})">🔍 Maximize</button>
+                                        <button class="btn btn-sm btn-outline-secondary" onclick="showTeamModal('${category}', ${JSON.stringify(list).replace(/"/g, '&quot;')})">📊 View More</button>
+                                    </div>
+                                </div>
+                                <div class="${scrollClass}">
+                                    <canvas id="${canvasId}" height="320"></canvas> <!-- Ensure all charts have the same height -->
+                                </div>
                             </div>
                         </div>
-                        <div class="${scrollClass}">
-                            <canvas id="${canvasId}" height="320"></canvas> <!-- Ensure all charts have the same height -->
-                        </div>
                     </div>
-                </div>
-            </div>
-        `);
-
-
-
+                `);
                 const teams = list.map(d => d.team);
                 const maxCount = Math.max(...list.map(d => d.approvedCount + d.pendingCount + d.rejectedCount), 1);
-
                 const datasets = [
                     {
                         label: 'Approved',
@@ -569,33 +559,33 @@
             });
         }
 
-                function getTeamColor(name) {
-                    if (!teamColors[name]) {
-                        teamColors[name] = colorPalette[Object.keys(teamColors).length % colorPalette.length];
-                    }
-                    return teamColors[name];
-                }
+        function getTeamColor(name)
+        {
+               if (!teamColors[name])
+               {
+                    teamColors[name] = colorPalette[Object.keys(teamColors).length % colorPalette.length];
+               }
+               return teamColors[name];
+        }
 
-                function exportAllCharts() {
-                    const chartCanvases = document.querySelectorAll('#dashboardExportContent canvas');
-
-                    const images = Array.from(chartCanvases).map(canvas => {
-                     canvas.toDataURL('image/png');
-                });
-
-                    $.ajax({
-                        type: "POST",
-                        url: "/Analytics/GenerateChartsPdf",
-                        contentType: "application/json",
-                        data: JSON.stringify(images),
-                        success: function () {
+        function exportAllCharts() 
+        {
+             const chartCanvases = document.querySelectorAll('#dashboardExportContent canvas');
+             const images = Array.from(chartCanvases).map(canvas => {
+                    canvas.toDataURL('image/png'); });
+             $.ajax({
+                    type: "POST",
+                    url: "/Analytics/GenerateChartsPdf",
+                    contentType: "application/json",
+                    data: JSON.stringify(images),
+                    success: function () {
                             window.location.href = "/Analytics/DownloadChartsPdf";
                         }
                     });
-                }
+        }
 
-
-                function exportAllCharts() {
+         function exportAllCharts() 
+         {
                     const exportElement = document.getElementById('dashboardExportContent');
                     html2canvas(exportElement, { scale: 2, useCORS: true }).then(canvas => {
                         const img = canvas.toDataURL('image/png');
@@ -606,8 +596,10 @@
                         pdf.addImage(img, 'PNG', 0, 10, w, h);
                         pdf.save('Analytics_Dashboard.pdf');
                     });
-                }
-                function showTeamModal(category, data) {
+         }
+
+         function showTeamModal(category, data) 
+         {
                     let html = `<h6>${category}</h6><table class="table table-bordered mt-2"><thead><tr><th>Team</th><th>Nominations</th></tr></thead><tbody>`;
                     data.forEach(d => {
                         html += `<tr><td>${d.team}</td><td>${d.count}</td></tr>`;
@@ -615,8 +607,10 @@
                     html += '</tbody></table>';
                     $('#teamModalBody').html(html);
                     new bootstrap.Modal($('#teamModal')[0]).show();
-                }
-                        function exportChartsAsWord() {
+         }
+
+         function exportChartsAsWord() 
+         {
                     const chartElements = document.querySelectorAll('canvas');
                     const imagePromises = Array.from(chartElements).map(canvas =>
                         html2canvas(canvas).then(c => c.toDataURL('image/png'))
@@ -633,10 +627,10 @@
                             }
                         });
                     });
-                }
+         }
 
-
-         function showTeamModal(category, list) {
+         function showTeamModal(category, list) 
+         {
             const modal = $('#teamModal');
             modal.find('.modal-title').text(`Category: ${category}`);
             const modalBody = modal.find('.modal-body');

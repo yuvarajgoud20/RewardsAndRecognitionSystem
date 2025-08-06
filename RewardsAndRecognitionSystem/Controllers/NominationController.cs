@@ -55,22 +55,16 @@ namespace RewardsAndRecognitionSystem.Controllers
         // GET: Nomination
         public async Task<IActionResult> Index(Guid? yearQuarterId, string filter = "all", string FilterForDelete = "active", int page = 1)
         {
-
             ViewBag.filter = filter;
-
-
             int pageSize = _paginationSettings.DefaultPageSize;
-
             var currentUser = await _userManager.GetUserAsync(User);
             if (currentUser == null)
                 return RedirectToAction("Login", "Account", new { area = "Identity" });
-
             List<Nomination> allNominations = new();
             List<Nomination> deletednominations = new();
             var selectedQuarter = yearQuarterId.HasValue
              ? await _context.YearQuarters.FirstOrDefaultAsync(yq => yq.Id == yearQuarterId.Value)
              : await _context.YearQuarters.FirstOrDefaultAsync(yq => yq.IsActive);
-
             if (selectedQuarter == null)
             {
                 TempData["Message"] = GeneralMessages.No_Valid_Quarter;
@@ -84,8 +78,7 @@ namespace RewardsAndRecognitionSystem.Controllers
             var userRoles = await _userManager.GetRolesAsync(currentUser);
             List<Nomination> nominationsToShow = new();
             if (userRoles.Contains(nameof(Roles.Director)))
-                {
-
+            {
                 nominationsToShow = await _context.Nominations
                  .Include(n => n.Nominee).ThenInclude(u => u.Team)
                  .Include(n => n.Category)
@@ -132,11 +125,9 @@ namespace RewardsAndRecognitionSystem.Controllers
                 }
 
                 return View(directorList);
-            }
-
-           
+            }           
            if (userRoles.Contains(nameof(Roles.Manager)))
-                {
+           {
 
                 nominationsToShow = await _context.Nominations
                    .Include(n => n.Nominee).ThenInclude(u => u.Team)
@@ -180,10 +171,8 @@ namespace RewardsAndRecognitionSystem.Controllers
                 }
                 return View(managerList);
             }
-            if (userRoles.Contains(nameof(Roles.TeamLead)))
-              
+            if (userRoles.Contains(nameof(Roles.TeamLead)))              
             {
-
                 nominationsToShow = await _context.Nominations
                 .Include(n => n.Nominee).ThenInclude(u => u.Team)
                 .Include(n => n.Category)
@@ -249,8 +238,6 @@ namespace RewardsAndRecognitionSystem.Controllers
             var viewModelList = _mapper.Map<List<NominationViewModel>>(nominationsToShow);
             return View(viewModelList);
         }
-
-
         // GET: Nomination/Details/5
         public async Task<IActionResult> Details(Guid id)
         {
@@ -262,7 +249,6 @@ namespace RewardsAndRecognitionSystem.Controllers
             var viewModel = _mapper.Map<NominationViewModel>(nomination);
             return View(viewModel);
         }
-
         // GET: Nomination/Create
         public async Task<IActionResult> Create()
         {
@@ -296,7 +282,6 @@ namespace RewardsAndRecognitionSystem.Controllers
             ViewBag.Status = NominationStatus.PendingManager;
             return View(viewModel);
         }
-
         // POST: Nomination/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
@@ -310,10 +295,8 @@ namespace RewardsAndRecognitionSystem.Controllers
 
            if (exists)
             {
-                ModelState.AddModelError("CategoryId",
-                "Please select another category — this person is already nominated in the chosen category for this quarter.");
+                ModelState.AddModelError("CategoryId",GeneralMessages.DuplicateNomination);
             }
-
             if (ModelState.IsValid)
             {
                 var nomination = _mapper.Map<Nomination>(viewModel);
@@ -359,8 +342,6 @@ namespace RewardsAndRecognitionSystem.Controllers
             var viewModel = _mapper.Map<NominationViewModel>(nomination);
             return View(viewModel);
         }
-
-
         // POST: Nomination/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
@@ -412,8 +393,6 @@ namespace RewardsAndRecognitionSystem.Controllers
             var nomination = await _nominationRepo.GetNominationByIdAsync(id);
             if (nomination == null)
                 return NotFound();
-
-
             return View(nomination);
         }
         // POST: Nomination/Review/{id}
@@ -423,17 +402,13 @@ namespace RewardsAndRecognitionSystem.Controllers
         {
             var nomination = await _nominationRepo.GetNominationByIdAsync(id);
             var currentUser = await _userManager.GetUserAsync(User);
-
-
             var userRole = await _userManager.GetRolesAsync(currentUser);
-
             if (nomination == null || currentUser == null)
                 return NotFound();
-
             // Parse enum safely
             if (!Enum.TryParse<ApprovalAction>(action, out var parsedAction))
             {
-                ModelState.AddModelError("", "Invalid approval action.");
+                ModelState.AddModelError("", GeneralMessages.ApprovalError);
                 return View(nomination); // Or redirect back with error
             }
 
@@ -452,15 +427,11 @@ namespace RewardsAndRecognitionSystem.Controllers
                 ActionAt = DateTime.UtcNow,
                 Remarks = remarks
             };
-
             _context.Approvals.Add(approval);
             await _context.SaveChangesAsync();
-
-
             // Fetch nominator and nominee
             var nominator = await _userManager.FindByIdAsync(nomination.NominatorId);
             var nominee = await _userManager.FindByIdAsync(nomination.NomineeId);
-
             if (nomination.Status == NominationStatus.DirectorApproved)
             {
                 // Notify the nominator
@@ -582,7 +553,6 @@ namespace RewardsAndRecognitionSystem.Controllers
                 // TeamLead sees nominations for teams they lead
                 query = query.Where(n => n.Nominee.Team.TeamLeadId == user.Id);
             }
-
             // Filter by YearQuarter
             if (yearQuarterId.HasValue)
             {
@@ -605,17 +575,11 @@ namespace RewardsAndRecognitionSystem.Controllers
                 stylesPart.Stylesheet.Save();
 
                 // Headers
-                var headers = new[]
-                {
-            "Nominee Name", "Nominator Name", "Category", "Description",
-            "Achievements", "Status", "Quarter", "Created At"
-        };
-
+                var headers = new[]{"Nominee Name", "Nominator Name", "Category", "Description","Achievements", "Status", "Quarter", "Created At"};
                 var headerRow = new Row();
                 foreach (var header in headers)
                     headerRow.Append(SheetClassesStyles.CreateStyledCell(header, 2));
                 sheetData.Append(headerRow);
-
                 // Data rows
                 foreach (var nomination in nominations)
                 {
@@ -630,13 +594,11 @@ namespace RewardsAndRecognitionSystem.Controllers
                     row.Append(SheetClassesStyles.CreateStyledCell(nomination.CreatedAt.ToString("dd-MM-yyyy"), 1));
                     sheetData.Append(row);
                 }
-
                 // Column width
                 var columns = new Columns(
                     new Column { Min = 1, Max = 8, Width = 25, CustomWidth = true }
                 );
                 worksheetPart.Worksheet.InsertAt(columns, 0);
-
                 // Sheets
                 Sheets sheets = workbookPart.Workbook.AppendChild(new Sheets());
                 Sheet sheet = new Sheet()
@@ -649,9 +611,7 @@ namespace RewardsAndRecognitionSystem.Controllers
 
                 workbookPart.Workbook.Save();
             }
-
             memStream.Seek(0, SeekOrigin.Begin);
-
             return File(memStream.ToArray(),
                 "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
                 "Nominations.xlsx");
@@ -664,7 +624,6 @@ namespace RewardsAndRecognitionSystem.Controllers
             var currentUser = await _userManager.GetUserAsync(User);
             if (currentUser == null)
                 return RedirectToAction("Login", "Account", new { area = "Identity" });
-
             var userRoles = await _userManager.GetRolesAsync(currentUser);
 
             // Get team name
@@ -680,11 +639,9 @@ namespace RewardsAndRecognitionSystem.Controllers
                 .Include(n => n.Category)
                 .Include(n => n.YearQuarter)
                 .AsQueryable();
-
-            // Role-based filtering
-          
+            // Role-based filtering          
             if (userRoles.Contains(nameof(Roles.Manager)))
-                {
+            {
                 query = query.Where(n =>
                     n.Nominator.Team.Manager.Id == currentUser.Id &&
                     n.Nominator.TeamId == teamId);
@@ -695,16 +652,13 @@ namespace RewardsAndRecognitionSystem.Controllers
                     n.Nominator.Team.Director.Id == currentUser.Id &&
                     n.Nominator.TeamId == teamId);
             }
-
             // Year + Quarter filtering
             if (year.HasValue)
                 query = query.Where(n => n.YearQuarter.Year == year.Value);
 
             if (quarterId.HasValue)
                 query = query.Where(n => n.YearQuarter.Id == quarterId.Value);
-
             var nominations = await query.ToListAsync();
-
             // Generate Excel
             using var memStream = new MemoryStream();
             using (SpreadsheetDocument document = SpreadsheetDocument.Create(memStream, SpreadsheetDocumentType.Workbook))
@@ -721,18 +675,11 @@ namespace RewardsAndRecognitionSystem.Controllers
                 stylesPart.Stylesheet.Save();
 
                 // Header row
-                var headers = new[]
-                {
-            "Nominee Name","Nominated By", "Category", "Description",
-            "Achievements", "Status", "Created At"
-        };
-
+                var headers = new[]{"Nominee Name","Nominated By", "Category", "Description","Achievements", "Status", "Created At"};
                 var headerRow = new Row();
                 foreach (var header in headers)
                     headerRow.Append(SheetClassesStyles.CreateStyledCell(header, 2));
-
                 sheetData.Append(headerRow);
-
                 // Data rows
                 foreach (var nomination in nominations)
                 {
@@ -746,13 +693,11 @@ namespace RewardsAndRecognitionSystem.Controllers
                     row.Append(SheetClassesStyles.CreateStyledCell(nomination.CreatedAt.ToString("dd-MM-yyyy"), 1));
                     sheetData.Append(row);
                 }
-
                 // Column width
                 var columns = new Columns(
                     new Column { Min = 1, Max = 8, Width = 25, CustomWidth = true }
                 );
                 worksheetPart.Worksheet.InsertAt(columns, 0);
-
                 // Sheets
                 Sheets sheets = workbookPart.Workbook.AppendChild(new Sheets());
                 Sheet sheet = new Sheet()
@@ -762,10 +707,8 @@ namespace RewardsAndRecognitionSystem.Controllers
                     Name = "Nominations"
                 };
                 sheets.Append(sheet);
-
                 workbookPart.Workbook.Save();
             }
-
             memStream.Seek(0, SeekOrigin.Begin);
             return File(memStream.ToArray(),
                 "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
@@ -774,7 +717,6 @@ namespace RewardsAndRecognitionSystem.Controllers
 
         [HttpGet]
         public IActionResult DownloadTemplate()
-
         {
             // Generate Excel
             using var memStream = new MemoryStream();
@@ -831,7 +773,6 @@ namespace RewardsAndRecognitionSystem.Controllers
 
                 workbookPart.Workbook.Save();
             }
-
             memStream.Seek(0, SeekOrigin.Begin);
             return File(memStream.ToArray(),
                 "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
@@ -887,7 +828,6 @@ namespace RewardsAndRecognitionSystem.Controllers
             return View("UploadNomination", previewList);  // show preview grid
         }
 
-
         private string GetCellValue(WorkbookPart wbPart, Cell cell)
         {
             string value = cell.InnerText;
@@ -920,27 +860,24 @@ namespace RewardsAndRecognitionSystem.Controllers
                 var category = await _context.Categories.FirstOrDefaultAsync(x => x.Name == item.CategoryName);
 
                 var yq = item.YearQuarterName.Split(',');
-                if (yq.Length != 2) throw new Exception("Invalid YearQuarter data");
+                if (yq.Length != 2) throw new Exception(GeneralMessages.InvalidQuarterError);
 
                 var quarterString = yq[0];
                 var year = int.Parse(yq[1]);
 
                 if (!Enum.TryParse<Quarter>(quarterString, true, out var quarterEnum))
                     throw new Exception($"Invalid Quarter '{quarterString}'");
-
-
                 var yearQuarter = await _context.YearQuarters.FirstOrDefaultAsync(x => x.Year == year && x.Quarter == quarterEnum);
-
                 if (nominee == null || category == null || yearQuarter == null)
                 {
-                    throw new Exception($"Invalid Excel Data");
+                    throw new Exception(GeneralMessages.InvalidExcelData);
                 }
 
                 var ns = await _nominationRepo.GetAllNominationsAsync();
                 bool exists = ns.Any(n => n.NomineeId == nominee.Id && n.CategoryId == category.Id);
 
                 if (exists)
-                    throw new Exception($"Some nominations in Excel already Exists");
+                    throw new Exception(GeneralMessages.ExcelDuplicateData);
 
                 nominations.Add(new Nomination
                 {
@@ -965,8 +902,6 @@ namespace RewardsAndRecognitionSystem.Controllers
             TempData["Message"] = Excel_Messages.SaveExcelData;
             return RedirectToAction(nameof(Index));
         }
-
-
         [HttpPost]
         public IActionResult CancelUpload()
         {

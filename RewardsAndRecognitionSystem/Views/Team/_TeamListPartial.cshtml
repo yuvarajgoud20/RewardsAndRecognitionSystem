@@ -3,16 +3,13 @@
     int currentPage = Model.CurrentPage;
     int totalPages = Model.TotalPages;
     string action = Model.ActionName;
-    var showDeleted = Context.Request.Query["showDeleted"].ToString();
-    
-
+    var showDeleted = Context.Request.Query["showDeleted"].ToString(); 
 }
     <div class="d-flex justify-content-between align-items-center pt-3 border-top">
         <!-- Page info (left) -->
         <div>
             Showing Page @currentPage of @totalPages
         </div>
-
         <!-- Pagination (right) -->
         <nav>
             <ul class="pagination mb-0">

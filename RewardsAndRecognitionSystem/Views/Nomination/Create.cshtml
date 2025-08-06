@@ -87,9 +87,6 @@
        
         <form asp-action="Create">
             @Html.AntiForgeryToken()
-
-            @* <div asp-validation-summary="All" class="text-danger"></div> *@
-
             <div class="form-group">
                 <input type="hidden" asp-for="NominatorId" value="@ViewBag.NominatorId" />
             </div>
@@ -114,10 +111,8 @@
                 <label>Quarter <span class="text-danger">*</span></label>
                 <input type="text" class="form-control" value="@ViewData["ActiveQuarterDisplay"]" disabled />
                 <input type="hidden" asp-for="YearQuarterId" />
-
                 <span asp-validation-for="YearQuarterId" class="text-danger"></span>
             </div>
-
 
             <div class="form-group">
                 <label for="Description">Description<span>*</span></label>

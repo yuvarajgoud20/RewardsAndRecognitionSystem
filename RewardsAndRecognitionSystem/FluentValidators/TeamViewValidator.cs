@@ -12,7 +12,6 @@ namespace RewardsAndRecognitionSystem.FluentValidators
              .MaximumLength(100).WithMessage("Team name must not exceed 100 characters.")
              .Matches(@"^(?=.*[A-Za-z])[A-Za-z _-]{2,}$").WithMessage("Team name must contain at least 2 characters and can only include Alphabets.");
 
-
             RuleFor(x => x.TeamLeadId)
                 .NotEmpty().WithMessage("Team Lead is required.");
 

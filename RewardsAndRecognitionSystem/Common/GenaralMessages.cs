@@ -17,9 +17,17 @@
         public static string Selected_Award = "🎖️ You Have Been Selected for an Award!";
         public static string Nomination_Reverted = "Nomination Reverted";
         public static string No_Team_Assigned_TeamLead = "No team assigned to you as Team Lead.";
-       
         //user controller
-
+        public static string DuplicateCategory = "Category Already Exists";
+        public static string DuplicateNomination = "Please select another category — this person is already nominated in the chosen category for this quarter.";
+        public static string ApprovalError = "Invalid approval action.";
+        public static string InvalidQuarterError = "Invalid YearQuarter data";
+        public static string InvalidExcelData = "Invalid Excel Data";
+        public static string ExcelDuplicateData = "Some nominations in Excel already Exists";
+        public static string SoftDeleteUserError = "Unable to soft delete the user.";
+        public static string DuplicateYearQuarterError = "Year + Quarter combination already exists. Please select another.";
+        public static string ExistsQuarterError = "A quarter already exists within this date range.";
+        public static string QuarterRangeError = "A quarter already exists within this date range."
     }
     public static class GeneralMessages_User
     {

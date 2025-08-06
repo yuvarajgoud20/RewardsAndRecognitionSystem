@@ -14,7 +14,6 @@ namespace RewardsAndRecognitionSystem.Middleware
         private readonly RequestDelegate _next;
         private readonly ILogger<ExceptionHandlingMiddleware> _logger;
         private readonly IModelMetadataProvider _metadataProvider;
-
         public ExceptionHandlingMiddleware(
             RequestDelegate next,
             ILogger<ExceptionHandlingMiddleware> logger,
@@ -46,17 +45,14 @@ namespace RewardsAndRecognitionSystem.Middleware
                     controllerName = descriptor.ControllerName;
                     actionName = descriptor.ActionName;
                 }
-
                 // Log the error
                 LogError(statusCode, ex, controllerName, actionName);
-
                 // Prepare the error model
                 var errorObject = new MessageObject
                 {
                     Message = ex.Message,
                     ErrorDescription = $"Error at Controller: {controllerName}, Method: {actionName}, Type: {ex.GetType().FullName}"
                 };
-
                 // Render the error view
                 await RenderErrorViewAsync(context, errorObject, statusCode);
             }

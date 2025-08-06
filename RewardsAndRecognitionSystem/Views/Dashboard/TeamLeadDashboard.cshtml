@@ -82,7 +82,6 @@
 
 <div class="row g-4 mb-4">
     <div class="col-md-3">
-        @* <a href="@Url.Action("Index", "Nomination", new { filter = "all" })" class="clickable-card"> *@
         <a href="javascript:void(0);" onclick="navigateToNominations('all')" class="clickable-card">
 
             <div class="dashboard-card">
@@ -93,8 +92,6 @@
     </div>
     <div class="col-md-3">
         <a href="javascript:void(0);" onclick="navigateToNominations('pending')" class="clickable-card">
-
-            @* <a href="@Url.Action("Index", "Nomination", new { filter = "pending" })" class="clickable-card"> *@
             <div class="dashboard-card">
                 <div class="dashboard-title">Pending Reviews</div>
                 <div class="dashboard-value text-orange">@ViewBag.PendingNominations</div>
@@ -103,8 +100,6 @@
     </div>
     <div class="col-md-3">
         <a href="javascript:void(0);" onclick="navigateToNominations('directorapproved')" class="clickable-card">
-
-            @* <a href="@Url.Action("Index", "Nomination", new { filter = "directorapproved" })" class="clickable-card"> *@
             <div class="dashboard-card">
                 <div class="dashboard-title">Final Approved</div>
                 <div class="dashboard-value text-green">@ViewBag.FinalApprovedNominations</div>
@@ -113,8 +108,6 @@
     </div>
     <div class="col-md-3">
         <a href="javascript:void(0);" onclick="navigateToNominations('directorrejected')" class="clickable-card">
-
-            @* <a href="@Url.Action("Index", "Nomination", new { filter = "directorrejected" })" class="clickable-card"> *@
             <div class="dashboard-card">
                 <div class="dashboard-title">Final Rejected</div>
                 <div class="dashboard-value text-danger">@ViewBag.RejectedNominations</div>
@@ -124,9 +117,7 @@
 </div>
 
 <h4 class="mt-5 mb-3 text-primary">Category-wise Breakdown</h4>
-
 <div id="teamLeadChartsContainer" class="row row-cols-1 row-cols-md-2 g-4 mb-5"></div>
-
 @section Scripts {
     <script src="~/lib/Charts/chart.js"></script>
     <script src="~/lib/Charts/chartjs-plugin-datalabels.js"></script>
@@ -230,17 +221,18 @@
         });
     </script>
     <script>
-        function navigateToNominations(filter) {
-                 const quarterId = document.getElementById("quarterDropdown").value;
+            function navigateToNominations(filter) 
+            {
+                     const quarterId = document.getElementById("quarterDropdown").value;
 
-                 if (!quarterId) {
-                     alert("Please select a quarter.");
-                     return;
-                 }
+                     if (!quarterId) {
+                         alert("Please select a quarter.");
+                         return;
+                     }
 
-                 const url = `/Nomination/Index?filter=${filter}&yearQuarterId=${quarterId}`;
-                 window.location.href = url;
-             }
+                     const url = `/Nomination/Index?filter=${filter}&yearQuarterId=${quarterId}`;
+                     window.location.href = url;
+            }
 
              $(document).ready(function () {
                  loadYears();
@@ -259,7 +251,8 @@
                  });
              });
 
-             function loadYears() {
+             function loadYears()
+             {
                  $.get('/Dashboard/GetYears', function (years) {
                      let options = '<option value="">-- Select Year --</option>';
                      years.forEach(y => {
@@ -276,7 +269,8 @@
                  });
              }
 
-             function loadQuarters(year, selectedId) {
+             function loadQuarters(year, selectedId) 
+             {
                  $.get(`/Dashboard/GetQuarters?year=${year}`, function (quarters) {
                      let options = '<option value="">-- Select Quarter --</option>';
                      quarters.forEach(q => {

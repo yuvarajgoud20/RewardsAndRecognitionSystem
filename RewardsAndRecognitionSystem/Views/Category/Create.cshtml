@@ -1,5 +1,4 @@
 ﻿@model RewardsAndRecognitionSystem.ViewModels.CategoryViewModel
-
 @{
     ViewData["Title"] = "Create Category";
 }
@@ -30,7 +29,6 @@
 <div class="card shadow-sm border-0 p-4" style="max-width: 600px; margin: auto;">
     <form asp-action="Create" method="post">
         @Html.AntiForgeryToken()
-        @* <div asp-validation-summary="All" class="text-danger"></div> *@
         <div class="mb-3">
             <label asp-for="Name" class="form-label"></label><span class="text-danger">*</span>
             <input asp-for="Name" class="form-control border-dark-subtle" />
@@ -47,7 +45,6 @@
             <input asp-for="isActive" class="form-check-input" type="checkbox" checked />
             <label asp-for="isActive" class="form-check-label">Is Active</label>
         </div>
-
 
         <div class="d-flex justify-content-between">
             <a asp-action="Index" class="btn btn-danger  px-4">Cancel</a>

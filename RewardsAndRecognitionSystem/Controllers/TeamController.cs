@@ -25,7 +25,6 @@ namespace RewardsAndRecognitionSystem.Controllers
         private readonly PaginationSettings _paginationSettings;
 
         public TeamController(IMapper mapper, ITeamRepo teamRepo, IUserRepo userRepo, UserManager<User> userManager, ApplicationDbContext context, IOptions<PaginationSettings> paginationOptions)
-
         {
             _mapper = mapper;
             _teamRepo = teamRepo;
@@ -34,7 +33,6 @@ namespace RewardsAndRecognitionSystem.Controllers
             _userManager = userManager;
             _paginationSettings = paginationOptions.Value;
         }
-
         public async Task<IActionResult> Index(int page = 1, bool showDeleted = false)
         {
             int pageSize = _paginationSettings.DefaultPageSize;
@@ -74,8 +72,6 @@ namespace RewardsAndRecognitionSystem.Controllers
 
             return View(grouped);
         }
-
-
         public async Task<IActionResult> Create()
         {
             await LoadDropdownsAsync();
@@ -183,7 +179,6 @@ namespace RewardsAndRecognitionSystem.Controllers
             TempData["message"] = ToastMessages_Team.UpdateTeam;
             return RedirectToAction(nameof(Index));
         }
-
         public async Task<IActionResult> Details(Guid id)
         {
             var team = await _teamRepo.GetByIdAsync(id);
@@ -193,7 +188,6 @@ namespace RewardsAndRecognitionSystem.Controllers
 
             return View(team);
         }
-
         public async Task<IActionResult> Delete(Guid id)
         {
             var team = await _teamRepo.GetByIdAsync(id);
@@ -211,15 +205,10 @@ namespace RewardsAndRecognitionSystem.Controllers
             var team = await _teamRepo.GetByIdAsync(id);
             if (team == null)
                 return NotFound();
-
-
-            await _teamRepo.SoftDeleteAsync(id); 
-
+            await _teamRepo.SoftDeleteAsync(id);
             TempData["message"] = ToastMessages_Team.DeleteTeam;
             return RedirectToAction(nameof(Index));
         }
-
-
         private async Task LoadDropdownsAsync()
         {
             var managersQuery = await _userRepo.GetAllManagersAsync();

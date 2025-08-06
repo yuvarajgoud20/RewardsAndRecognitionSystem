@@ -20,7 +20,7 @@ using RewardsAndRecognitionSystem.ViewModels;
 
 namespace RewardsAndRecognitionSystem.Controllers
 {
-    //[Authorize(Roles = nameof(Roles.Admin))]
+    [Authorize(Roles = nameof(Roles.Admin))]
     public class UserController : Controller
     {
         private readonly IMapper _mapper;
@@ -97,7 +97,6 @@ namespace RewardsAndRecognitionSystem.Controllers
                 }
                 return PartialView("_UserListPartial", usersList);
             }
-
             return View(usersList);
         }
 
@@ -165,11 +164,9 @@ namespace RewardsAndRecognitionSystem.Controllers
                     TempData["message"] = ToastMessages_User.CreateUser; 
                     return RedirectToAction(nameof(Index));
                 }
-
                 foreach (var error in result.Errors)
                     ModelState.AddModelError("", error.Description);
             }
-
             await PopulateDropDowns();
             return View(viewModel);
         }
@@ -182,8 +179,6 @@ namespace RewardsAndRecognitionSystem.Controllers
             var userWithTeam = await _context.Users
                 .Include(u => u.Team)
                 .FirstOrDefaultAsync(u => u.Id == user.Id);
-
-
             var viewModel = new EditUserViewModel
             {
                 Id = userWithTeam.Id,
@@ -192,14 +187,11 @@ namespace RewardsAndRecognitionSystem.Controllers
                 TeamId = userWithTeam.TeamId,
                 Team = userWithTeam.Team
             };
-
             var roles = await _userManager.GetRolesAsync(user);
             bool isRestrictedRole = roles.Contains(nameof(Roles.TeamLead))
                        || roles.Contains(nameof(Roles.Manager))
                        || roles.Contains(nameof(Roles.Director));
-
             ViewBag.CanEditTeam = !isRestrictedRole;
-
             await PopulateDropDowns();
             return View(viewModel);
         }
@@ -220,7 +212,6 @@ namespace RewardsAndRecognitionSystem.Controllers
             var updatedUser = _mapper.Map<User>(updatedUserViewModel);
             var user = await _userManager.FindByIdAsync(id);
             if (user == null) return NotFound();
-
             var roles = await _userManager.GetRolesAsync(user);
             bool isTeamLeadOrManager = roles.Contains(nameof(Roles.TeamLead))
                           || roles.Contains(nameof(Roles.Manager));
@@ -230,7 +221,6 @@ namespace RewardsAndRecognitionSystem.Controllers
                 await PopulateDropDowns();
                 return View(updatedUserViewModel);
             }
-
             if (ModelState.IsValid)
             {
                 user.NormalizedUserName = updatedUser.Email.ToUpper();
@@ -246,11 +236,9 @@ namespace RewardsAndRecognitionSystem.Controllers
                     TempData["message"] =ToastMessages_User.UpdateUser;
                     return RedirectToAction(nameof(Index));
                 }
-
                 foreach (var error in result.Errors)
                     ModelState.AddModelError("", error.Description);
             }
-
             ModelState.Clear();
             await PopulateDropDowns();
             return View(user);
@@ -272,7 +260,7 @@ namespace RewardsAndRecognitionSystem.Controllers
             if (!result.Succeeded)
             {
                 // handle failure (optional)
-                ModelState.AddModelError("", "Unable to soft delete the user.");
+                ModelState.AddModelError("", GeneralMessages.SoftDeleteUserError);
             }
             TempData["message"] = ToastMessages_User.DeleteUser;
             return RedirectToAction(nameof(Index));
@@ -344,7 +332,6 @@ namespace RewardsAndRecognitionSystem.Controllers
             memStream.Seek(0, SeekOrigin.Begin);
             return File(memStream.ToArray(), "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "Users.xlsx");
         }
-
         private async Task PopulateDropDowns()
         {
             var teamsQuery = await _teamRepo.GetAllAsync();

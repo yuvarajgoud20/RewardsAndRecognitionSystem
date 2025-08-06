@@ -145,40 +145,30 @@
 <!-- Summary Cards -->
 <div class="row g-4 mb-4">
     <div class="col-md-3">
-
         <a href="#" onclick="navigateToNominations('all')" class="dashboard-card text-blue d-block text-decoration-none" ">
             <div class="dashboard-title">Total Nominations</div>
             <div class="dashboard-value" style="color: #007bff;">@ViewBag.TotalNominations</div> <!-- Blue -->
         </a>
     </div>
     <div class="col-md-3">
-
         <a href="#" onclick="navigateToNominations('pending')" class="dashboard-card d-block text-decoration-none">
-
             <div class="dashboard-title">Pending Reviews</div>
             <div class="dashboard-value" style="color: #fd7e14;">@ViewBag.PendingNominations</div> <!-- Orange -->
         </a>
     </div>
     <div class="col-md-3">
-
         <a href="#" onclick="navigateToNominations('directorapproved')" class="dashboard-card d-block text-decoration-none">
-
             <div class="dashboard-title">Final Approved</div>
             <div class="dashboard-value" style="color: #28a745;">@ViewBag.FinalApprovedNominations</div> <!-- Green -->
         </a>
     </div>
     <div class="col-md-3">
-
         <a href="#" onclick="navigateToNominations('directorrejected')" class="dashboard-card d-block text-decoration-none">
-
             <div class="dashboard-title">Final Rejected</div>
             <div class="dashboard-value text-danger">@ViewBag.FinalRejectedNominations</div>
         </a>
     </div>
 </div>
-
-
-
 
 @{
     var chartIndex = 0;
@@ -308,7 +298,6 @@
                     <h5 class="mt-2 mb-1 text-dark fw-semibold">@GeneralMessages.No_Nominations_This_Quarter</h5>
                 </div>
             </div>
-
         }
     </div>
 </div>
@@ -341,8 +330,6 @@
                             var teamNominations = Model.Where(n =>
                             n.Nominee?.Team?.Id == team.TeamId &&
                             currentQuarterId.HasValue && n.YearQuarterId == currentQuarterId.Value);
-
-
                             var categoryGroups = teamNominations
                             .GroupBy(n => n.Category?.Name)
                             .OrderBy(g => g.Key);
@@ -373,7 +360,6 @@
 
 <!-- View Nominations by Team (AJAX) -->
 <h4 class="mt-5"><i class="bi bi-info-circle-fill"></i> View Nominations by Team</h4>
-
 <div class="mb-4 d-flex align-items-center gap-3">
     <label class="form-label mb-0"><strong>Select Team:</strong></label>
     <select id="teamSelect" class="form-select w-auto">
@@ -398,20 +384,17 @@
     <script>
         $(document).ready(function () {
             loadYears();
-
             $('#yearDropdown').change(function () {
                 const year = $(this).val();
                 if (year) loadQuarters(year);
                 else $('#quarterDropdown').prop('disabled', true).html('<option>-- Select Quarter --</option>');
             });
-
             $('#quarterDropdown').change(function () {
                 const quarterId = $(this).val();
                 if (quarterId) {
                     window.location.href = `/Dashboard/Index?yearQuarterId=${quarterId}`;
                 }
             });
-
             // Removed the currentYear setting from here and moved inside loadYears()
         });
 
@@ -422,7 +405,6 @@
                     options += `<option value="${y}">${y}</option>`;
                 });
                 $('#yearDropdown').html(options);
-
                 // Now set current year and load quarters AFTER years are loaded
                 const currentYear = '@ViewBag.CurrentYear';
                 const currentQuarterId = '@ViewBag.CurrentQuarterId';
@@ -433,7 +415,8 @@
             });
         }
 
-        function loadQuarters(year, selectedId) {
+        function loadQuarters(year, selectedId) 
+        {
             $.get(`/Dashboard/GetQuarters?year=${year}`, function (quarters) {
                 let options = '<option value="">-- Select Quarter --</option>';
                 quarters.forEach(q => {
@@ -444,7 +427,8 @@
         }
     </script>
     <script>
-        function navigateToNominations(filter) {
+        function navigateToNominations(filter) 
+        {
             const quarterId = document.getElementById("quarterDropdown")?.value;
 
             if (!quarterId) {
@@ -510,7 +494,8 @@
 
       
                  // 🔍 Filter nominations table by nominee name
-        function filterNominations() {
+        function filterNominations() 
+        {
             const input = document.getElementById("searchInput");
             const filter = input.value.toLowerCase();
             const table = document.getElementById("nominationsTable");
@@ -519,7 +504,8 @@
             let matchFound = false;
 
             // Loop through table rows (skip header row at index 0)
-            for (let i = 1; i < rows.length; i++) {
+            for (let i = 1; i < rows.length; i++) 
+            {
                 const nomineeCell = rows[i].getElementsByTagName("td")[1];
                 if (nomineeCell) {
                     const name = nomineeCell.textContent || nomineeCell.innerText;
