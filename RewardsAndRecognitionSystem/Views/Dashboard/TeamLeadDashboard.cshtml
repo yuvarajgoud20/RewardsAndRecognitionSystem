@@ -94,7 +94,7 @@
     <div class="col-md-3">
         <a href="javascript:void(0);" onclick="navigateToNominations('pending')" class="clickable-card">
 
-        @* <a href="@Url.Action("Index", "Nomination", new { filter = "pending" })" class="clickable-card"> *@
+            @* <a href="@Url.Action("Index", "Nomination", new { filter = "pending" })" class="clickable-card"> *@
             <div class="dashboard-card">
                 <div class="dashboard-title">Pending Reviews</div>
                 <div class="dashboard-value text-orange">@ViewBag.PendingNominations</div>
@@ -104,7 +104,7 @@
     <div class="col-md-3">
         <a href="javascript:void(0);" onclick="navigateToNominations('directorapproved')" class="clickable-card">
 
-        @* <a href="@Url.Action("Index", "Nomination", new { filter = "directorapproved" })" class="clickable-card"> *@
+            @* <a href="@Url.Action("Index", "Nomination", new { filter = "directorapproved" })" class="clickable-card"> *@
             <div class="dashboard-card">
                 <div class="dashboard-title">Final Approved</div>
                 <div class="dashboard-value text-green">@ViewBag.FinalApprovedNominations</div>
@@ -114,7 +114,7 @@
     <div class="col-md-3">
         <a href="javascript:void(0);" onclick="navigateToNominations('directorrejected')" class="clickable-card">
 
-        @* <a href="@Url.Action("Index", "Nomination", new { filter = "directorrejected" })" class="clickable-card"> *@
+            @* <a href="@Url.Action("Index", "Nomination", new { filter = "directorrejected" })" class="clickable-card"> *@
             <div class="dashboard-card">
                 <div class="dashboard-title">Final Rejected</div>
                 <div class="dashboard-value text-danger">@ViewBag.RejectedNominations</div>
@@ -165,7 +165,7 @@
                                         <h5 class="card-title">${item.category}</h5>
                                     </div>
                                     <div class="scroll-wrapper">
-                                        <canvas id="${canvasId}" height="180"></canvas>
+                                        <canvas id="${canvasId}" height="280"></canvas>
                                     </div>
                                 </div>
                             </div>
@@ -173,46 +173,49 @@
                     `);
 
                     const ctx = document.getElementById(canvasId).getContext('2d');
+                                               Chart.defaults.devicePixelRatio = 1; // add once globally
 
-                    new Chart(ctx, {
-                        type: 'bar',
-                        data: {
-                            labels: ['Approved', 'Pending', 'Rejected'],
-                            datasets: [{
-                                label: item.category,
-                                data: [item.approved, item.pending, item.rejected],
-                                backgroundColor: ['#2E7D32', '#F9A825', '#D32F2F'],
-                                borderRadius: 6,
-                                barThickness: 40
-                            }]
-                        },
-                        options: {
-                            responsive: true,
-                            plugins: {
-                                legend: { display: false },
-                                datalabels: {
-                                    anchor: 'end',
-                                    align: 'top',
-                                    font: { weight: 'bold', size: 14 },
-                                    color: '#333',
-                                    formatter: val => val > 0 ? val : ''
-                                }
-                            },
-                            scales: {
-                                y: {
-                                    beginAtZero: true,
-                                    suggestedMax: Math.max(item.approved, item.pending, item.rejected) + 1,
-                                    ticks: { stepSize: 1, color: '#333' },
-                                    grid: { color: '#eee' }
-                                },
-                                x: {
-                                    ticks: { color: '#333' },
-                                    grid: { display: false }
-                                }
-                            }
-                        },
-                        plugins: [ChartDataLabels]
-                    });
+        new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: ['Approved', 'Pending', 'Rejected'],
+                datasets: [{
+                    label: item.category,
+                    data: [item.approved, item.pending, item.rejected],
+                    backgroundColor: ['#2E7D32', '#F9A825', '#D32F2F'],
+                    borderRadius: 6,
+                    barThickness:37
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { display: false },
+                    datalabels: {
+                        anchor: 'end',
+                        align: 'top',
+                        font: { weight: 'bold', size: 14 },
+                        color: '#333',
+                        formatter: val => val > 0 ? val : ''
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        suggestedMax: Math.max(item.approved, item.pending, item.rejected) + 1,
+                        ticks: { stepSize: 1, color: '#333' },
+                        grid: { color: '#eee' }
+                    },
+                    x: {
+                        ticks: { color: '#333' },
+                        grid: { display: false }
+                    }
+                }
+            },
+            plugins: [ChartDataLabels]
+                  });
+
                 });
             });
         }
@@ -227,61 +230,61 @@
         });
     </script>
     <script>
-           function navigateToNominations(filter) {
-                    const quarterId = document.getElementById("quarterDropdown").value;
+        function navigateToNominations(filter) {
+                 const quarterId = document.getElementById("quarterDropdown").value;
 
-                    if (!quarterId) {
-                        alert("Please select a quarter.");
-                        return;
-                    }
+                 if (!quarterId) {
+                     alert("Please select a quarter.");
+                     return;
+                 }
 
-                    const url = `/Nomination/Index?filter=${filter}&yearQuarterId=${quarterId}`;
-                    window.location.href = url;
-                }
+                 const url = `/Nomination/Index?filter=${filter}&yearQuarterId=${quarterId}`;
+                 window.location.href = url;
+             }
 
-                $(document).ready(function () {
-                    loadYears();
+             $(document).ready(function () {
+                 loadYears();
 
-                    $('#yearDropdown').change(function () {
-                        const year = $(this).val();
-                        if (year) loadQuarters(year);
-                        else $('#quarterDropdown').prop('disabled', true).html('<option>-- Select Quarter --</option>');
-                    });
+                 $('#yearDropdown').change(function () {
+                     const year = $(this).val();
+                     if (year) loadQuarters(year);
+                     else $('#quarterDropdown').prop('disabled', true).html('<option>-- Select Quarter --</option>');
+                 });
 
-                    $('#quarterDropdown').change(function () {
-                        const quarterId = $(this).val();
-                        if (quarterId) {
-                            window.location.href = `/Dashboard/Index?yearQuarterId=${quarterId}`;
-                        }
-                    });
-                });
+                 $('#quarterDropdown').change(function () {
+                     const quarterId = $(this).val();
+                     if (quarterId) {
+                         window.location.href = `/Dashboard/Index?yearQuarterId=${quarterId}`;
+                     }
+                 });
+             });
 
-                function loadYears() {
-                    $.get('/Dashboard/GetYears', function (years) {
-                        let options = '<option value="">-- Select Year --</option>';
-                        years.forEach(y => {
-                            options += `<option value="${y}">${y}</option>`;
-                        });
-                        $('#yearDropdown').html(options);
+             function loadYears() {
+                 $.get('/Dashboard/GetYears', function (years) {
+                     let options = '<option value="">-- Select Year --</option>';
+                     years.forEach(y => {
+                         options += `<option value="${y}">${y}</option>`;
+                     });
+                     $('#yearDropdown').html(options);
 
-                        const currentYear = '@ViewBag.CurrentYear';
-                        const currentQuarterId = '@ViewBag.CurrentQuarterId';
-                        if (currentYear) {
-                            $('#yearDropdown').val(currentYear);
-                            loadQuarters(currentYear, currentQuarterId);
-                        }
-                    });
-                }
+                     const currentYear = '@ViewBag.CurrentYear';
+                     const currentQuarterId = '@ViewBag.CurrentQuarterId';
+                     if (currentYear) {
+                         $('#yearDropdown').val(currentYear);
+                         loadQuarters(currentYear, currentQuarterId);
+                     }
+                 });
+             }
 
-                function loadQuarters(year, selectedId) {
-                    $.get(`/Dashboard/GetQuarters?year=${year}`, function (quarters) {
-                        let options = '<option value="">-- Select Quarter --</option>';
-                        quarters.forEach(q => {
-                            const isSel = q.id.toLowerCase() === (selectedId || '').toLowerCase();
-                            options += `<option value="${q.id}" ${isSel ? 'selected' : ''}>${q.name}</option>`;
-                        });
-                        $('#quarterDropdown').prop('disabled', false).html(options);
-                    });
-                }
-              </script>
-              }
+             function loadQuarters(year, selectedId) {
+                 $.get(`/Dashboard/GetQuarters?year=${year}`, function (quarters) {
+                     let options = '<option value="">-- Select Quarter --</option>';
+                     quarters.forEach(q => {
+                         const isSel = q.id.toLowerCase() === (selectedId || '').toLowerCase();
+                         options += `<option value="${q.id}" ${isSel ? 'selected' : ''}>${q.name}</option>`;
+                     });
+                     $('#quarterDropdown').prop('disabled', false).html(options);
+                 });
+             }
+    </script>
+}
