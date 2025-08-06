@@ -1,5 +1,9 @@
 ﻿@model IEnumerable<RewardsAndRecognitionSystem.ViewModels.YearQuarterViewModel>
 
+@{
+    string selectedFilter = ViewBag.SelectedFilter as string ?? "active";
+}
+
 <table class="yearquarter-table">
     <thead>
         <tr>
@@ -12,86 +16,96 @@
         </tr>
     </thead>
     <tbody>
-        @foreach (var yq in Model)
+        @if (!Model.Any())
         {
-            <tr class="@(yq.IsActive ? "" : "table-danger")">
-                <td>@yq.Year</td>
-                <td>@yq.Quarter</td>
-                <td>@(yq.StartDate?.ToShortDateString() ?? "N/A")</td>
-                <td>@(yq.EndDate?.ToShortDateString() ?? "N/A")</td>
-                <td>
-                    @if (yq.IsActive)
-                    {
-                        <span class="badge bg-success"><i class="bi bi-check-circle-fill"></i> Active</span>
-                    }
-                    else
-                    {
-                        <span class="badge bg-secondary"><i class="bi bi-x-circle-fill"></i> Inactive</span>
-                    }
-                </td>
-                <td>
-                
-                    @if (!yq.IsDeleted)
-                    {
-                        <a asp-action="Details" asp-route-id="@yq.Id" class="btn btn-secondary">
-                            <i class="bi bi-eye-fill"></i> View
-                        </a>
-                        <a asp-action="Edit" asp-route-id="@yq.Id" class="btn btn-primary">
-                            <i class="bi bi-pencil-square"></i> Edit
-                        </a>
-                        <button type="button" class="btn btn-danger" onclick="confirmDelete('@yq.Id')">
-                            <i class="bi bi-trash-fill"></i> Delete
-                        </button>
-                    }
-                    else
-                    {
-
-                        <button class="btn btn-secondary" disabled>
-                            <i class="bi bi-eye-fill"></i> View
-                        </button>
-                        <button class="btn btn-primary" disabled>
-                            <i class="bi bi-pencil-square"></i> Edit
-                        </button>
-                        <button class="btn btn-danger" disabled>
-                            <i class="bi bi-trash-fill"></i> Deleted
-                        </button>
-                    }
+            <tr>
+                <td colspan="6" class="text-center">
+                    <div class="alert alert-warning m-0" role="alert">
+                    <i class="bi bi-info-circle"></i>
+                    @(selectedFilter == "deleted" ? "No deleted year quarters found." : "No active year quarters found.")
+                    </div>
                 </td>
             </tr>
         }
+        else
+        {
+            foreach (var yq in Model)
+            {
+                <tr class="@(yq.IsActive ? "" : "table-danger")">
+                    <td>@yq.Year</td>
+                    <td>@yq.Quarter</td>
+                    <td>@(yq.StartDate?.ToShortDateString() ?? "N/A")</td>
+                    <td>@(yq.EndDate?.ToShortDateString() ?? "N/A")</td>
+                    <td>
+                        @if (yq.IsActive)
+                        {
+                            <span class="badge bg-success"><i class="bi bi-check-circle-fill"></i> Active</span>
+                        }
+                        else
+                        {
+                            <span class="badge bg-secondary"><i class="bi bi-x-circle-fill"></i> Inactive</span>
+                        }
+                    </td>
+                    <td>
+                        @if (!yq.IsDeleted)
+                        {
+                            <a asp-action="Details" asp-route-id="@yq.Id" class="btn btn-secondary">
+                                <i class="bi bi-eye-fill"></i> View
+                            </a>
+                            <a asp-action="Edit" asp-route-id="@yq.Id" class="btn btn-primary">
+                                <i class="bi bi-pencil-square"></i> Edit
+                            </a>
+                            <button type="button" class="btn btn-danger" onclick="confirmDelete('@yq.Id')">
+                                <i class="bi bi-trash-fill"></i> Delete
+                            </button>
+                        }
+                        else
+                        {
+                            <button class="btn btn-secondary" disabled>
+                                <i class="bi bi-eye-fill"></i> View
+                            </button>
+                            <button class="btn btn-primary" disabled>
+                                <i class="bi bi-pencil-square"></i> Edit
+                            </button>
+                            <button class="btn btn-danger" disabled>
+                                <i class="bi bi-trash-fill"></i> Deleted
+                            </button>
+                        }
+                    </td>
+                </tr>
+            }
+        }
     </tbody>
 </table>
-@if(Model.Any())
+
+@if (Model.Any())
 {
-<div class="d-flex justify-content-between align-items-center mt-4" style="min-height: 75px;">
-    <span>Showing page @ViewBag.CurrentPage of @ViewBag.TotalPages</span>
-    <nav>
-        <ul class="pagination mb-0">
-            <li class="page-item @(ViewBag.CurrentPage == 1 ? "disabled" : "")">
-                <a class="page-link"
-                   asp-action="Index"
-                   asp-route-page="@(ViewBag.CurrentPage - 1)"
-                   asp-route-filter="@ViewBag.SelectedFilter">
-                    Previous
-                </a>
-            </li>
+    <div class="d-flex justify-content-between align-items-center mt-4" style="min-height: 75px;">
+        <span>Showing page @ViewBag.CurrentPage of @ViewBag.TotalPages</span>
+        <nav>
+            <ul class="pagination mb-0">
+                <li class="page-item @(ViewBag.CurrentPage == 1 ? "disabled" : "")">
+                    <a class="page-link"
+                       asp-action="Index"
+                       asp-route-page="@(ViewBag.CurrentPage - 1)"
+                       asp-route-filter="@ViewBag.SelectedFilter">
+                        Previous
+                    </a>
+                </li>
 
-            <li class="page-item active">
-                <span class="page-link">
-                    @ViewBag.CurrentPage
-                </span>
-            </li>
+                <li class="page-item active">
+                    <span class="page-link">@ViewBag.CurrentPage</span>
+                </li>
 
-            <li class="page-item @(ViewBag.CurrentPage == ViewBag.TotalPages ? "disabled" : "")">
-                <a class="page-link"
-                   asp-action="Index"
-                   asp-route-page="@(ViewBag.CurrentPage + 1)"
-                   asp-route-filter="@ViewBag.SelectedFilter">
-                    Next
-                </a>
-            </li>
-        </ul>
-    </nav>
-</div>
+                <li class="page-item @(ViewBag.CurrentPage == ViewBag.TotalPages ? "disabled" : "")">
+                    <a class="page-link"
+                       asp-action="Index"
+                       asp-route-page="@(ViewBag.CurrentPage + 1)"
+                       asp-route-filter="@ViewBag.SelectedFilter">
+                        Next
+                    </a>
+                </li>
+            </ul>
+        </nav>
+    </div>
 }
-

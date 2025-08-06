@@ -230,7 +230,21 @@
         </a>
     </div>
 </div>
-
+@if (!Model.Any())
+{
+    <div class="alert alert-warning text-center" role="alert">
+        @if (ViewBag.ShowDeleted == true)
+        {
+            <span><i class="bi bi-info-circle me-2"></i> No deleted teams found.</span>
+        }
+        else
+        {
+            <span><i class="bi bi-info-circle me-2"></i> No active teams found.</span>
+        }
+    </div>
+}
+else
+{
 
 @foreach (var group in Model)
 {
@@ -322,6 +336,7 @@
             </table>
         </div>
     </div>
+}
 }
 
 <div class="modal fade top-centered" id="deleteModal" tabindex="-1">

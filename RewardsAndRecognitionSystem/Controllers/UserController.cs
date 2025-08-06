@@ -70,6 +70,10 @@ namespace RewardsAndRecognitionSystem.Controllers
                 .Skip((page - 1) * pageSize)
                 .Take(pageSize)
                 .ToListAsync();
+            ViewBag.SelectedFilter = filter;
+            ViewBag.NoDeletedRecords = filter == "deleted" && users.Count == 0;
+            ViewBag.NoActiveRecords = filter == "active" && users.Count == 0;
+
 
             var userRoles = new Dictionary<string, string>();
             foreach (var user in users)

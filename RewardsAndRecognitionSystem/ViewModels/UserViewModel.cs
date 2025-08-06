@@ -11,5 +11,6 @@ namespace RewardsAndRecognitionSystem.ViewModels
         public string SelectedRole { get; set; }
         public Guid? TeamId { get; set; }
         public Team? Team { get; set; }
+        public bool IsDeleted { get; set; }
     }
 }
