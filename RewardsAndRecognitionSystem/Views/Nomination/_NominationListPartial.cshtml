@@ -51,7 +51,7 @@
     </div>
 
 
-            @if (nominationsList.Any())
+            @if (nominationsList.Any() && dashboardFilter?.ToString().ToLower() == "all")
             {
                 <a href="/Nomination/ExportAllNominationsOpenXml?yearQuarterId=@ViewBag.SelectedYearQuarterId"
                    class="btn btn-success">
@@ -171,7 +171,7 @@
 
             <!-- Right: Excel, Filter, and Create Nomination -->
             <div style="display: flex; gap: 10px; align-items: center;">
-                @if (nominationsList.Any())
+                @if (nominationsList.Any() && dashboardFilter?.ToString().ToLower() == "all")
                 {
                     <a href="/Nomination/ExportAllNominationsOpenXml?yearQuarterId=@ViewBag.SelectedYearQuarterId"
                        class="btn btn-success">
