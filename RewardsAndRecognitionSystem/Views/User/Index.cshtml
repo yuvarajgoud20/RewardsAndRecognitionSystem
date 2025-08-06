@@ -102,6 +102,12 @@
             background: var(--danger-hover);
             color: white;
         }
+   
+    .form-check-input.red-toggle:checked {
+        background-color: #dc3545;
+        border-color: #dc3545;
+    }
+
 </style>
 
 <div class="user-header">
@@ -109,13 +115,13 @@
 
     <div class="d-flex align-items-center gap-3 flex-wrap">
         <div class="form-check form-switch">
-            <input class="form-check-input" type="checkbox" role="switch" id="toggleDeletedUsers"
+            <input class="form-check-input red-toggle" type="checkbox" role="switch" id="toggleDeletedUsers"
                    @(ViewBag.SelectedFilter == "deleted" ? "checked" : "") />
+
             <label class="form-check-label ms-2" for="toggleDeletedUsers">
                 Show Deleted
             </label>
         </div>
-
         <a asp-action="ExportAllUsersOpenXml" class="btn btn-success">
             <i class="bi bi-file-earmark-excel"></i> Export
         </a>
@@ -139,7 +145,6 @@
 @section Scripts {
     <script>
                 function confirmDelete(userId) {
-          // Blur the currently focused element (e.g., the delete button)
           const activeBtn = document.activeElement;
           if (activeBtn) {
             activeBtn.blur();

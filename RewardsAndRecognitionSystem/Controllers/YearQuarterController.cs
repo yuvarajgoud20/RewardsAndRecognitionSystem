@@ -107,11 +107,12 @@ namespace RewardsAndRecognitionSystem.Controllers
                 // Overlap check with all non-deleted quarters
                 bool overlaps = yqs.Any(q =>
                     q.IsDeleted == false &&
+                    q.Year == yq.Year &&
                     q.StartDate.HasValue && q.EndDate.HasValue &&
                     (
-                        (start >= q.StartDate.Value.Date && start <= q.EndDate.Value.Date) ||       // Starts inside
-                        (end >= q.StartDate.Value.Date && end <= q.EndDate.Value.Date) ||           // Ends inside
-                        (start <= q.StartDate.Value.Date && end >= q.EndDate.Value.Date)            // Fully encloses
+                        (start >= q.StartDate.Value.Date && start <= q.EndDate.Value.Date) ||      
+                        (end >= q.StartDate.Value.Date && end <= q.EndDate.Value.Date) ||           
+                        (start <= q.StartDate.Value.Date && end >= q.EndDate.Value.Date)           
                     )
                 );
 
@@ -179,9 +180,9 @@ namespace RewardsAndRecognitionSystem.Controllers
                     q.IsDeleted == false &&
                     q.Year == yq.Year &&
                     (
-                        (start >= q.StartDate && start <= q.EndDate) ||       // Start overlaps
-                        (end >= q.StartDate && end <= q.EndDate) ||           // End overlaps
-                        (start <= q.StartDate && end >= q.EndDate)            // Fully encloses another
+                        (start >= q.StartDate && start <= q.EndDate) ||      
+                        (end >= q.StartDate && end <= q.EndDate) ||          
+                        (start <= q.StartDate && end >= q.EndDate)           
                     )
                 );
 

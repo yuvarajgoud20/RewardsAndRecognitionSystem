@@ -69,7 +69,8 @@ namespace RewardsAndRecognitionSystem.Controllers
             ViewBag.ShowDeleted = showDeleted;
             ViewBag.CurrentPage = page;
             ViewBag.TotalPages = totalPages;
-            ViewBag.ActionName = nameof(Index); // for pagination
+            ViewBag.ActionName = nameof(Index);
+            ViewBag.NoDataFound = !grouped.Any();
 
             return View(grouped);
         }

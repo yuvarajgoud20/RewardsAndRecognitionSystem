@@ -1,7 +1,9 @@
 ﻿@model IEnumerable<RewardsAndRecognitionSystem.ViewModels.UserViewModel>
 @{
     var userRoles = ViewBag.UserRoles as Dictionary<string, string>;
+    string selectedFilter = ViewBag.SelectedFilter as string ?? "deleted";
 }
+
 
 <table class="users-table" id="usersTable">
     <thead>
@@ -15,23 +17,76 @@
         </tr>
     </thead>
     <tbody>
-        @foreach (var user in Model)
+        @if (!Model.Any())
         {
-            string teamName = user.Team?.Name ?? "Not Assigned";
-            string managerName = user.Team?.Manager?.Name ?? "No Manager";
-            string role = userRoles.ContainsKey(user.Id) ? userRoles[user.Id] : "No Role";
-
             <tr>
-                <td>@user.Name</td>
-                <td>@user.Email</td>
-                <td>@teamName</td>
-                <td>@managerName</td>
-                <td>@role</td>
-                <td>
-                    <a class="btn btn-edit" asp-action="Edit" asp-route-id="@user.Id"><i class="bi bi-pencil-square"></i> Edit</a>
-                    <button class="btn btn-delete" onclick="confirmDelete('@user.Id')"><i class="bi bi-trash-fill"></i> Delete</button>
+                <td colspan="6" class="text-center">
+                    @if (ViewBag.NoDeletedRecords == true)
+                    {
+                        <div class="alert alert-warning m-0" role="alert">
+                            <i class="bi bi-info-circle"></i> No deleted users found.
+                        </div>
+                    }
+                    else if (ViewBag.NoActiveRecords == true)
+                    {
+                        <div class="alert alert-warning m-0" role="alert">
+                            <i class="bi bi-info-circle"></i> No users found.
+                        </div>
+                    }
                 </td>
             </tr>
         }
+        else
+        {
+            foreach (var user in Model)
+            {
+                string teamName = user.Team?.Name ?? "Not Assigned";
+                string managerName = user.Team?.Manager?.Name ?? "No Manager";
+                string role = userRoles != null && userRoles.ContainsKey(user.Id) ? userRoles[user.Id] : "No Role";
+                bool isDeleted = user.IsDeleted;
+
+                <tr class="@(isDeleted ? "table-danger" : "")">
+                    <td>@user.Name</td>
+                    <td>@user.Email</td>
+                    <td>@teamName</td>
+                    <td>@managerName</td>
+                    <td>@role</td>
+                    <td>
+                        @if (user.IsDeleted)
+                        {
+                            <button type="button" class="btn btn-secondary btn-sm" disabled>
+                                <i class="bi bi-pencil-fill"></i> Edit
+                            </button>
+                            <button type="button" class="btn btn-danger btn-sm" disabled>
+                                <i class="bi bi-trash-fill"></i> Deleted
+                            </button>
+                        }
+                        else
+                        {
+                            <a asp-action="Edit" asp-route-id="@user.Id" class="btn btn-indigo btn-sm">
+                                <i class="bi bi-pencil-fill"></i> Edit
+                            </a>
+                            <button type="button" class="btn btn-danger btn-sm" onclick="confirmDelete('@user.Id')">
+                                <i class="bi bi-trash-fill"></i> Delete
+                            </button>
+                        }
+                    </td>
+
+                </tr>
+            }
+        }
     </tbody>
 </table>
+
+<style>
+   
+
+    .btn.disabled, .btn:disabled {
+        pointer-events: none;
+        opacity: 0.6;
+    }
+
+    .btn-edit, .btn-delete {
+        margin-right: 5px;
+    }
+</style>

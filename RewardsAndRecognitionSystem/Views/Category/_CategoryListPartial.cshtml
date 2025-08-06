@@ -15,97 +15,74 @@
         </tr>
     </thead>
     <tbody>
-        @foreach (var category in Model)
+        @if (!Model.Any())
         {
-            <tr class="@(category.IsDeleted ? "table-danger" : "")">
-                <td>@category.Name</td>
-                <td class="desc-cell">@category.Description</td>
-                <td>@category.CreatedAt.ToShortDateString()</td>
-                <td>
-                    @if (category.IsDeleted)
-                    {
-                        <span class="badge bg-danger"><i class="bi bi-x-circle-fill"></i> Deleted</span>
-                    }
-                    else if (category.isActive)
-                    {
-                        <span class="badge bg-success"><i class="bi bi-check-circle-fill"></i> Active</span>
-                    }
-                    else
-                    {
-                        <span class="badge bg-secondary"><i class="bi bi-x-circle-fill"></i> Inactive</span>
-                    }
+            <tr>
+                <td colspan="5" class="text-center">
+                    <div class="alert alert-warning m-0" role="alert">
+                        <i class="bi bi-info-circle me-2"></i>
+                        @(showDeleted ? "No deleted categories found." : "No active categories found.")
+                    </div>
                 </td>
-                <td class="actions-cell">
-                    @if (category.IsDeleted)
-                    {
-                        <button type="button" class="btn btn-secondary btn-sm" disabled>
-                            <i class="bi bi-pencil-fill"></i> Edit
-                        </button>
-                        <button type="button" class="btn btn-danger btn-sm" disabled>
-                            <i class="bi bi-trash-fill"></i> Deleted
-                        </button>
-                    }
-                    else
-                    {
-                        <a asp-action="Edit" asp-route-id="@category.Id" class="btn btn-indigo btn-sm">
-                            <i class="bi bi-pencil-fill"></i> Edit
-                        </a>
-                        <a asp-action="Details" asp-route-id="@category.Id" class="btn btn-secondary btn-sm">
-                            <i class="bi bi-eye-fill"></i> Details
-                        </a>
-
-                        @if (usedCategoryIds.Contains(category.Id))
+            </tr>
+        }
+        else
+        {
+            foreach (var category in Model)
+            {
+                <tr class="@(category.IsDeleted ? "table-danger" : "")">
+                    <td>@category.Name</td>
+                    <td class="desc-cell">@category.Description</td>
+                    <td>@category.CreatedAt.ToShortDateString()</td>
+                    <td>
+                        @if (category.IsDeleted)
                         {
-                            <button type="button" class="btn btn-danger btn-sm" disabled title="Cannot delete - used in nomination">
-                                <i class="bi bi-trash-fill"></i> Delete
+                            <span class="badge bg-danger"><i class="bi bi-x-circle-fill"></i> Deleted</span>
+                        }
+                        else if (category.isActive)
+                        {
+                            <span class="badge bg-success"><i class="bi bi-check-circle-fill"></i> Active</span>
+                        }
+                        else
+                        {
+                            <span class="badge bg-secondary"><i class="bi bi-x-circle-fill"></i> Inactive</span>
+                        }
+                    </td>
+                    <td class="actions-cell">
+                        @if (category.IsDeleted)
+                        {
+                            <button type="button" class="btn btn-secondary btn-sm" disabled>
+                                <i class="bi bi-pencil-fill"></i> Edit
+                            </button>
+                            <button type="button" class="btn btn-danger btn-sm" disabled>
+                                <i class="bi bi-trash-fill"></i> Deleted
                             </button>
                         }
                         else
                         {
-                            <button type="button" class="btn btn-danger btn-sm" onclick="confirmDelete('@category.Id')">
-                                <i class="bi bi-trash-fill"></i> Delete
-                            </button>
+                            <a asp-action="Edit" asp-route-id="@category.Id" class="btn btn-indigo btn-sm">
+                                <i class="bi bi-pencil-fill"></i> Edit
+                            </a>
+                            <a asp-action="Details" asp-route-id="@category.Id" class="btn btn-secondary btn-sm">
+                                <i class="bi bi-eye-fill"></i> Details
+                            </a>
+
+                            @if (usedCategoryIds.Contains(category.Id))
+                            {
+                                <button type="button" class="btn btn-danger btn-sm" disabled title="Cannot delete - used in nomination">
+                                    <i class="bi bi-trash-fill"></i> Delete
+                                </button>
+                            }
+                            else
+                            {
+                                <button type="button" class="btn btn-danger btn-sm" onclick="confirmDelete('@category.Id')">
+                                    <i class="bi bi-trash-fill"></i> Delete
+                                </button>
+                            }
                         }
-                    }
-                </td>
-            </tr>
+                    </td>
+                </tr>
+            }
         }
     </tbody>
 </table>
-
-@if (Model.Any())
-{
-    <div class="d-flex justify-content-between align-items-center mt-4 pt-3 border-top">
-        <!-- Left: page info -->
-        <div>
-            Showing page @ViewBag.CurrentPage of @ViewBag.TotalPages
-        </div>
-
-        <!-- Right: simplified pagination -->
-        <nav>
-            <ul class="pagination mb-0">
-                <li class="page-item @(ViewBag.CurrentPage == 1 ? "disabled" : "")">
-                    <a class="page-link pagination-link"
-                       asp-action="Index"
-                       asp-route-page="@(ViewBag.CurrentPage - 1)"
-                       asp-route-showDeleted="@showDeleted">
-                        Previous
-                    </a>
-                </li>
-
-                <li class="page-item active">
-                    <span class="page-link">@ViewBag.CurrentPage</span>
-                </li>
-
-                <li class="page-item @(ViewBag.CurrentPage == ViewBag.TotalPages ? "disabled" : "")">
-                    <a class="page-link pagination-link"
-                       asp-action="Index"
-                       asp-route-page="@(ViewBag.CurrentPage + 1)"
-                       asp-route-showDeleted="@showDeleted">
-                        Next
-                    </a>
-                </li>
-            </ul>
-        </nav>
-    </div>
-}
