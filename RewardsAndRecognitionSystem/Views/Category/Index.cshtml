@@ -110,8 +110,7 @@
 <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
     <h2 class="mb-4"><i class="bi bi-tags-fill me-2"></i>Categories</h2>
 
-    <div></div> <!-- Empty left to maintain spacing symmetry -->
-  
+    <div></div>  
 
     <div class="d-flex align-items-center gap-3">
         <div class="form-check form-switch m-0">
@@ -136,50 +135,51 @@
 </script>
 
 <script>
-                   function confirmDelete(categoryId) {
-        // Force blur the Delete button BEFORE the popup opens
-        const activeBtn = document.activeElement;
-        if (activeBtn) {
-            activeBtn.blur();
-        }
-
-        Swal.fire({
-            title: 'Are you sure?',
-            text: "This action cannot be undone.",
-            icon: 'warning',
-            showCancelButton: true,
-            confirmButtonText: 'Yes, delete it!',
-            cancelButtonText: 'No, cancel!',
-            reverseButtons: true,
-            allowOutsideClick: true,
-            focusConfirm: false,
-            focusCancel: false,
-            didOpen: () => {
-                // Extra guard to make sure nothing stays focused
-                setTimeout(() => document.activeElement?.blur(), 10);
-            },
-            didClose: () => {
-                // Make sure focus does not return to the previously focused Delete button
-                setTimeout(() => document.activeElement?.blur(), 10);
+       function confirmDelete(categoryId) 
+       {
+            // Force blur the Delete button BEFORE the popup opens
+            const activeBtn = document.activeElement;
+            if (activeBtn) {
+                activeBtn.blur();
             }
-        }).then((result) => {
-            if (result.isConfirmed) {
-                const form = document.createElement('form');
-                form.method = 'POST';
-                form.action = '/Category/Delete/' + categoryId;
 
-                const token = document.querySelector('input[name="__RequestVerificationToken"]');
-                if (token) {
-                    const hiddenToken = document.createElement('input');
-                    hiddenToken.type = 'hidden';
-                    hiddenToken.name = '__RequestVerificationToken';
-                    hiddenToken.value = token.value;
-                    form.appendChild(hiddenToken);
+            Swal.fire({
+                title: 'Are you sure?',
+                text: "This action cannot be undone.",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonText: 'Yes, delete it!',
+                cancelButtonText: 'No, cancel!',
+                reverseButtons: true,
+                allowOutsideClick: true,
+                focusConfirm: false,
+                focusCancel: false,
+                didOpen: () => {
+                    // Extra guard to make sure nothing stays focused
+                    setTimeout(() => document.activeElement?.blur(), 10);
+                },
+                didClose: () => {
+                    // Make sure focus does not return to the previously focused Delete button
+                    setTimeout(() => document.activeElement?.blur(), 10);
                 }
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    const form = document.createElement('form');
+                    form.method = 'POST';
+                    form.action = '/Category/Delete/' + categoryId;
 
-                document.body.appendChild(form);
-                form.submit();
-            }
+                    const token = document.querySelector('input[name="__RequestVerificationToken"]');
+                    if (token) {
+                        const hiddenToken = document.createElement('input');
+                        hiddenToken.type = 'hidden';
+                        hiddenToken.name = '__RequestVerificationToken';
+                        hiddenToken.value = token.value;
+                        form.appendChild(hiddenToken);
+                    }
+
+                    document.body.appendChild(form);
+                    form.submit();
+                }
         });
     }
 

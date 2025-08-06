@@ -137,54 +137,57 @@
 </div>
 @if(Model.Count()>0)
 {
-<div class="d-flex justify-content-center mt-4" id="paginationContainer">
-    @await Html.PartialAsync("_PaginationPartial", ((int)ViewBag.CurrentPage, (int)ViewBag.TotalPages, (string)ViewBag.ActionName))
-</div>
+    <div class="d-flex justify-content-center mt-4" id="paginationContainer">
+        @await Html.PartialAsync("_PaginationPartial", ((int)ViewBag.CurrentPage, (int)ViewBag.TotalPages, (string)ViewBag.ActionName))
+    </div>
 }
 
 @section Scripts {
     <script>
-                function confirmDelete(userId) {
-          const activeBtn = document.activeElement;
-          if (activeBtn) {
-            activeBtn.blur();
-          }
-
-          Swal.fire({
-            title: 'Are you sure?',
-            text: "This action cannot be undone.",
-            icon: 'warning',
-            showCancelButton: true,
-            confirmButtonText: 'Yes, delete it!',
-            cancelButtonText: 'No, cancel!',
-            reverseButtons: true,
-            focusConfirm: false,
-            focusCancel: false,
-            didOpen: () => {
-              setTimeout(() => document.activeElement?.blur(), 10);
-            },
-            didClose: () => {
-              setTimeout(() => document.activeElement?.blur(), 10);
-            }
-          }).then((result) => {
-            if (result.isConfirmed) {
-              const form = document.createElement('form');
-              form.method = 'POST';
-              form.action = '/User/Delete/' + userId;
-
-              const token = document.querySelector('input[name="__RequestVerificationToken"]');
-              if (token) {
-                const hiddenToken = document.createElement('input');
-                hiddenToken.type = 'hidden';
-                hiddenToken.name = '__RequestVerificationToken';
-                hiddenToken.value = token.value;
-                form.appendChild(hiddenToken);
+        function confirmDelete(userId)
+        {
+              const activeBtn = document.activeElement;
+              if (activeBtn) {
+                activeBtn.blur();
               }
 
-              document.body.appendChild(form);
-              form.submit();
-            }
-          });
+              Swal.fire({
+                title: 'Are you sure?',
+                text: "This action cannot be undone.",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonText: 'Yes, delete it!',
+                cancelButtonText: 'No, cancel!',
+                reverseButtons: true,
+                focusConfirm: false,
+                focusCancel: false,
+                didOpen: () => {
+                  setTimeout(() => document.activeElement?.blur(), 10);
+                },
+                didClose: () => {
+                  setTimeout(() => document.activeElement?.blur(), 10);
+                }
+              }).then((result) =>
+              {
+                  if (result.isConfirmed) 
+                  {
+                      const form = document.createElement('form');
+                      form.method = 'POST';
+                      form.action = '/User/Delete/' + userId;
+
+                      const token = document.querySelector('input[name="__RequestVerificationToken"]');
+                      if (token) {
+                        const hiddenToken = document.createElement('input');
+                        hiddenToken.type = 'hidden';
+                        hiddenToken.name = '__RequestVerificationToken';
+                        hiddenToken.value = token.value;
+                        form.appendChild(hiddenToken);
+                      }
+
+                      document.body.appendChild(form);
+                      form.submit();
+                  }
+              });
         }
 
     </script>

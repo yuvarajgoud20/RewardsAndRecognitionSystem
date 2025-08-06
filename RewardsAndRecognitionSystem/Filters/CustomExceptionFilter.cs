@@ -10,7 +10,6 @@ namespace RewardsAndRecognitionSystem.Filters
     {
         private readonly IModelMetadataProvider _metadataProvider;
         private readonly ILogger<CustomExceptionFilter> _logger;
-
         public CustomExceptionFilter(IModelMetadataProvider metadataProvider, ILogger<CustomExceptionFilter> logger)
         {
             _metadataProvider = metadataProvider;

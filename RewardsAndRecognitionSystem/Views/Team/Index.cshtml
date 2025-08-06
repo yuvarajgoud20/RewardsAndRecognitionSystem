@@ -7,15 +7,12 @@
 
 <link rel="stylesheet" href="~/lib/Layout/bootstrap-icons.css" />
 
-
 <style>
     /* Make toggle switch red when checked */
     .form-check-input:checked {
         background-color: #dc3545 !important; /* Bootstrap danger */
         border-color: #dc3545 !important;
     }
-
-
 
     .team-card {
         border: 1px solid #e0e0e0;
@@ -256,8 +253,7 @@ else
     <div class="team-card">
         <div class="team-header">
             <h5 class="mb-0 d-flex align-items-center">
-                <i class="bi bi-diagram-3-fill me-1"></i> @team.Name
-               
+                <i class="bi bi-diagram-3-fill me-1"></i> @team.Name               
             </h5>
 
             <div class="team-actions-inline">
@@ -365,14 +361,16 @@ else
 
 @section Scripts {
     <script>
-        function toggleTeam(id, iconId) {
+        function toggleTeam(id, iconId) 
+        {
             const section = document.getElementById(id);
             const icon = document.getElementById(iconId);
             section.classList.toggle("open");
             icon.classList.toggle("rotate");
         }
 
-               function confirmDelete(teamId) {
+        function confirmDelete(teamId)
+        {
             const activeBtn = document.activeElement;
             if (activeBtn) {
                 activeBtn.blur();
@@ -416,7 +414,8 @@ else
         }
 
 
-        function filterTeams() {
+        function filterTeams() 
+        {
             const query = document.getElementById("searchBox").value.toLowerCase();
             document.querySelectorAll(".team-card").forEach(card => {
                 const name = card.querySelector(".team-header h5").textContent.toLowerCase();
@@ -424,13 +423,15 @@ else
             });
         }
 
-        function clearSearch() {
+        function clearSearch() 
+        {
             const searchBox = document.getElementById("searchBox");
             searchBox.value = "";
             filterTeams();
         }
 
-        function openEditModal(teamId) {
+        function openEditModal(teamId)
+        {
             window.location.href = `/Team/Edit/${teamId}`;
         }
            
@@ -443,6 +444,7 @@ else
 
     </script>
 }
+
 @if(Model.Any())
 {
 <div class="d-flex justify-content-between align-items-center mt-4 mb-2" style="min-height: 50px;">
@@ -451,7 +453,6 @@ else
     <div>
         Page @ViewBag.CurrentPage of @ViewBag.TotalPages
     </div>
-
     <!-- Right: Minimal Pagination -->
     <nav>
         <ul class="pagination mb-0">

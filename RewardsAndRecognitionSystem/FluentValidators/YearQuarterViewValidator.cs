@@ -34,17 +34,16 @@ namespace RewardsAndRecognitionSystem.FluentValidators
 
             // ✅ Enforce exact 3-month (approx. quarter) range
             RuleFor(x => x.EndDate)
-       .Must((model, endDate) =>
-       {
-           if (model.StartDate == null || endDate == null)
-               return true; // Skip this check if dates are missing
+               .Must((model, endDate) =>
+               {
+                   if (model.StartDate == null || endDate == null)
+                       return true; // Skip this check if dates are missing
 
-           var diffInDays = (endDate.Value - model.StartDate.Value).TotalDays + 1;
-           return diffInDays >= 89 && diffInDays <= 92;
-       })
-       .WithMessage("Date range must be approximately 3 months long.")
-       .When(x => x.StartDate != null && x.EndDate != null); // ✅ Add this guard
-
+                   var diffInDays = (endDate.Value - model.StartDate.Value).TotalDays + 1;
+                   return diffInDays >= 89 && diffInDays <= 92;
+               })
+               .WithMessage("Date range must be approximately 3 months long.")
+               .When(x => x.StartDate != null && x.EndDate != null); 
         }
     }
 }

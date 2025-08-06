@@ -13,10 +13,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
 
     <!-- Bootstrap -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" />
+    <link href="~/css/UserCreateBootstrap.css" rel="stylesheet" />
 
     <!-- Font Awesome (for eye icon) -->
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet" />
+    <link href="~/css/UserEyeIcon.css" rel="stylesheet" />
 
     <style>
         .btn-indigo {
@@ -60,7 +60,6 @@
             <form asp-action="Create" id="myForm" method="post">
                 @Html.AntiForgeryToken()
                 <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-
                 <div class="form-group mb-3">
                     <label asp-for="Name" class="form-label fw-semibold">Name</label><span class="text-danger">*</span>
                     <input asp-for="Name" class="form-control border-dark-subtle" />
@@ -74,13 +73,12 @@
                 </div>
 
                 <div class="form-group mb-3 position-relative">
-                    <label asp-for="PasswordHash" class="form-label fw-semibold">Password</label><span class="text-danger">*</span>
-
+                    <label asp-for="PasswordHash" class="form-label fw-semibold">Password</label>
+                    <span class="text-danger">*</span>
                     <div class="position-relative">
                         <input asp-for="PasswordHash" type="password" class="form-control border-dark-subtle" id="passwordField" />
                         <i class="fa fa-eye position-absolute" id="togglePassword"></i>
                     </div>
-
                     <span asp-validation-for="PasswordHash" class="text-danger"></span>
                 </div>
 
@@ -113,9 +111,8 @@
     </div>
 
     <!-- JS Scripts -->
-    <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-
+    <script src="~/js/UserJquery.js"></script>
+    <script src="~/js/UserJsdeliver.js"></script>
     <!-- Password Toggle Script -->
     <script>
         document.addEventListener("DOMContentLoaded", function () {
@@ -130,7 +127,6 @@
             });
         });
     </script>
-
     <!-- Role -> Team toggle logic -->
     <script>
         $(function () {
@@ -151,7 +147,6 @@
             toggleTeam();
         });
     </script>
-
     @await Html.PartialAsync("_ValidationScriptsPartial")
 </body>
 </html>

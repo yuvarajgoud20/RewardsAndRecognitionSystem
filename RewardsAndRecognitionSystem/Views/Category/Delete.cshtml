@@ -12,14 +12,12 @@
     <dl class="row mt-3">
         <dt class="col-sm-4">Name</dt>
         <dd class="col-sm-8">@Model.Name</dd>
-
         <dt class="col-sm-4">Description</dt>
         <dd class="col-sm-8">@Model.Description</dd>
     </dl>
 
     <form asp-action="DeleteConfirmed" method="post">
         <input type="hidden" asp-for="Id" />
-
         <div class="d-flex justify-content-between">
             <a asp-action="Index" class="btn btn-outline-secondary">Cancel</a>
             <button type="submit" class="btn btn-danger">Delete</button>

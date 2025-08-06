@@ -32,8 +32,48 @@ internal class Program
         {
             Serilog.Debugging.SelfLog.Enable(Console.Error);
 
-            var builder = WebApplication.CreateBuilder(args);
-      
+            var builder = WebApplication.CreateBuilder(args); 
+
+            Log.Logger = new LoggerConfiguration()
+               .MinimumLevel.Verbose()
+               .Enrich.FromLogContext()
+               .Enrich.WithMachineName()
+               .Enrich.WithThreadId()
+
+               .WriteTo.Logger(lc => lc
+                   .Filter.ByIncludingOnly(le => le.Level == Serilog.Events.LogEventLevel.Information)
+                   .WriteTo.File(
+                       path: "Logs/info-log-.txt",
+                       rollingInterval: RollingInterval.Day,
+                       retainedFileCountLimit: 7,
+                       outputTemplate: "{Timestamp:yyyy-MM-dd HH:mm:ss} [{Level}] {Message}{NewLine}{Exception}"
+                   )
+               )
+
+               .WriteTo.Logger(lc => lc
+                   .Filter.ByIncludingOnly(le => le.Level == Serilog.Events.LogEventLevel.Warning)
+                   .WriteTo.File(
+                       path: "Logs/warning-log-.txt",
+                       rollingInterval: RollingInterval.Day,
+                       retainedFileCountLimit: 7,
+                       outputTemplate: "{Timestamp:yyyy-MM-dd HH:mm:ss} [{Level}] {Message}{NewLine}{Exception}"
+                   )
+               )
+
+               .WriteTo.Logger(lc => lc
+                   .Filter.ByIncludingOnly(le =>
+                       le.Level == Serilog.Events.LogEventLevel.Error ||
+                       le.Level == Serilog.Events.LogEventLevel.Fatal)
+                   .WriteTo.File(
+                       path: "Logs/error-log-.txt",
+                       rollingInterval: RollingInterval.Day,
+                       retainedFileCountLimit: 7,
+                       outputTemplate: "{Timestamp:yyyy-MM-dd HH:mm:ss} [{Level}] {Message}{NewLine}{Exception}"
+                   )
+               )
+               .CreateLogger();
+
+           builder.Host.UseSerilog(); 
 
             var connectionString = builder.Configuration.GetConnectionString("DefaultConnection") ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
 
@@ -93,7 +133,7 @@ internal class Program
             builder.Services.AddScoped<IApprovalRepo, ApprovalRepo>();
             builder.Services.AddScoped<IYearQuarterRepo, YearQuarterRepo>();
 
-            //
+          
 
             builder.Services.AddScoped<ICategoryService, CategoryService>();
             builder.Services.Configure<PaginationSettings>(builder.Configuration.GetSection("PaginationSettings"));

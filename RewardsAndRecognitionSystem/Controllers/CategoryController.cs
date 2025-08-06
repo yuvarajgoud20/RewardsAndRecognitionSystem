@@ -90,7 +90,7 @@ namespace RewardsAndRecognitionSystem.Controllers
 
             if (allcategories.Any(category => NormalisingString.Normalize(category.Name) == newCategoryName))
             {
-                ModelState.AddModelError("Name", "Category Already Exists");
+                ModelState.AddModelError("Name", GeneralMessages.DuplicateCategory);
             }
             if (ModelState.IsValid)
             {

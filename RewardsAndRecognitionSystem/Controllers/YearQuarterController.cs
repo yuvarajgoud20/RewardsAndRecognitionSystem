@@ -19,20 +19,16 @@ namespace RewardsAndRecognitionSystem.Controllers
         private readonly IYearQuarterRepo _yearQuarterRepo;
         private readonly IMapper _mapper;
         private readonly PaginationSettings _paginationSettings;
-
-
         public YearQuarterController(IMapper mapper, IYearQuarterRepo yearQuarterRepo, IOptions<PaginationSettings> paginationOptions)
         {
             _mapper = mapper;
             _yearQuarterRepo = yearQuarterRepo;
             _paginationSettings = paginationOptions.Value;
         }
-
         public async Task<IActionResult> Index(string filter = "active", int page = 1)
         {
             int pageSize = _paginationSettings.DefaultPageSize;
             IEnumerable<YearQuarter> allQuarters;
-
             if (filter == "deleted")
             {
                 allQuarters = await _yearQuarterRepo.GetDeletedAsync();
@@ -41,34 +37,26 @@ namespace RewardsAndRecognitionSystem.Controllers
             {
                 allQuarters = await _yearQuarterRepo.GetActiveAsync();
             }
-
             var sortedQuarters = allQuarters
            .OrderBy(q => q.Year)
            .ThenBy(q => q.Quarter)
            .ToList();
-
             var totalRecords = sortedQuarters.Count();
             var totalPages = (int)Math.Ceiling(totalRecords / (double)pageSize);
-
             var paginated = sortedQuarters
                 .Skip((page - 1) * pageSize)
                 .Take(pageSize)
                 .ToList();
-
             ViewBag.CurrentPage = page;
             ViewBag.TotalPages = totalPages;
             ViewBag.SelectedFilter = filter;
-
             var qList = _mapper.Map<List<YearQuarterViewModel>>(paginated);
-
             if (Request.Headers["X-Requested-With"] == "XMLHttpRequest")
             {
                 return PartialView("_YearQuarterListPartial", qList);
             }
-
             return View(qList);
         }
-
         public async Task<IActionResult> Details(Guid id)
         {
             var quarter = await _yearQuarterRepo.GetByIdAsync(id);
@@ -77,7 +65,6 @@ namespace RewardsAndRecognitionSystem.Controllers
             var quarterView = _mapper.Map<YearQuarterViewModel>(quarter);
             return View(quarterView);
         }
-
         public IActionResult Create()
         {
             ViewBag.Quarters = new SelectList(Enum.GetValues(typeof(Quarter)));
@@ -89,21 +76,16 @@ namespace RewardsAndRecognitionSystem.Controllers
         public async Task<IActionResult> Create(YearQuarterViewModel yq)
         {
             var yqs = await _yearQuarterRepo.GetAllAsync();
-
             // Check for duplicate Year + Quarter (non-deleted only)
             if (yqs.Any(q => q.Year == yq.Year && q.Quarter == yq.Quarter && q.IsDeleted == false))
             {
-                ModelState.AddModelError("Quarter", "Year + Quarter combination already exists. Please select another.");
+                ModelState.AddModelError("Quarter", GeneralMessages.DuplicateYearQuarterError);
             }
-
             // Ensure both dates are entered before checking overlaps
             if (yq.StartDate.HasValue && yq.EndDate.HasValue)
             {
                 var start = yq.StartDate.Value.Date;
-                var end = yq.EndDate.Value.Date;
-
-               
-                
+                var end = yq.EndDate.Value.Date;                  
                 // Overlap check with all non-deleted quarters
                 bool overlaps = yqs.Any(q =>
                     q.IsDeleted == false &&
@@ -118,27 +100,22 @@ namespace RewardsAndRecognitionSystem.Controllers
 
                 if (overlaps)
                 {
-                    ModelState.AddModelError("", "A quarter already exists within this date range.");
+                    ModelState.AddModelError("", GeneralMessages.ExistsQuarterError);
                 }
             }
-
             if (!ModelState.IsValid)
             {
                 ViewBag.Quarters = new SelectList(Enum.GetValues(typeof(Quarter)));
                 return View(yq);
             }
-
             yq.Id = Guid.NewGuid();
             var yearQuarter = _mapper.Map<YearQuarter>(yq);
             await _yearQuarterRepo.AddAsync(yearQuarter);
-
             TempData["message"] = ToastMessages_YearQuarter.CreateYearQuarter;
-
             return RedirectToAction(nameof(Index));
         }
 
         [HttpGet]
-
         public async Task<IActionResult> Edit(Guid id)
         {
             var yq = await _yearQuarterRepo.GetByIdAsync(id);
@@ -166,9 +143,8 @@ namespace RewardsAndRecognitionSystem.Controllers
             // Duplicate year + quarter (excluding itself)
             if (yqs.Any(q => q.Id != yq.Id && q.Year == yq.Year && q.Quarter == yq.Quarter && q.IsDeleted == false))
             {
-                ModelState.AddModelError("Quarter", "Year + Quarter combination already exists. Please select another.");
+                ModelState.AddModelError("Quarter", GeneralMessages.DuplicateYearQuarterError);
             }
-
             // Check overlapping date ranges (excluding itself)
             if (yq.StartDate.HasValue && yq.EndDate.HasValue)
             {
@@ -188,16 +164,14 @@ namespace RewardsAndRecognitionSystem.Controllers
 
                 if (overlaps)
                 {
-                    ModelState.AddModelError("", "A quarter already exists within this date range.");
+                    ModelState.AddModelError("",GeneralMessages.QuarterRangeError);
                 }
             }
-
             if (!ModelState.IsValid)
             {
                 ViewBag.Quarters = new SelectList(Enum.GetValues(typeof(Quarter)));
                 return View(yq);
             }
-
             // Update the existing entity
             existing.Quarter = yq.Quarter;
             existing.Year = yq.Year;
@@ -209,7 +183,6 @@ namespace RewardsAndRecognitionSystem.Controllers
             TempData["message"] = ToastMessages_YearQuarter.UpdateYearQuarter;
             return RedirectToAction(nameof(Index));
         }
-
         public async Task<IActionResult> Delete(Guid id)
         {
             var yq = await _yearQuarterRepo.GetByIdAsync(id);

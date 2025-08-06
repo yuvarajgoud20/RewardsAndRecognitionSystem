@@ -227,7 +227,6 @@
                     });
                 </script>
             }
-
             chartIndex++;
         }
 
@@ -315,19 +314,19 @@
 
 @section Scripts {
     <script>
-            function goToNominations(filter) {
-            const year = document.getElementById("yearDropdown").value;
-            const quarterId = document.getElementById("quarterDropdown").value;
+            function goToNominations(filter) 
+            {
+                const year = document.getElementById("yearDropdown").value;
+                const quarterId = document.getElementById("quarterDropdown").value;
+                if (!year || !quarterId) {
+                    alert("Please select a year and quarter.");
+                    return;
+                }
 
-            if (!year || !quarterId) {
-                alert("Please select a year and quarter.");
-                return;
+
+                  const url = `/Nomination/Index?filter=${filter}&yearQuarterId=${quarterId}`;
+                window.location.href = url;
             }
-
-
-              const url = `/Nomination/Index?filter=${filter}&yearQuarterId=${quarterId}`;
-            window.location.href = url;
-        }
 
         $(document).ready(function () {
             loadYears();
@@ -358,7 +357,8 @@
         });
 
 
-        function loadYears() {
+        function loadYears() 
+        {
             $.get('/Dashboard/GetYears', function (years) {
                 let options = '<option value="">-- Select Year --</option>';
                 years.forEach(y => {
@@ -375,7 +375,8 @@
             });
         }
 
-        function loadQuarters(year, selectedId) {
+        function loadQuarters(year, selectedId)
+        {
             $.get(`/Dashboard/GetQuarters?year=${year}`, function (quarters) {
                 let options = '<option value="">-- Select Quarter --</option>';
                 quarters.forEach(q => {
@@ -405,7 +406,8 @@
                 .catch(() => alert("Error fetching nominations."));
         });
 
-        function hideTeamModal() {
+        function hideTeamModal() 
+        {
             const modalInstance = bootstrap.Modal.getInstance(document.getElementById("teamNominationsModal"));
             if (modalInstance) {
                 modalInstance.hide();
@@ -413,7 +415,8 @@
             }
         }
 
-              function filterNominations() {
+        function filterNominations() 
+        {
             const filter = document.getElementById("searchInput").value.toLowerCase();
             const rows = document.querySelectorAll("#nominationsTable tbody tr");
 
