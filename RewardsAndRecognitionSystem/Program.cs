@@ -32,6 +32,7 @@ internal class Program
         {
             Serilog.Debugging.SelfLog.Enable(Console.Error);
 
+
             var builder = WebApplication.CreateBuilder(args); 
 
             Log.Logger = new LoggerConfiguration()
@@ -74,6 +75,7 @@ internal class Program
                .CreateLogger();
 
            builder.Host.UseSerilog(); 
+
 
             var connectionString = builder.Configuration.GetConnectionString("DefaultConnection") ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
 
