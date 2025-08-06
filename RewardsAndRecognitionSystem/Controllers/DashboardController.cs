@@ -36,22 +36,30 @@ public class DashboardController : Controller
         _context = context;
 
     }
-    [HttpGet]
-    public IActionResult GetYears()
-    {
-        var years = _context.YearQuarters.Select(yq => yq.Year).Distinct().OrderByDescending(y => y).ToList();
-        return Json(years);
-    }
+  [HttpGet]
+public IActionResult GetYears()
+{
+    var years = _context.YearQuarters
+        .Where(yq => !yq.IsDeleted) // Show only non-deleted
+        .Select(yq => yq.Year)
+        .Distinct()
+        .OrderByDescending(y => y)
+        .ToList();
 
-    [HttpGet]
-    public IActionResult GetQuarters(int year)
-    {
-        var quarters = _context.YearQuarters
-            .Where(yq => yq.Year == year)
-            .Select(yq => new { id = yq.Id, name = $"{yq.Quarter}" })
-            .ToList();
-        return Json(quarters);
-    }
+    return Json(years);
+}
+
+[HttpGet]
+public IActionResult GetQuarters(int year)
+{
+    var quarters = _context.YearQuarters
+        .Where(yq => yq.Year == year && !yq.IsDeleted) // Show only non-deleted
+        .Select(yq => new { id = yq.Id, name = $"{yq.Quarter}" })
+        .ToList();
+
+    return Json(quarters);
+}
+
     [HttpGet]
     public async Task<IActionResult> GetTeamNominations(Guid teamId, int year, Guid quarterId)
     {
