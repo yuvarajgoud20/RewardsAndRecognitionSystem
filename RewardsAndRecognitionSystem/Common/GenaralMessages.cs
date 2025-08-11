@@ -27,7 +27,7 @@
         public static string SoftDeleteUserError = "Unable to soft delete the user.";
         public static string DuplicateYearQuarterError = "Year + Quarter combination already exists. Please select another.";
         public static string ExistsQuarterError = "A quarter already exists within this date range.";
-        public static string QuarterRangeError = "A quarter already exists within this date range."
+        public static string QuarterRangeError = "A quarter already exists within this date range.";
     }
     public static class GeneralMessages_User
     {

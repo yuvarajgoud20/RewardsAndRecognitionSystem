@@ -1,4 +1,6 @@
-﻿@{
+﻿@using Microsoft.AspNetCore.Mvc.Localization
+@inject IViewLocalizer Localizer
+@{
     ViewData["Title"] = "Home";
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
@@ -13,7 +15,7 @@
         padding: 100px 20px 60px;
         background: linear-gradient(to right, #6a11cb, #2575fc);
         color: white;
-        border-radius:20px;
+        border-radius: 20px;
     }
 
     .hero-title {
@@ -72,9 +74,9 @@
 
 </style>
 <div class="hero-section">
-    <h1 class="hero-title">Built to Recognize Tomorrow’s Leaders</h1>
+    <h1 class="hero-title">@Localizer["Welcome"]</h1>
     <p class="hero-subtitle">
-       Come let us celebrate a moment where Talent meets Spotlight!
+        @Localizer["Come_let_us_celebrate_a_moment_where_Talent_meets_Spotlight!"]
     </p>
 </div>
 
@@ -83,49 +85,49 @@
 <div class="features">
     <div class="feature-box" style="border-top: 5px solid #6f42c1;">
         <div class="feature-icon">🌟</div>
-        <div class="feature-title">Nominate Talents</div>
+        <div class="feature-title">@Localizer["Nominate_Talents"]</div>
         <div class="feature-desc">
-            Team Leads can effortlessly nominate top performers every quarter.
+            @Localizer["TeamLeads"]
         </div>
     </div>
 
     <div class="feature-box" style="border-top: 5px solid #20c997;">
         <div class="feature-icon">✅</div>
-        <div class="feature-title">Multi-Level Approvals</div>
+        <div class="feature-title">@Localizer["Multi-Level_Approvals"]</div>
         <div class="feature-desc">
-            Transparent workflows via Manager & Director approvals.
+            @Localizer["Transparent"]
         </div>
     </div>
 
     <div class="feature-box" style="border-top: 5px solid #fd7e14;">
         <div class="feature-icon">📈</div>
-        <div class="feature-title">Recognition Dashboard</div>
+        <div class="feature-title"> @Localizer["Recognition_Dashboard"]</div>
         <div class="feature-desc">
-            Approved recognitions are displayed in a dynamic visual timeline.
+            @Localizer["Approved"]
         </div>
     </div>
 
     <div class="feature-box" style="border-top: 5px solid #dc3545;">
         <div class="feature-icon">🏆</div>
-        <div class="feature-title">Award Categories</div>
+        <div class="feature-title">@Localizer["Award_Categories"]</div>
         <div class="feature-desc">
-            Celebrate achievements across categories like Innovation & Leadership.
+            @Localizer["Celebrate"]
         </div>
     </div>
 
     <div class="feature-box" style="border-top: 5px solid #17a2b8;">
         <div class="feature-icon">📅</div>
-        <div class="feature-title">Quarter-Based System</div>
+        <div class="feature-title"> @Localizer["Quarter-Based_System"]</div>
         <div class="feature-desc">
-            Track and manage nominations per quarter effortlessly.
+            @Localizer["Track"]
         </div>
     </div>
 
     <div class="feature-box" style="border-top: 5px solid #ffc107;">
         <div class="feature-icon">🔔</div>
-        <div class="feature-title">Live Notifications</div>
+        <div class="feature-title">  @Localizer["Live_Notifications"]</div>
         <div class="feature-desc">
-            Get notified on nomination status changes and approvals.
+            @Localizer["Get"]
         </div>
     </div>
 </div>
