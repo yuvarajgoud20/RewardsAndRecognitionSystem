@@ -1,4 +1,6 @@
-﻿@model IEnumerable<RewardsAndRecognitionSystem.ViewModels.CategoryViewModel>
+﻿@using Microsoft.AspNetCore.Mvc.Localization
+@inject IViewLocalizer Localizer
+@model IEnumerable<RewardsAndRecognitionSystem.ViewModels.CategoryViewModel>
 
 @{
     ViewData["Title"] = "Categories";
@@ -108,7 +110,7 @@
 
 
 <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
-    <h2 class="mb-4"><i class="bi bi-tags-fill me-2"></i>Categories</h2>
+    <h2 class="mb-4"><i class="bi bi-tags-fill me-2"></i> @Localizer["Categories"]</h2>
 
     <div></div>  
 
@@ -117,12 +119,13 @@
             <input class="form-check-input" type="checkbox" role="switch" id="toggleCategoryFilter"
                    @(ViewBag.ShowDeleted ? "checked" : "") />
             <label class="form-check-label ms-2" for="toggleCategoryFilter">
-                Show Deleted
+                @Localizer["Show_Deleted"]
+
             </label>
         </div>
 
         <a asp-action="Create" class="btn btn-indigo d-inline-flex align-items-center gap-2">
-            <i class="bi bi-plus-circle-fill"></i> New Category
+            <i class="bi bi-plus-circle-fill"></i> @Localizer["New_Category"]
         </a>
     </div>
 </div>
@@ -133,7 +136,15 @@
 <script type="text/javascript">
     const categoriesInNominations = @Html.Raw(ViewBag.CategoryIdsJson);
 </script>
-
+<script>
+    var localizedTexts = {
+        areYouSure: '@Localizer["Are_You_Sure"]',
+        actionCannotBeUndone: '@Localizer["Action_Cannot_Be_Undone"]',
+        yesDeleteIt: '@Localizer["Yes_Delete_It"]',
+        noCancel: '@Localizer["No_Cancel"]',
+        failedToLoad: '@Localizer["Failed_To_Load_Category_Data"]'
+    };
+</script>
 <script>
        function confirmDelete(categoryId) 
        {
@@ -142,15 +153,14 @@
             if (activeBtn) {
                 activeBtn.blur();
             }
-
-            Swal.fire({
-                title: 'Are you sure?',
-                text: "This action cannot be undone.",
-                icon: 'warning',
-                showCancelButton: true,
-                confirmButtonText: 'Yes, delete it!',
-                cancelButtonText: 'No, cancel!',
-                reverseButtons: true,
+    Swal.fire({
+        title: localizedTexts.areYouSure,
+        text: localizedTexts.actionCannotBeUndone,
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonText: localizedTexts.yesDeleteIt,
+        cancelButtonText: localizedTexts.noCancel,
+        reverseButtons: true,
                 allowOutsideClick: true,
                 focusConfirm: false,
                 focusCancel: false,
@@ -188,6 +198,8 @@
 
 </script>
 <script src="~/lib/ValidationScriptsPartial/jquery-3.6.4.min.js"></script>
+
+
 <script>
     $(document).on("click", ".pagination-link", function (e) {
         e.preventDefault();
@@ -201,7 +213,8 @@
                 $('#categoryListContainer').html(result);
             },
             error: function () {
-                alert("Failed to load category data.");
+                alert(localizedTexts.failedToLoad);
+
             }
         });
     });

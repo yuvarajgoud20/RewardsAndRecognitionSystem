@@ -3,12 +3,15 @@
 //example
 //https://localhost:7156/?ui-culture=de-DE
 //https://localhost:7156/?ui-culture=hi-IN
+using System.Globalization;
 using FluentValidation;
 using FluentValidation.AspNetCore;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Localization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
+using Microsoft.AspNetCore.Mvc.Razor;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using RewardsAndRecognitionRepository.Dapper;
@@ -27,9 +30,7 @@ using RewardsAndRecognitionSystem.FluentValidators;
 using RewardsAndRecognitionSystem.Middleware;
 using RewardsAndRecognitionSystem.ViewModels;
 using Serilog;
-using Microsoft.AspNetCore.Mvc.Razor;
 using Serilog.Filters.Expressions;
-using System.Globalization;
 
 internal class Program
 {
@@ -143,8 +144,18 @@ internal class Program
                 new CultureInfo("de-DE"),
                   new CultureInfo("hi-IN"),
                  new CultureInfo("ar-SA")};
-                options.DefaultRequestCulture = new Microsoft.AspNetCore.Localization.RequestCulture("en-US");
+                options.DefaultRequestCulture = new RequestCulture("en-US");
+                options.SupportedCultures = supportedCultures;
                 options.SupportedUICultures = supportedCultures;
+                // Priority: Query string ? Cookie ? Accept-Language header
+                options.RequestCultureProviders = new IRequestCultureProvider[]
+                {
+        new QueryStringRequestCultureProvider(),
+        new CookieRequestCultureProvider(),
+        new AcceptLanguageHeaderRequestCultureProvider()
+                };
+                //// Add cookie-based provider
+                //options.RequestCultureProviders.Insert(0, new CookieRequestCultureProvider());
             });
             builder.Services.AddScoped<DapperContext>();
             builder.Services.AddScoped<ISample, DapperNotification>();
