@@ -1,3 +1,8 @@
+//home page language change
+//URL
+//example
+//https://localhost:7156/?ui-culture=de-DE
+//https://localhost:7156/?ui-culture=hi-IN
 using FluentValidation;
 using FluentValidation.AspNetCore;
 using Microsoft.AspNetCore.Authentication;
@@ -22,7 +27,9 @@ using RewardsAndRecognitionSystem.FluentValidators;
 using RewardsAndRecognitionSystem.Middleware;
 using RewardsAndRecognitionSystem.ViewModels;
 using Serilog;
+using Microsoft.AspNetCore.Mvc.Razor;
 using Serilog.Filters.Expressions;
+using System.Globalization;
 
 internal class Program
 {
@@ -33,7 +40,7 @@ internal class Program
             Serilog.Debugging.SelfLog.Enable(Console.Error);
 
 
-            var builder = WebApplication.CreateBuilder(args); 
+            var builder = WebApplication.CreateBuilder(args);
 
             Log.Logger = new LoggerConfiguration()
                .MinimumLevel.Verbose()
@@ -74,7 +81,7 @@ internal class Program
                )
                .CreateLogger();
 
-           builder.Host.UseSerilog(); 
+            builder.Host.UseSerilog();
 
 
             var connectionString = builder.Configuration.GetConnectionString("DefaultConnection") ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
@@ -124,7 +131,21 @@ internal class Program
                 .AddEntityFrameworkStores<ApplicationDbContext>()
                 .AddDefaultTokenProviders();
 
-            builder.Services.AddControllersWithViews();
+            builder.Services.AddControllersWithViews().AddViewLocalization(LanguageViewLocationExpanderFormat.Suffix);
+            builder.Services.AddLocalization(options =>
+            {
+                options.ResourcesPath = "Resources";
+            });
+            builder.Services.Configure<RequestLocalizationOptions>(options =>
+            {
+                var supportedCultures = new[] {
+                new CultureInfo("en-US"),
+                new CultureInfo("de-DE"),
+                  new CultureInfo("hi-IN"),
+                 new CultureInfo("ar-SA")};
+                options.DefaultRequestCulture = new Microsoft.AspNetCore.Localization.RequestCulture("en-US");
+                options.SupportedUICultures = supportedCultures;
+            });
             builder.Services.AddScoped<DapperContext>();
             builder.Services.AddScoped<ISample, DapperNotification>();
 
@@ -135,7 +156,7 @@ internal class Program
             builder.Services.AddScoped<IApprovalRepo, ApprovalRepo>();
             builder.Services.AddScoped<IYearQuarterRepo, YearQuarterRepo>();
 
-          
+
 
             builder.Services.AddScoped<ICategoryService, CategoryService>();
             builder.Services.Configure<PaginationSettings>(builder.Configuration.GetSection("PaginationSettings"));
@@ -151,7 +172,7 @@ internal class Program
             });
 
             var app = builder.Build();
-
+            app.UseRequestLocalization();
             app.UseMiddleware<ExceptionHandlingMiddleware>();
 
             using (var scope = app.Services.CreateScope())
