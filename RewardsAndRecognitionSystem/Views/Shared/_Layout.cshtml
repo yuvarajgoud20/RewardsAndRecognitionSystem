@@ -1,6 +1,13 @@
 ﻿@inject Microsoft.AspNetCore.Identity.UserManager<RewardsAndRecognitionRepository.Models.User> UserManager
 @inject Microsoft.AspNetCore.Identity.SignInManager<RewardsAndRecognitionRepository.Models.User> SignInManager
 @using RewardsAndRecognitionRepository.Enums
+@using Microsoft.AspNetCore.Localization
+@using System.Globalization
+@{
+    var currentCulture = Context.Features.Get<IRequestCultureFeature>()?.RequestCulture.Culture?.Name ?? "en-US";
+    var returnUrl = Context.Request.Path + Context.Request.QueryString;
+}
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -205,6 +212,16 @@
                         }                    
                     </ul>
                     <partial name="_LoginPartial" />
+                    <form asp-controller="Culture" asp-action="SetCulture" method="post" class="ms-3">
+                        <input type="hidden" name="returnUrl" value="@returnUrl" />
+                        <select name="culture" class="form-select form-select-sm" onchange="this.form.submit()">
+                            <option value="en-US" selected="@(currentCulture == "en-US")">English</option>
+                            <option value="de-DE" selected="@(currentCulture == "de-DE")">German</option>
+                            <option value="hi-IN" selected="@(currentCulture == "hi-IN")">Hindi</option>
+                            <option value="ar-SA" selected="@(currentCulture == "ar-SA")">Arabic</option>
+                        </select>
+                    </form>
+
                 </div>
             </div>
         </nav>
