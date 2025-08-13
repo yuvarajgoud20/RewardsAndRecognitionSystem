@@ -1,9 +1,15 @@
-﻿@model IEnumerable<RewardsAndRecognitionSystem.ViewModels.CategoryViewModel>
+﻿@inject IStringLocalizer<SharedResource> localizer
+
+@using Microsoft.Extensions.Localization
+@using RewardsAndRecognitionSystem.Localization
+@inject IStringLocalizer<SharedResource> localizer
+@model IEnumerable<RewardsAndRecognitionSystem.ViewModels.CategoryViewModel>
 
 @{
     ViewData["Title"] = "Categories";
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
+<meta charset="utf-8">
 
 <style>
     :root {
@@ -32,7 +38,7 @@
 
     .btn-indigo {
         background: var(--indigo-main);
-        color:white;
+        color: white;
     }
 
         .btn-indigo:hover {
@@ -42,12 +48,10 @@
 
     .btn-secondary {
         background: var(--gray);
-        
     }
 
         .btn-secondary:hover {
             background: #5a6268;
-            
         }
 
     .btn-danger {
@@ -57,7 +61,6 @@
 
         .btn-danger:hover {
             background: var(--danger-hover);
-            
         }
 
     .table-custom {
@@ -108,21 +111,22 @@
 
 
 <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
-    <h2 class="mb-4"><i class="bi bi-tags-fill me-2"></i>Categories</h2>
+    <h2 class="mb-4"><i class="bi bi-tags-fill me-2"></i> @localizer["Categories"]</h2>
 
-    <div></div>  
+    <div></div>
 
     <div class="d-flex align-items-center gap-3">
         <div class="form-check form-switch m-0">
             <input class="form-check-input" type="checkbox" role="switch" id="toggleCategoryFilter"
                    @(ViewBag.ShowDeleted ? "checked" : "") />
             <label class="form-check-label ms-2" for="toggleCategoryFilter">
-                Show Deleted
+                @localizer["Show Deleted"]
+
             </label>
         </div>
 
         <a asp-action="Create" class="btn btn-indigo d-inline-flex align-items-center gap-2">
-            <i class="bi bi-plus-circle-fill"></i> New Category
+            <i class="bi bi-plus-circle-fill"></i> @localizer["New_Category"]
         </a>
     </div>
 </div>
@@ -133,24 +137,32 @@
 <script type="text/javascript">
     const categoriesInNominations = @Html.Raw(ViewBag.CategoryIdsJson);
 </script>
-
 <script>
-       function confirmDelete(categoryId) 
+    var localizedTexts = {
+        areYouSure: '@localizer["Are_You_Sure"]',
+        actionCannotBeUndone:  '@Html.Raw(localizer["Action_Cannot_Be_Undone"])',
+
+        yesDeleteIt: '@localizer["Yes_Delete_It"]',
+        noCancel: '@localizer["No_Cancel"]',
+        failedToLoad: '@localizer["Failed_To_Load_Category_Data"]'
+    };
+</script>
+<script>
+       function confirmDelete(categoryId)
        {
             // Force blur the Delete button BEFORE the popup opens
             const activeBtn = document.activeElement;
             if (activeBtn) {
                 activeBtn.blur();
             }
-
-            Swal.fire({
-                title: 'Are you sure?',
-                text: "This action cannot be undone.",
-                icon: 'warning',
-                showCancelButton: true,
-                confirmButtonText: 'Yes, delete it!',
-                cancelButtonText: 'No, cancel!',
-                reverseButtons: true,
+    Swal.fire({
+        title: localizedTexts.areYouSure,
+        text: localizedTexts.actionCannotBeUndone,
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonText: localizedTexts.yesDeleteIt,
+        cancelButtonText: localizedTexts.noCancel,
+        reverseButtons: true,
                 allowOutsideClick: true,
                 focusConfirm: false,
                 focusCancel: false,
@@ -188,6 +200,8 @@
 
 </script>
 <script src="~/lib/ValidationScriptsPartial/jquery-3.6.4.min.js"></script>
+
+
 <script>
     $(document).on("click", ".pagination-link", function (e) {
         e.preventDefault();
@@ -201,7 +215,8 @@
                 $('#categoryListContainer').html(result);
             },
             error: function () {
-                alert("Failed to load category data.");
+                alert(localizedTexts.failedToLoad);
+
             }
         });
     });

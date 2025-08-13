@@ -1,8 +1,11 @@
-﻿@model RewardsAndRecognitionSystem.ViewModels.YearQuarterViewModel
+﻿@using Microsoft.Extensions.Localization
+@using RewardsAndRecognitionSystem.Localization
+@inject IStringLocalizer<SharedResource> localizer
+@model RewardsAndRecognitionSystem.ViewModels.YearQuarterViewModel
 @{
     ViewData["Title"] = "Edit Year Quarter";
 }
-<h2 class="mb-4">Edit Year Quarter</h2>
+<h2 class="mb-4">@localizer["Edit Year Quarter"]</h2>
 <div class="card p-4 shadow-sm" style="max-width: 600px; margin: auto;">
     <form asp-action="Edit" method="post">
         @Html.AntiForgeryToken()
@@ -14,31 +17,31 @@
         </div>
 
         <div class="mb-3">
-            <select  asp-for="Quarter" class="form-select" asp-items="ViewBag.Quarters" hidden>
-                <option value="">-- Select Quarter --</option>
+            <select asp-for="Quarter" class="form-select" asp-items="ViewBag.Quarters" hidden>
+                <option value="">@localizer["-- Select Quarter --"]</option>
             </select>
         </div>
         <div class="mb-3">
-            <label asp-for="StartDate" class="form-label">Start Date</label>
+            <label asp-for="StartDate" class="form-label">@localizer["Start Date"]</label>
             <input asp-for="StartDate" class="form-control" type="date" />
-            <span asp-validation-for="StartDate" class="text-danger"></span> 
+            <span asp-validation-for="StartDate" class="text-danger"></span>
         </div>
 
         <div class="mb-3">
-            <label asp-for="EndDate" class="form-label">End Date</label>
+            <label asp-for="EndDate" class="form-label">@localizer["End Date"]</label>
             <input asp-for="EndDate" class="form-control" type="date" />
             <span asp-validation-for="EndDate" class="text-danger"></span>
         </div>
 
         <div class="form-check mb-3">
             <input asp-for="IsActive" class="form-check-input" />
-            <label asp-for="IsActive" class="form-check-label">Is Active</label><br />
+            <label asp-for="IsActive" class="form-check-label">@localizer["Is Active"]</label><br />
             <span asp-validation-for="IsActive" class="text-danger"></span>
         </div>
 
         <div class="d-flex justify-content-between">
-            <a asp-action="Index" class="btn btn-outline-secondary">Cancel</a>
-            <button type="submit" class="btn btn-dark">Update</button>
+            <a asp-action="Index" class="btn btn-outline-secondary">@localizer["Cancel"]</a>
+            <button type="submit" class="btn btn-dark">@localizer["Update"]</button>
         </div>
     </form>
 </div>

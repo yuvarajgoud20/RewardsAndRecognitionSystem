@@ -1,3 +1,5 @@
+//final code
+using AspNetCore.Localizer.Json.Localizer;
 using FluentValidation;
 using FluentValidation.AspNetCore;
 using Microsoft.AspNetCore.Authentication;
@@ -6,6 +8,8 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Localization;
+using Microsoft.Extensions.Options;
 using RewardsAndRecognitionRepository.Dapper;
 using RewardsAndRecognitionRepository.Data;
 using RewardsAndRecognitionRepository.Interfaces;
@@ -33,7 +37,7 @@ internal class Program
             Serilog.Debugging.SelfLog.Enable(Console.Error);
 
 
-            var builder = WebApplication.CreateBuilder(args); 
+            var builder = WebApplication.CreateBuilder(args);
 
             Log.Logger = new LoggerConfiguration()
                .MinimumLevel.Verbose()
@@ -74,7 +78,7 @@ internal class Program
                )
                .CreateLogger();
 
-           builder.Host.UseSerilog(); 
+            builder.Host.UseSerilog();
 
 
             var connectionString = builder.Configuration.GetConnectionString("DefaultConnection") ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
@@ -125,6 +129,18 @@ internal class Program
                 .AddDefaultTokenProviders();
 
             builder.Services.AddControllersWithViews();
+            // Localization configuration
+            builder.Services.AddLocalization(options => options.ResourcesPath = "Localization");
+
+            builder.Services.Configure<RequestLocalizationOptions>(options =>
+            {
+                var supportedCultures = new[] { "en", "fr", "ar","hi" };
+                options.SetDefaultCulture("en");
+                options.AddSupportedCultures(supportedCultures);
+                options.AddSupportedUICultures(supportedCultures);
+
+            });
+
             builder.Services.AddScoped<DapperContext>();
             builder.Services.AddScoped<ISample, DapperNotification>();
 
@@ -135,7 +151,7 @@ internal class Program
             builder.Services.AddScoped<IApprovalRepo, ApprovalRepo>();
             builder.Services.AddScoped<IYearQuarterRepo, YearQuarterRepo>();
 
-          
+
 
             builder.Services.AddScoped<ICategoryService, CategoryService>();
             builder.Services.Configure<PaginationSettings>(builder.Configuration.GetSection("PaginationSettings"));
@@ -148,6 +164,16 @@ internal class Program
             builder.Services.AddControllersWithViews(options =>
             {
                 options.Filters.Add(new AutoValidateAntiforgeryTokenAttribute());
+            });
+       
+
+          
+
+            builder.Services.AddSingleton<IStringLocalizerFactory, JsonStringLocalizerFactory>();
+            builder.Services.AddSingleton<IStringLocalizer>(sp =>
+            {
+                var factory = sp.GetRequiredService<IStringLocalizerFactory>();
+                return factory.Create(null);
             });
 
             var app = builder.Build();
@@ -170,8 +196,14 @@ internal class Program
                 app.UseExceptionHandler("/Home/Error");
                 app.UseHsts();
             }
+            // Enable localization middleware
+            var locOptions = app.Services.GetRequiredService<IOptions<RequestLocalizationOptions>>();
+            app.UseRequestLocalization(locOptions.Value);
 
             app.UseRouting();
+            // Use localization middleware
+         
+          
             app.UseAuthentication();
             app.UseAuthorization();
 

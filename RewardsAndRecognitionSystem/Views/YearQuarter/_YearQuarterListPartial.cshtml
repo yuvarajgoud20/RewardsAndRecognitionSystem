@@ -1,4 +1,8 @@
-﻿@model IEnumerable<RewardsAndRecognitionSystem.ViewModels.YearQuarterViewModel>
+﻿@using Microsoft.Extensions.Localization
+@using RewardsAndRecognitionSystem.Localization
+@inject IStringLocalizer<SharedResource> localizer
+
+@model IEnumerable<RewardsAndRecognitionSystem.ViewModels.YearQuarterViewModel>
 
 @{
     string selectedFilter = ViewBag.SelectedFilter as string ?? "active";
@@ -7,12 +11,12 @@
 <table class="yearquarter-table">
     <thead>
         <tr>
-            <th><i class="bi bi-calendar2"></i> Year</th>
-            <th><i class="bi bi-calendar3"></i> Quarter</th>
-            <th><i class="bi bi-calendar-event"></i> Start Date</th>
-            <th><i class="bi bi-calendar-check"></i> End Date</th>
-            <th><i class="bi bi-check2-circle"></i> Active</th>
-            <th><i class="bi bi-gear-fill"></i> Actions</th>
+            <th><i class="bi bi-calendar2"></i> @localizer["Year"]</th>
+            <th><i class="bi bi-calendar3"></i> @localizer["Quarter"]</th>
+            <th><i class="bi bi-calendar-event"></i> @localizer["Start_Date"]</th>
+            <th><i class="bi bi-calendar-check"></i> @localizer["End_Date"]</th>
+            <th><i class="bi bi-check2-circle"></i> @localizer["Active"]</th>
+            <th><i class="bi bi-gear-fill"></i> @localizer["Actions"]</th>
         </tr>
     </thead>
     <tbody>
@@ -21,8 +25,8 @@
             <tr>
                 <td colspan="6" class="text-center">
                     <div class="alert alert-warning m-0" role="alert">
-                    <i class="bi bi-info-circle"></i>
-                    @(selectedFilter == "deleted" ? "No deleted year quarters found." : "No active year quarters found.")
+                        <i class="bi bi-info-circle"></i>
+                        @(selectedFilter == "deleted" ? localizer["No_deleted_year_quarters_found"] : localizer["No_active_year_quarters_found"])
                     </div>
                 </td>
             </tr>
@@ -34,41 +38,41 @@
                 <tr class="@(yq.IsActive ? "" : "table-danger")">
                     <td>@yq.Year</td>
                     <td>@yq.Quarter</td>
-                    <td>@(yq.StartDate?.ToShortDateString() ?? "N/A")</td>
-                    <td>@(yq.EndDate?.ToShortDateString() ?? "N/A")</td>
+                    <td>@(yq.StartDate?.ToShortDateString() ?? localizer["N/A"])</td>
+                    <td>@(yq.EndDate?.ToShortDateString() ?? localizer["N/A"])</td>
                     <td>
                         @if (yq.IsActive)
                         {
-                            <span class="badge bg-success"><i class="bi bi-check-circle-fill"></i> Active</span>
+                            <span class="badge bg-success"><i class="bi bi-check-circle-fill"></i> @localizer["Active"]</span>
                         }
                         else
                         {
-                            <span class="badge bg-secondary"><i class="bi bi-x-circle-fill"></i> Inactive</span>
+                            <span class="badge bg-secondary"><i class="bi bi-x-circle-fill"></i> @localizer["Inactive"]</span>
                         }
                     </td>
                     <td>
                         @if (!yq.IsDeleted)
                         {
                             <a asp-action="Details" asp-route-id="@yq.Id" class="btn btn-secondary">
-                                <i class="bi bi-eye-fill"></i> View
+                                <i class="bi bi-eye-fill"></i> @localizer["View"]
                             </a>
                             <a asp-action="Edit" asp-route-id="@yq.Id" class="btn btn-primary">
-                                <i class="bi bi-pencil-square"></i> Edit
+                                <i class="bi bi-pencil-square"></i> @localizer["Edit"]
                             </a>
                             <button type="button" class="btn btn-danger" onclick="confirmDelete('@yq.Id')">
-                                <i class="bi bi-trash-fill"></i> Delete
+                                <i class="bi bi-trash-fill"></i> @localizer["Delete"]
                             </button>
                         }
                         else
                         {
                             <button class="btn btn-secondary" disabled>
-                                <i class="bi bi-eye-fill"></i> View
+                                <i class="bi bi-eye-fill"></i> @localizer["View"]
                             </button>
                             <button class="btn btn-primary" disabled>
-                                <i class="bi bi-pencil-square"></i> Edit
+                                <i class="bi bi-pencil-square"></i> @localizer["Edit"]
                             </button>
                             <button class="btn btn-danger" disabled>
-                                <i class="bi bi-trash-fill"></i> Deleted
+                                <i class="bi bi-trash-fill"></i> @localizer["Deleted"]
                             </button>
                         }
                     </td>
@@ -81,7 +85,7 @@
 @if (Model.Any())
 {
     <div class="d-flex justify-content-between align-items-center mt-4" style="min-height: 75px;">
-        <span>Showing page @ViewBag.CurrentPage of @ViewBag.TotalPages</span>
+        <span>@localizer["Showing_page"] @ViewBag.CurrentPage @localizer["of"] @ViewBag.TotalPages</span>
         <nav>
             <ul class="pagination mb-0">
                 <li class="page-item @(ViewBag.CurrentPage == 1 ? "disabled" : "")">
@@ -89,7 +93,7 @@
                        asp-action="Index"
                        asp-route-page="@(ViewBag.CurrentPage - 1)"
                        asp-route-filter="@ViewBag.SelectedFilter">
-                        Previous
+                        @localizer["Previous"]
                     </a>
                 </li>
 
@@ -102,7 +106,7 @@
                        asp-action="Index"
                        asp-route-page="@(ViewBag.CurrentPage + 1)"
                        asp-route-filter="@ViewBag.SelectedFilter">
-                        Next
+                        @localizer["Next"]
                     </a>
                 </li>
             </ul>
