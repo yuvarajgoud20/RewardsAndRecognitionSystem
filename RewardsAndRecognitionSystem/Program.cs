@@ -24,6 +24,7 @@ using RewardsAndRecognitionSystem.CustomMappers;
 using RewardsAndRecognitionSystem.Filters;
 using RewardsAndRecognitionSystem.FluentValidators;
 using RewardsAndRecognitionSystem.Middleware;
+using RewardsAndRecognitionSystem.SeedData;
 using RewardsAndRecognitionSystem.ViewModels;
 using Serilog;
 using Serilog.Filters.Expressions;
@@ -185,6 +186,8 @@ internal class Program
                 var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
                 var userManager = scope.ServiceProvider.GetRequiredService<UserManager<User>>();
                 await DbInitializer.SeedRolesAndUsersAsync(roleManager, userManager);
+                var services = scope.ServiceProvider;
+                await SeedData.InitializeAsync(services);
             }
 
             if (app.Environment.IsDevelopment())
