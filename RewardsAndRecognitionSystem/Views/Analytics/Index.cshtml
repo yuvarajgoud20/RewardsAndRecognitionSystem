@@ -55,7 +55,7 @@
         display: flex;
         justify-content: center;
         align-items: center;
-        height: 400px; 
+        height: 400px;
         margin-top: 20px;
         width: 100%;
         margin-bottom: 20px;
@@ -71,8 +71,8 @@
     }
 
     #teamPieChart {
-        width: 400px !important; 
-        height: 400px !important; 
+        width: 400px !important;
+        height: 400px !important;
         margin: 0 auto;
     }
 
@@ -94,7 +94,7 @@
     .row.mb-4 {
         margin-bottom: 20px;
     }
-  
+
 </style>
 <div class="d-flex justify-content-between align-items-center mb-4">
     <h2 class="mb-0">@localizer["Analytics Dashboard"]</h2>
@@ -142,7 +142,6 @@
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body" id="teamModalBody">
-                
             </div>
         </div>
     </div>
@@ -177,8 +176,8 @@
                         const year = $('#yearDropdown').val();
                         const quarterText = $('option:selected', this).text();
                         const id = $(this).val();
-                        resetQuarter();  
-                        showLoading();  
+                        resetQuarter();
+                        showLoading();
 
                         if (id) {
                             $('#chartsHeader').text(`Analytics for ${year} ${quarterText}`);
@@ -190,7 +189,7 @@
                     });
                 });
 
-           function maximizeChart(category, data) 
+           function maximizeChart(category, data)
            {
                     const canvas = document.getElementById('fullscreenChartCanvas');
                     const ctx = canvas.getContext('2d');
@@ -199,7 +198,7 @@
                         fullscreenChartInstance = null;
                     }
 
-                  
+
                     canvas.width = 700;
                     canvas.height = 400;
 
@@ -280,7 +279,7 @@
                     // Show modal
                     new bootstrap.Modal(document.getElementById('maximizeChartModal')).show();
            }
-           function resetAll() 
+           function resetAll()
            {
                     $('#chartsHeader').text('');
                     $('#quarterDropdown').prop('disabled', true).html('<option>-- Select Quarter --</option>');
@@ -290,11 +289,11 @@
 
            function resetQuarter() {
                     charts.forEach(chart => chart.destroy());
-                    charts.length = 0;                 
+                    charts.length = 0;
                     if (teamPieChartInstance) {
                         teamPieChartInstance.destroy();
                         teamPieChartInstance = null;
-                    }                 
+                    }
                     if (fullscreenChartInstance) {
                         fullscreenChartInstance.destroy();
                         fullscreenChartInstance = null;
@@ -305,24 +304,24 @@
                     $('#chartsHeader').text('');
            }
 
-           function showLoading() 
+           function showLoading()
            {
                     $('#chartsContainer').html('<p class="text-muted">Loading charts...</p>');
                     $('#teamPieContainer').hide();
            }
-           function hideLoading() 
+           function hideLoading()
            {
-                    
+
            }
 
-           function fetchYears() 
+           function fetchYears()
            {
                     return $.get('/Analytics/GetYears', data => {
                         $('#yearDropdown').html('<option>-- Select Year --</option>' + data.map(y => `<option>${y}</option>`));
                     });
            }
 
-           function fetchQuarters(year) 
+           function fetchQuarters(year)
            {
                     return $.get(`/Analytics/GetQuarters?year=${year}`, data => {
                         $('#quarterDropdown').prop('disabled', false)
@@ -330,7 +329,7 @@
                     });
            }
 
-            async function loadActiveQuarterData(id) 
+            async function loadActiveQuarterData(id)
             {
                     const res = await fetch(`/Analytics/GetYears`);
                     const years = await res.json();
@@ -338,7 +337,7 @@
                     for (const year of years) {
                         const qData = await fetch(`/Analytics/GetQuarters?year=${year}`).then(r => r.json());
                         const match = qData.find(q => q.id === id);
-                        if (match) 
+                        if (match)
                         {
                             $('#yearDropdown').val(year);
                             $('#quarterDropdown').html('<option>-- Select Quarter --</option>' +
@@ -346,8 +345,8 @@
                             $('#quarterDropdown').prop('disabled', false);
                             $('#chartsHeader').text(`Analytics for ${year} ${match.name}`);
 
-                            resetQuarter();  
-                            showLoading();  
+                            resetQuarter();
+                            showLoading();
                                     Promise.all([
                                 fetchAnalyticsData(id),
                                 fetchTeamSummary(id)
@@ -358,15 +357,15 @@
                     }
             }
 
-           function fetchAnalyticsData(id) 
+           function fetchAnalyticsData(id)
            {
                     return $.get(`/Analytics/GetAnalyticsData?yearQuarterId=${id}`, data =>
                     {
-                        if (data.categoryTeamData?.length) 
+                        if (data.categoryTeamData?.length)
                         {
-                            renderCategoryTeamCharts(data.categoryTeamData);                
-                        } 
-                        else 
+                            renderCategoryTeamCharts(data.categoryTeamData);
+                        }
+                        else
                         {
                             $('#chartsContainer').html(`
                                 <div class="col">
@@ -380,7 +379,7 @@
                     });
            }
 
-          function fetchTeamSummary(id) 
+          function fetchTeamSummary(id)
           {
                     return $.get(`/Analytics/GetQuarterTeamSummary?yearQuarterId=${id}`, data => {
                         if (data.length) {
@@ -572,7 +571,7 @@
                return teamColors[name];
         }
 
-        function exportAllCharts() 
+        function exportAllCharts()
         {
              const chartCanvases = document.querySelectorAll('#dashboardExportContent canvas');
              const images = Array.from(chartCanvases).map(canvas => {
@@ -588,7 +587,7 @@
                     });
         }
 
-         function exportAllCharts() 
+         function exportAllCharts()
          {
                     const exportElement = document.getElementById('dashboardExportContent');
                     html2canvas(exportElement, { scale: 2, useCORS: true }).then(canvas => {
@@ -602,7 +601,7 @@
                     });
          }
 
-         function showTeamModal(category, data) 
+         function showTeamModal(category, data)
          {
                     let html = `<h6>${category}</h6><table class="table table-bordered mt-2"><thead><tr><th>Team</th><th>Nominations</th></tr></thead><tbody>`;
                     data.forEach(d => {
@@ -613,7 +612,7 @@
                     new bootstrap.Modal($('#teamModal')[0]).show();
          }
 
-         function exportChartsAsWord() 
+         function exportChartsAsWord()
          {
                     const chartElements = document.querySelectorAll('canvas');
                     const imagePromises = Array.from(chartElements).map(canvas =>
@@ -633,7 +632,7 @@
                     });
          }
 
-         function showTeamModal(category, list) 
+         function showTeamModal(category, list)
          {
             const modal = $('#teamModal');
             modal.find('.modal-title').text(`Category: ${category}`);

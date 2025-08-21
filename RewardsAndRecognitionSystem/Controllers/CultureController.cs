@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Localization;
+using Microsoft.AspNetCore.Localization;
 using Microsoft.AspNetCore.Mvc;
 
 public class CultureController : Controller
