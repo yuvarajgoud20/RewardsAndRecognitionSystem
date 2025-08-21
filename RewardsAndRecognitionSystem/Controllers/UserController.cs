@@ -47,6 +47,11 @@ namespace RewardsAndRecognitionSystem.Controllers
             _emailService = emailService;
             _paginationSettings = paginationOptions.Value;
         }
+        private void PopulateRolesOnly()
+        {
+            ViewBag.Roles = new List<string> { "Admin", "TeamLead", "Manager", "Director", "Employee" };
+        }
+
 
         public async Task<IActionResult> Index(string filter = "active",int page = 1)
         {
@@ -99,77 +104,106 @@ namespace RewardsAndRecognitionSystem.Controllers
             }
             return View(usersList);
         }
-
-        public async Task<IActionResult> Create()
+      
+        public async Task<IActionResult> Create(string role = null, string returnUrl = null, string targetField = null)
         {
             await PopulateDropDowns();
-            return View();
+
+            var viewModel = new UserViewModel();
+
+            // Autofill the role if passed in query string
+            if (!string.IsNullOrEmpty(role))
+            {
+                viewModel.SelectedRole = role;  // assuming your ViewModel has SelectedRole property
+            }
+
+            ViewBag.ReturnUrl = returnUrl;        // optionally use to redirect after creation
+            ViewBag.TargetField = targetField;    // optionally use to know which field to update after return
+
+            return View(viewModel);
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create(UserViewModel viewModel)
+        public async Task<IActionResult> Create(UserViewModel viewModel, string returnUrl = null)
         {
             if (!ModelState.IsValid)
             {
                 await PopulateDropDowns();
+                ViewBag.ReturnUrl = returnUrl;
                 return View(viewModel);
             }
 
+            // Map from ViewModel → Entity
             var user = _mapper.Map<User>(viewModel);
-            if (ModelState.IsValid)
+
+            user.UserName = user.Email;
+            user.NormalizedEmail = user.Email.ToUpper();
+            user.EmailConfirmed = true;
+            user.CreatedAt = DateTime.UtcNow;
+
+            // Create user with plain password (not PasswordHash)
+            var result = await _userManager.CreateAsync(user, viewModel.PasswordHash);
+
+            if (result.Succeeded)
             {
-                user.UserName = user.Email;
-                user.NormalizedEmail = user.Email.ToUpper();
-                user.EmailConfirmed = true;
-                user.CreatedAt = DateTime.UtcNow;
+                // Assign role
+                var roleToAssign = viewModel.SelectedRole;
+                var roleResult = await _userManager.AddToRoleAsync(user, roleToAssign);
 
-                var result = await _userManager.CreateAsync(user, viewModel.PasswordHash);
-
-                if (result.Succeeded)
+                if (!roleResult.Succeeded)
                 {
-                    var roleToAssign = viewModel.SelectedRole;
-                    var roleResult = await _userManager.AddToRoleAsync(user, roleToAssign);
-                    if (!roleResult.Succeeded)
-                    {
-                        foreach (var error in roleResult.Errors)
-                            ModelState.AddModelError("", error.Description);
-                        await PopulateDropDowns();
-                        return View(user);
-                    }
+                    foreach (var error in roleResult.Errors)
+                        ModelState.AddModelError("", error.Description);
 
-                    await _emailService.SendEmailAsync(
-                        subject:GeneralMessages_User.EmailSubjectWelcome,
-                        to: user.Email,
-                        isHtml: true,
-                        body: $@"
-                        <body style=""font-family: Arial, sans-serif; margin: 0; padding: 0; background-color: #ffffff;"">
-                          <div style=""background-color: #ffffff; padding: 10px 20px; max-width: 600px; margin: auto; color: #000;"">
-                            <img src=""cid:bannerImage"" alt=""Zelis Banner"" style=""width: 100%; max-width: 600px;"">
-                            <p>Dear <strong>{user.Name}</strong>,</p>
-                            <p>Welcome to the <strong>Rewards and Recognition</strong> platform!</p>
-                            <p>Your account has been successfully created. Below are your login credentials:</p>
-                            <p style=""font-size: 16px;"">
-                              <strong>Email:</strong> {user.Email}<br>
-                              <strong>Temporary Password:</strong> <span style=""color: #black;"">{viewModel.PasswordHash}</span>
-                            </p>
-                            <p>Please log in and <strong>change your password immediately</strong> to secure your account.</p>
-                            <p>If you have any questions or need help accessing your account, feel free to contact our support team.</p>
-                            <p style=""font-size: 13px; color: #999; text-align: center;"">
-                              — This email was sent from the <strong>Rewards & Recognition</strong> system
-                            </p>
-                          </div>
-                        </body>"
-                    );
-                    TempData["message"] = ToastMessages_User.CreateUser; 
-                    return RedirectToAction(nameof(Index));
+                    await PopulateDropDowns();
+                    ViewBag.ReturnUrl = returnUrl;
+                    return View(viewModel);
                 }
-                foreach (var error in result.Errors)
-                    ModelState.AddModelError("", error.Description);
+
+                // Send welcome email
+                await _emailService.SendEmailAsync(
+                    subject: GeneralMessages_User.EmailSubjectWelcome,
+                    to: user.Email,
+                    isHtml: true,
+                    body: $@"
+            <body style=""font-family: Arial, sans-serif; margin: 0; padding: 0; background-color: #ffffff;"">
+              <div style=""background-color: #ffffff; padding: 10px 20px; max-width: 600px; margin: auto; color: #000;"">
+                <img src=""cid:bannerImage"" alt=""Zelis Banner"" style=""width: 100%; max-width: 600px;"">
+                <p>Dear <strong>{user.Name}</strong>,</p>
+                <p>Welcome to the <strong>Rewards and Recognition</strong> platform!</p>
+                <p>Your account has been successfully created. Below are your login credentials:</p>
+                <p style=""font-size: 16px;"">
+                  <strong>Email:</strong> {user.Email}<br>
+                  <strong>Temporary Password:</strong> <span style=""color: #000;"">{viewModel.PasswordHash}</span>
+                </p>
+                <p>Please log in and <strong>change your password immediately</strong> to secure your account.</p>
+                <p>If you have any questions or need help accessing your account, feel free to contact our support team.</p>
+                <p style=""font-size: 13px; color: #999; text-align: center;"">
+                  — This email was sent from the <strong>Rewards & Recognition</strong> system
+                </p>
+              </div>
+            </body>"
+                );
+
+                TempData["message"] = ToastMessages_User.CreateUser;
+
+                if (!string.IsNullOrEmpty(returnUrl))
+                {
+                    return Redirect(returnUrl);
+                }
+                return RedirectToAction(nameof(Index));
             }
+
+            // Add Identity errors to model state
+            foreach (var error in result.Errors)
+                ModelState.AddModelError("", error.Description);
+
             await PopulateDropDowns();
+            ViewBag.ReturnUrl = returnUrl;
             return View(viewModel);
         }
+
 
         public async Task<IActionResult> Edit(string id)
         {
@@ -332,17 +366,18 @@ namespace RewardsAndRecognitionSystem.Controllers
             memStream.Seek(0, SeekOrigin.Begin);
             return File(memStream.ToArray(), "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "Users.xlsx");
         }
+   
         private async Task PopulateDropDowns()
         {
             var teamsQuery = await _teamRepo.GetAllAsync();
             var teams = teamsQuery.Where(t => t.IsDeleted == false);
             var managersQuery = await _userRepo.GetAllManagersAsync();
             var managers = managersQuery.Where(u => u.IsDeleted == false);
-            var roles = new List<string> { "Admin", "TeamLead", "Manager", "Director", "Employee" };
+            var roles = new List<string> { "Admin", "TeamLead", "Manager", "Director", "Employee" }; 
 
             ViewBag.Teams = new SelectList(teams, "Id", "Name");
             ViewBag.Managers = new SelectList(managers, "Id", "Name");
-            ViewBag.Roles = roles;
+            ViewBag.Roles = new SelectList(roles);
         }
     }
 }

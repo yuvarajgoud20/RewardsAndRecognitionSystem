@@ -1,0 +1,88 @@
+﻿@using Microsoft.Extensions.Localization
+@using RewardsAndRecognitionSystem.Localization
+@inject IStringLocalizer<SharedResource> localizer
+@model RewardsAndRecognitionSystem.ViewModels.UserTeamMappingViewModel
+
+<h2 class="mb-3">@localizer["User → Team Mapping"]</h2>
+
+<form asp-action="Assign" method="post">
+    <div class="row g-3 align-items-end mb-3">
+        <div class="col-md-4">
+            <label class="form-label">@localizer["Team"]</label>
+            <select name="selectedTeamId" class="form-select" required>
+                <option value="" disabled selected>@localizer["Select Team"]</option>
+                @foreach (var t in Model.Teams)
+                {
+                    <option value="@t.Id">@t.Name</option>
+                }
+            </select>
+
+        </div>
+        <div class="col-md-4">
+            <label class="form-label">@localizer["Search users"]</label>
+       <input id="userSearch" type="text" class="form-control" placeholder="@localizer["Type to filter..."]" />
+        </div>
+        <div class="col-md-4 text-end">
+            <button type="submit" class="btn btn-primary">@localizer["Assign Selected Users"]</button>
+        </div>
+    </div>
+
+    <div class="mb-2">
+        <input type="checkbox" id="selectAll" /> <label for="selectAll">@localizer["Select all"]</label>
+    </div>
+    @if (Model.Users.Any())
+    {
+        <table class="table table-bordered table-hover" id="usersTable">
+            <thead>
+                <tr>
+                    <th style="width:48px; color:white;"></th>
+                    <th style="color:white;">@localizer["Name"]</th>
+                    <th style="color:white;">@localizer["Email"]</th>
+                    <th style="color:white;">@localizer["Current Team"]</th>
+                </tr>
+            </thead>
+
+            <tbody>
+                @foreach (var u in Model.Users)
+                {
+                    <tr>
+                        <td>
+                            <input type="checkbox" name="selectedUserIds" value="@u.Id" />
+                        </td>
+                        <td>@u.Name</td>
+                        <td>@u.Email</td>
+                        <td>@(u.Team?.Name ?? "Not Assigned")</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    }
+    else
+    {
+        <div class="alert alert-info">
+            @localizer["No users found"]
+        </div>
+    }
+
+</form>
+
+@section Scripts {
+    <script>
+        // Select all
+        document.getElementById('selectAll')?.addEventListener('change', function(e){
+            document.querySelectorAll('input[name="selectedUserIds"]').forEach(cb => { cb.checked = e.target.checked; });
+        });
+
+        // Client-side filter (Name column only)
+        const search = document.getElementById('userSearch');
+        const rows = () => Array.from(document.querySelectorAll('#usersTable tbody tr'));
+        search?.addEventListener('input', function(){
+            const q = this.value.toLowerCase();
+            rows().forEach(r => {
+                const nameCell = r.querySelectorAll('td')[1];
+                const nameText = nameCell ? nameCell.innerText.toLowerCase() : '';
+                r.style.display = nameText.includes(q) ? '' : 'none';
+            });
+        });
+    </script>
+}

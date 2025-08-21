@@ -1,4 +1,8 @@
-﻿@{
+﻿
+@using Microsoft.Extensions.Localization
+@using RewardsAndRecognitionSystem.Localization
+@inject IStringLocalizer<SharedResource> localizer
+@{
     ViewData["Title"] = "Analytics";
     var selectedYQId = ViewBag.SelectedYearQuarterId?.ToString() ?? "";
 }
@@ -93,15 +97,15 @@
   
 </style>
 <div class="d-flex justify-content-between align-items-center mb-4">
-    <h2 class="mb-0">Analytics Dashboard</h2>
-    <button class="btn btn-success" onclick="exportAllCharts()">📄 Export All Charts</button>
+    <h2 class="mb-0">@localizer["Analytics Dashboard"]</h2>
+    <button class="btn btn-success" onclick="exportAllCharts()">@localizer["📄 Export All Charts"]</button>
 </div>
 
 <div id="dashboardExportContent">
     <div class="row mb-4" id="teamPieContainer" style="display:none;">
         <div class="col-md-12">
             <div class="card shadow-sm">
-                <div class="card-header fw-semibold">Team-wise Nominations</div>
+                <div class="card-header fw-semibold">@localizer["Team-wise Nominations"]</div>
                 <div class="card-body">
                     <canvas id="teamPieChart" width="300" height="300"></canvas>
                 </div>
@@ -455,8 +459,8 @@
                                 <div class="d-flex justify-content-between align-items-center mb-2">
                                     <h5 class="card-title">${category}</h5>
                                     <div>
-                                        <button class="btn btn-sm btn-outline-secondary me-2" onclick="maximizeChart('${category}', ${JSON.stringify(list).replace(/"/g, '&quot;')})">🔍 Maximize</button>
-                                        <button class="btn btn-sm btn-outline-secondary" onclick="showTeamModal('${category}', ${JSON.stringify(list).replace(/"/g, '&quot;')})">📊 View More</button>
+                                        <button class="btn btn-sm btn-outline-secondary me-2" onclick="maximizeChart('${category}', ${JSON.stringify(list).replace(/"/g, '&quot;')})">@localizer["🔍 Maximize"]</button>
+                                        <button class="btn btn-sm btn-outline-secondary" onclick="showTeamModal('${category}', ${JSON.stringify(list).replace(/"/g, '&quot;')})">@localizer["📊 View More"]</button>
                                     </div>
                                 </div>
                                 <div class="${scrollClass}">
@@ -470,7 +474,7 @@
                 const maxCount = Math.max(...list.map(d => d.approvedCount + d.pendingCount + d.rejectedCount), 1);
                 const datasets = [
                     {
-                        label: 'Approved',
+                       label: '@Html.Raw(localizer["Approved"])',
                         data: list.map(d => d.approvedCount),
                         backgroundColor: '#4caf50',
                         borderColor: '#4caf50',
@@ -479,7 +483,7 @@
                         barThickness: 40
                     },
                     {
-                        label: 'Pending',
+                         label: '@Html.Raw(localizer["Pending"])', // Using localization for "Pending"
                         data: list.map(d => d.pendingCount),
                         backgroundColor: '#ffc107',
                         borderColor: '#ffc107',
@@ -488,7 +492,7 @@
                         barThickness: 40
                     },
                     {
-                        label: 'Rejected',
+                        label: '@Html.Raw(localizer["Rejected"])', // Using localization for "Rejected"
                         data: list.map(d => d.rejectedCount),
                         backgroundColor: '#f44336',
                         borderColor: '#f44336',

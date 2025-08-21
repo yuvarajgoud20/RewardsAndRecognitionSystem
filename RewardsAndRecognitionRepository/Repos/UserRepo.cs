@@ -20,6 +20,13 @@ namespace RewardsAndRecognitionRepository.Repos
             _context = context;
             _userManager = userManager;
         }
+        public async Task<IEnumerable<User>> GetUnassignedUsersAsync()
+        {
+            return await _context.Users
+                .Where(u => (u.IsDeleted == false || u.IsDeleted == null) && u.TeamId == null)
+                .OrderBy(u => u.Name)
+                .ToListAsync();
+        }
 
         public async Task<IEnumerable<User>> GetAllAsync()
         {

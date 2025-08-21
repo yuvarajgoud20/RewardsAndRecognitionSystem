@@ -1,8 +1,11 @@
+@using Microsoft.Extensions.Localization
+@using RewardsAndRecognitionSystem.Localization
+@inject IStringLocalizer<SharedResource> localizer
 @using RewardsAndRecognitionSystem.Common
 @model IEnumerable<RewardsAndRecognitionRepository.Models.Nomination>
 
 <div class="modal-header">
-    <h5 class="modal-title fw-bold">Nominations from @ViewBag.TeamName</h5>
+    <h5 class="modal-title fw-bold">@localizer["Nominations from"] @ViewBag.TeamName</h5>
     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
 </div>
 
@@ -10,14 +13,15 @@
     @if (Model != null && Model.Any())
     {
         <div class="mb-3 d-flex justify-content-between align-items-center">
-            <input type="text" id="searchInput" onkeyup="filterNominations()" class="form-control w-50" placeholder="Search by Nominee Name..." />
+            <input type="text" id="searchInput" onkeyup="filterNominations()" class="form-control w-50" placeholder="@localizer["Search by Nominee Name..."]" />
+
             <a asp-controller="Nomination"
                asp-action="ExportTeamNominationsToExcel"
                asp-route-teamId="@ViewBag.SelectedTeamId"
                asp-route-year="@ViewBag.CurrentYear"
                asp-route-quarterId="@ViewBag.CurrentQuarterId"
                class="btn btn-success ms-3">
-                <i class="bi bi-file-earmark-excel-fill"></i> Export to Excel
+                <i class="bi bi-file-earmark-excel-fill"></i> @localizer["Export to Excel"]
             </a>
 
         </div>
@@ -26,13 +30,13 @@
             <table class="table table-bordered table-hover" id="nominationsTable">
                 <thead class="table-primary text-center">
                     <tr>
-                        <th>S.no</th>
-                        <th>Nominee</th>
-                        <th>Category</th>
-                        <th>Description</th>
-                        <th>Achievements</th>
-                        <th>Status</th>
-                        <th>Date</th>
+                        <th>@localizer["S.no"]</th>
+                        <th>@localizer["Nominee"]</th>
+                        <th>@localizer["Category"]</th>
+                        <th>@localizer["Description"]</th>
+                        <th>@localizer["Achievements"]</th>
+                        <th>@localizer["Status"]</th>
+                        <th>@localizer["Date"]</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -50,10 +54,10 @@
                                     @switch (nom.Status)
                                     {
                                         case RewardsAndRecognitionRepository.Enums.NominationStatus.DirectorApproved:
-                                            @:<span class="badge bg-success">DirectorApproved</span>
+                                            @:<span class="badge bg-success">@localizer["DirectorApproved"]</span>
                                             break;
                                         case RewardsAndRecognitionRepository.Enums.NominationStatus.DirectorRejected:
-                                            @:<span class="badge bg-danger">DirectorRejected</span>
+                                            @:<span class="badge bg-danger">@localizer["DirectorRejected"]</span>
                                             break;
                                         default:
                                             @:<span class="badge bg-secondary">@nom.Status</span>
@@ -72,13 +76,13 @@
     else
     {
         <div class="alert alert-info text-center mt-3">
-            <i class="bi bi-info-circle"></i>@GeneralMessages.No_Nominations_Found
+            <i class="bi bi-info-circle"></i>@localizer["No_Nominations_Found"]
         </div>
     }
 </div>
 
 <div class="modal-footer">
-    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">@localizer["Close"]</button>
 </div>
 
 <script>

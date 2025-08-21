@@ -85,7 +85,7 @@
 @if (Model.Any())
 {
     <div class="d-flex justify-content-between align-items-center mt-4" style="min-height: 75px;">
-        <span>@localizer["Showing_page"] @ViewBag.CurrentPage @localizer["of"] @ViewBag.TotalPages</span>
+        <span>@localizer["Showing page"] @ViewBag.CurrentPage @localizer["of"] @ViewBag.TotalPages</span>
         <nav>
             <ul class="pagination mb-0">
                 <li class="page-item @(ViewBag.CurrentPage == 1 ? "disabled" : "")">

@@ -1,4 +1,7 @@
-﻿@using RewardsAndRecognitionRepository.Models
+﻿@using Microsoft.Extensions.Localization
+@using RewardsAndRecognitionSystem.Localization
+@inject IStringLocalizer<SharedResource> localizer
+@using RewardsAndRecognitionRepository.Models
 @using RewardsAndRecognitionRepository.Enums
 @using RewardsAndRecognitionSystem.Common
 @model IEnumerable<Nomination>
@@ -38,18 +41,18 @@
 
 
 <div class="d-flex align-items-center justify-content-between mb-4 flex-wrap">
-    <h2 class="mb-0"><i class="bi bi-person-badge"></i> Manager Dashboard</h2>
+    <h2 class="mb-0"><i class="bi bi-person-badge"></i> @localizer["Manager Dashboard"]</h2>
     <div class="d-flex align-items-center gap-3 flex-wrap">
         <div>
-            <label for="yearDropdown" class="form-label mb-1">Select Year :</label>
+            <label for="yearDropdown" class="form-label mb-1">@localizer["Select Year"]</label>
             <select id="yearDropdown" class="form-select form-select-sm">
-                <option value="">-- Select Year --</option>
+                <option value="">@localizer["-- Select Year --"]</option>
             </select>
         </div>
         <div>
-            <label for="quarterDropdown" class="form-label mb-1">Select Quarter :</label>
+            <label for="quarterDropdown" class="form-label mb-1">@localizer["Select Quarter"]</label>
             <select id="quarterDropdown" class="form-select form-select-sm" disabled>
-                <option value="">-- Select Quarter --</option>
+                <option value="">@localizer["-- Select Quarter --"]</option>
             </select>
         </div>
     </div>
@@ -146,25 +149,25 @@
 <div class="row g-4 mb-4">
     <div class="col-md-3">
         <a href="#" onclick="navigateToNominations('all')" class="dashboard-card text-blue d-block text-decoration-none" ">
-            <div class="dashboard-title">Total Nominations</div>
+            <div class="dashboard-title">@localizer["Total Nominations"]</div>
             <div class="dashboard-value" style="color: #007bff;">@ViewBag.TotalNominations</div> <!-- Blue -->
         </a>
     </div>
     <div class="col-md-3">
         <a href="#" onclick="navigateToNominations('pending')" class="dashboard-card d-block text-decoration-none">
-            <div class="dashboard-title">Pending Reviews</div>
+            <div class="dashboard-title">@localizer["Pending Reviews"]</div>
             <div class="dashboard-value" style="color: #fd7e14;">@ViewBag.PendingNominations</div> <!-- Orange -->
         </a>
     </div>
     <div class="col-md-3">
         <a href="#" onclick="navigateToNominations('directorapproved')" class="dashboard-card d-block text-decoration-none">
-            <div class="dashboard-title">Final Approved</div>
+            <div class="dashboard-title">@localizer["Final Approved"]</div>
             <div class="dashboard-value" style="color: #28a745;">@ViewBag.FinalApprovedNominations</div> <!-- Green -->
         </a>
     </div>
     <div class="col-md-3">
         <a href="#" onclick="navigateToNominations('directorrejected')" class="dashboard-card d-block text-decoration-none">
-            <div class="dashboard-title">Final Rejected</div>
+            <div class="dashboard-title">@localizer["Final Rejected"]</div>
             <div class="dashboard-value text-danger">@ViewBag.FinalRejectedNominations</div>
         </a>
     </div>
@@ -183,14 +186,14 @@
 }
 
 <div class="d-flex justify-content-between align-items-center mb-3">
-    <h4 class="mt-5"><i class="bi bi-bar-chart-line-fill"></i> Team Wise Statistics</h4>
+    <h4 class="mt-5"><i class="bi bi-bar-chart-line-fill"></i> @localizer["Team Wise Statistics"]</h4>
     @if (hasData)
     {
         <a asp-controller="Analytics"
            asp-action="Index"
            asp-route-yearQuarterId="@ViewBag.CurrentQuarterId"
            class="btn btn-info analytics-btn mt-5">
-            <i class="bi bi-graph-up-arrow"></i> View Analytics
+            <i class="bi bi-graph-up-arrow"></i> @localizer["View Analytics"]
         </a>
     }
 </div>
@@ -250,7 +253,11 @@
                     new Chart(ctx_@chartIndex, {
                         type: 'bar',
                         data: {
-                            labels: ['Approved', 'Rejected', 'Pending'],
+                                    labels: [
+                        '@Html.Raw(localizer["Approved"])',  // Localized label for 'Approved'
+                        '@Html.Raw(localizer["Pending"])',   // Localized label for 'Pending'
+                        '@Html.Raw(localizer["Rejected"])'   // Localized label for 'Rejected'
+                    ],
                             datasets: [{
                                 data: [@approvedNominations, @rejectedNominations, @pendingNominations],
                                 backgroundColor: ['#4caf50', '#f44336', '#ffeb3b'],  // Green for Approved, Red for Rejected, Yellow for Pending
@@ -295,7 +302,7 @@
         {
             <div class="col-12">
                 <div class="alert alert-light border rounded-3 shadow-sm text-center py-4 my-3" style="max-width: 500px; margin: 0 auto;">
-                    <h5 class="mt-2 mb-1 text-dark fw-semibold">@GeneralMessages.No_Nominations_This_Quarter</h5>
+                    <h5 class="mt-2 mb-1 text-dark fw-semibold">@localizer["No_Nominations_This_Quarter"]</h5>
                 </div>
             </div>
         }
@@ -303,7 +310,7 @@
 </div>
 @* Enhanced Teams Accordion *@
 <h4 class="mt-5 mb-4 fw-bold text-dark">
-    <i class="bi bi-people-fill me-2"></i> Teams Under You
+    <i class="bi bi-people-fill me-2"></i> @localizer["Teams Under You"]
 </h4>
 
 <div class="accordion shadow-sm rounded" id="teamsAccordion">
@@ -321,9 +328,9 @@
             </h2>
             <div id="@collapseId" class="accordion-collapse collapse" aria-labelledby="@headingId" data-bs-parent="#teamsAccordion">
                 <div class="accordion-body bg-white">
-                    <p class="mb-2"><strong class="text-secondary">Team Lead:</strong> @team.TeamLeadName</p>
+                    <p class="mb-2"><strong class="text-secondary">@localizer["Team Lead:"]</strong> @team.TeamLeadName</p>
 
-                    <p class="mb-2 fw-semibold text-secondary">Category-wise Nominations:</p>
+                    <p class="mb-2 fw-semibold text-secondary">@localizer["Category-wise Nominations:"]</p>
                     <ul class="list-group list-group-flush">
                         @{
                             var currentQuarterId = ViewBag.CurrentQuarterId as Guid?;
@@ -348,7 +355,7 @@
                         else
                         {
                             <p class="text-muted fst-italic text-center mb-0">
-                                <i class="bi bi-exclamation-circle me-1"></i> No nominations available.
+                                <i class="bi bi-exclamation-circle me-1"></i> @localizer["No nominations available."]
                             </p>
                         }
                     </ul>
@@ -359,11 +366,11 @@
 </div>
 
 <!-- View Nominations by Team (AJAX) -->
-<h4 class="mt-5"><i class="bi bi-info-circle-fill"></i> View Nominations by Team</h4>
+<h4 class="mt-5"><i class="bi bi-info-circle-fill"></i> @localizer["View Nominations by Team"]</h4>
 <div class="mb-4 d-flex align-items-center gap-3">
     <label class="form-label mb-0"><strong>Select Team:</strong></label>
     <select id="teamSelect" class="form-select w-auto">
-        <option value="">-- Choose a team --</option>
+        <option value="">@localizer["-- Choose a team --"]</option>
         @foreach (var team in teams)
         {
             <option value="@team.TeamId">@team.TeamName</option>
@@ -400,7 +407,7 @@
 
         function loadYears() {
             $.get('/Dashboard/GetYears', function (years) {
-                let options = '<option value="">-- Select Year --</option>';
+                let options = '<option value="">@localizer["-- Select Year --"]</option>';
                 years.forEach(y => {
                     options += `<option value="${y}">${y}</option>`;
                 });
@@ -418,7 +425,7 @@
         function loadQuarters(year, selectedId) 
         {
             $.get(`/Dashboard/GetQuarters?year=${year}`, function (quarters) {
-                let options = '<option value="">-- Select Quarter --</option>';
+                let options = '<option value="">@localizer["-- Select Quarter --"]</option>';
                 quarters.forEach(q => {
                     options += `<option value="${q.id}" ${q.id === selectedId ? 'selected' : ''}>${q.name}</option>`;
                 });

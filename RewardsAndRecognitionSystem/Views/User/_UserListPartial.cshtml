@@ -1,4 +1,7 @@
-﻿@model IEnumerable<RewardsAndRecognitionSystem.ViewModels.UserViewModel>
+﻿@using Microsoft.Extensions.Localization
+@using RewardsAndRecognitionSystem.Localization
+@inject IStringLocalizer<SharedResource> localizer
+@model IEnumerable<RewardsAndRecognitionSystem.ViewModels.UserViewModel>
 @{
     var userRoles = ViewBag.UserRoles as Dictionary<string, string>;
     string selectedFilter = ViewBag.SelectedFilter as string ?? "deleted";
@@ -7,12 +10,12 @@
 <table class="users-table" id="usersTable">
     <thead>
         <tr>
-            <th>Name</th>
-            <th>Email</th>
-            <th>Team</th>
-            <th>Manager</th>
-            <th>Role</th>
-            <th>Actions</th>
+            <th>@localizer["Name"]</th>
+            <th>@localizer["Email"]</th>
+            <th>@localizer["Team"]</th>
+            <th>@localizer["Manager"]</th>
+            <th>@localizer["Role"]</th>
+            <th>@localizer["Actions"]</th>
         </tr>
     </thead>
     <tbody>
@@ -23,13 +26,13 @@
                     @if (ViewBag.NoDeletedRecords == true)
                     {
                         <div class="alert alert-warning m-0" role="alert">
-                            <i class="bi bi-info-circle"></i> No deleted users found.
+                            <i class="bi bi-info-circle"></i> @localizer["No deleted users found."]
                         </div>
                     }
                     else if (ViewBag.NoActiveRecords == true)
                     {
                         <div class="alert alert-warning m-0" role="alert">
-                            <i class="bi bi-info-circle"></i> No users found.
+                            <i class="bi bi-info-circle"></i> @localizer["No users found."]
                         </div>
                     }
                 </td>
@@ -54,19 +57,20 @@
                         @if (user.IsDeleted)
                         {
                             <button type="button" class="btn btn-secondary btn-sm" disabled>
-                                <i class="bi bi-pencil-fill"></i> Edit
+                                <i class="bi bi-pencil-fill"></i>  @localizer["Edit"]
                             </button>
                             <button type="button" class="btn btn-danger btn-sm" disabled>
-                                <i class="bi bi-trash-fill"></i> Deleted
+                                <i class="bi bi-trash-fill"></i>  @localizer["Deleted"]
                             </button>
                         }
                         else
                         {
-                            <a asp-action="Edit" asp-route-id="@user.Id" class="btn btn-indigo btn-sm">
-                                <i class="bi bi-pencil-fill"></i> Edit
+                            <a asp-action="Edit" asp-route-id="@user.Id" class="btn btn-edit btn-sm">
+
+                                <i class="bi bi-pencil-fill"></i>  @localizer["Edit"]
                             </a>
                             <button type="button" class="btn btn-danger btn-sm" onclick="confirmDelete('@user.Id')">
-                                <i class="bi bi-trash-fill"></i> Delete
+                                <i class="bi bi-trash-fill"></i>  @localizer["Delete"]
                             </button>
                         }
                     </td>

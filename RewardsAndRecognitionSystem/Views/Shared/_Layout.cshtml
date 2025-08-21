@@ -1,4 +1,7 @@
-﻿@inject Microsoft.AspNetCore.Identity.UserManager<RewardsAndRecognitionRepository.Models.User> UserManager
+﻿@using Microsoft.Extensions.Localization
+@using RewardsAndRecognitionSystem.Localization
+@inject IStringLocalizer<SharedResource> localizer
+@inject Microsoft.AspNetCore.Identity.UserManager<RewardsAndRecognitionRepository.Models.User> UserManager
 @inject Microsoft.AspNetCore.Identity.SignInManager<RewardsAndRecognitionRepository.Models.User> SignInManager
 @using RewardsAndRecognitionRepository.Enums
 @using System.Globalization
@@ -133,7 +136,7 @@
         <nav class="navbar navbar-expand-lg shadow-sm">
             <div class="container-fluid">
                 <span class="navbar-brand d-flex align-items-center gap-2">
-                    <i class="bi bi-stars fs-4"></i> Rewards & Recognition
+                    <i class="bi bi-stars fs-4"></i> @localizer["Rewards & Recognition"]
                 </span>
 
                 <button class="navbar-toggler text-white" type="button" data-bs-toggle="collapse" data-bs-target="#mainNavbar" aria-controls="mainNavbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -147,7 +150,7 @@
                         {
                             <li class="nav-item">
                                 <a class="nav-link" asp-controller="Home" asp-action="Index">
-                                    <i class="bi bi-house-door"></i> Home
+                                    <i class="bi bi-house-door"></i> @localizer["Home"]
                                 </a>
                             </li>
                         }
@@ -156,46 +159,46 @@
                         {
                             <li class="nav-item">
                                 <a class="nav-link @(ViewContext.RouteData.Values["controller"]?.ToString() == "Dashboard" ? "active-link" : "")" asp-controller="Dashboard" asp-action="Index">
-                                    <i class="bi bi-speedometer2"></i> Dashboard
+                                    <i class="bi bi-speedometer2"></i> @localizer["Dashboard"]
                                 </a>
                             </li>
                             <li class="nav-item">
                                 <a class="nav-link @(ViewContext.RouteData.Values["controller"]?.ToString() == "Nomination" ? "active-link" : "")" asp-controller="Nomination" asp-action="Index">
-                                    <i class="bi bi-award"></i> Nominations
+                                    <i class="bi bi-award"></i> @localizer["Nominations"]
                                 </a>
                             </li>
                         }
 
                         @if (User.IsInRole(nameof(Roles.Admin)))
                         {
-                            <li class="nav-item dropdown">
-                                <a class="nav-link dropdown-toggle" href="#" id="adminDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                    <i class="bi bi-gear-fill"></i> Admin
+                            <li class="nav-item">
+                                <a class="nav-link @(ViewContext.RouteData.Values["controller"]?.ToString() == "User" ? "active-link" : "")" asp-controller="User" asp-action="Index">
+                                    <i class="bi bi-person-lines-fill"></i> @localizer["Users"]
                                 </a>
-                                <ul class="dropdown-menu" aria-labelledby="adminDropdown">
-                                    <li>
-                                        <a class="dropdown-item" asp-controller="User" asp-action="Index">
-                                            <i class="bi bi-person-lines-fill"></i> Users
-                                        </a>
-                                    </li>
-                                    <li>
-                                        <a class="dropdown-item" asp-controller="Team" asp-action="Index">
-                                            <i class="bi bi-people-fill"></i> Teams
-                                        </a>
-                                    </li>
-                                    <li>
-                                        <a class="dropdown-item" asp-controller="Category" asp-action="Index">
-                                            <i class="bi bi-tags-fill"></i> Categories
-                                        </a>
-                                    </li>
-                                    <li>
-                                        <a class="dropdown-item" asp-controller="YearQuarter" asp-action="Index">
-                                            <i class="bi bi-calendar4-week"></i> Year Quarters
-                                        </a>
-                                    </li>
-                                </ul>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link @(ViewContext.RouteData.Values["controller"]?.ToString() == "Team" ? "active-link" : "")" asp-controller="Team" asp-action="Index">
+                                    <i class="bi bi-people-fill"></i> @localizer["Teams"]
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link @(ViewContext.RouteData.Values["controller"]?.ToString() == "Category" ? "active-link" : "")" asp-controller="Category" asp-action="Index">
+                                    <i class="bi bi-tags-fill"></i> @localizer["Categories"]
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link @(ViewContext.RouteData.Values["controller"]?.ToString() == "YearQuarter" ? "active-link" : "")" asp-controller="YearQuarter" asp-action="Index">
+                                    <i class="bi bi-calendar4-week"></i> @localizer["Year Quarters"]
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link @(ViewContext.RouteData.Values["controller"]?.ToString() == "UserTeam" ? "active-link" : "")"
+                                   asp-controller="UserTeam" asp-action="Map">
+                                    <i class="bi bi-people"></i> @localizer["Map Users → Team"]
+                                </a>
                             </li>
                         }
+
                     </ul>
 
                     @* Language dropdown on right *@

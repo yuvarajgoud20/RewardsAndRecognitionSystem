@@ -1,4 +1,7 @@
-﻿@using Microsoft.AspNetCore.Identity
+﻿@using Microsoft.Extensions.Localization
+@using RewardsAndRecognitionSystem.Localization
+@inject IStringLocalizer<SharedResource> localizer
+@using Microsoft.AspNetCore.Identity
 @using RewardsAndRecognitionRepository.Models
 @inject SignInManager<User> SignInManager
 @inject UserManager<User> UserManager
@@ -18,7 +21,7 @@
                 <li>
                      <a class="dropdown-item" asp-area="Identity" asp-page="/Account/Manage/Index">
                         <img src="~/images/profile_logo.png" alt="Profile" class="rounded-circle" width="35" height="35" />
-                        Profile
+                       @localizer["Profile"]
                     </a>
                 </li>
                 <li>
@@ -26,7 +29,7 @@
                           asp-route-returnUrl="@Url.Action("Index", "Home", new { area = "" })">
                         <button type="submit" class="dropdown-item">
                             <img src="~/images/logout_3.png" alt="Profile" class="rounded-circle" width="35" height="35" />
-                            Logout
+                           @localizer["Logout"]
                         </button>
                     </form>
                 </li>
@@ -37,7 +40,7 @@
     else
     {
         <li class="nav-item">
-            <a class="nav-link text-light" asp-area="Identity" asp-page="/Account/Login">Login</a>
+            <a class="nav-link text-light" asp-area="Identity" asp-page="/Account/Login">@localizer["Login"]</a>
         </li>
     }
 </ul>
