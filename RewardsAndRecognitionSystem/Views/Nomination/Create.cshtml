@@ -1,4 +1,8 @@
-﻿@model RewardsAndRecognitionSystem.ViewModels.NominationViewModel
+﻿@using Microsoft.Extensions.Localization
+@using RewardsAndRecognitionSystem.Localization
+
+@inject IStringLocalizer<SharedResource> localizer
+@model RewardsAndRecognitionSystem.ViewModels.NominationViewModel
 @{
     ViewData["Title"] = "Create Nomination";
     Layout = "~/Views/Shared/_Layout.cshtml";
@@ -83,7 +87,7 @@
 
 <div class="scroll-wrapper">
     <div class="card-form">
-        <h2>Create Nomination</h2>
+        <h2>@localizer["Create Nomination"]</h2>
        
         <form asp-action="Create">
             @Html.AntiForgeryToken()
@@ -92,36 +96,36 @@
             </div>
 
             <div class="form-group">
-                <label for="NomineeId">Nominee<span>*</span></label>
+                <label for="NomineeId">@localizer["Nominee"]<span>*</span></label>
                 <select asp-for="NomineeId" class="form-control" asp-items="ViewBag.Nominees">
-                    <option value="">-- Select Nominee --</option>
+                    <option value="">@localizer["-- Select Nominee --"]</option>
                 </select>
                 <span asp-validation-for="NomineeId" class="text-danger"></span>
             </div>
 
             <div class="form-group">
-                <label for="CategoryId">Category<span>*</span></label>
+                <label for="CategoryId">@localizer["Category"]<span>*</span></label>
                 <select asp-for="CategoryId" class="form-control" asp-items="ViewBag.Categories">
-                    <option value="">-- Select Category --</option>
+                    <option value="">@localizer["-- Select Category --"]</option>
                 </select>
                 <span asp-validation-for="CategoryId" class="text-danger"></span>
             </div>
 
             <div class="form-group">
-                <label>Quarter <span class="text-danger">*</span></label>
+                <label>@localizer["Quarter"]<span class="text-danger">*</span></label>
                 <input type="text" class="form-control" value="@ViewData["ActiveQuarterDisplay"]" disabled />
                 <input type="hidden" asp-for="YearQuarterId" />
                 <span asp-validation-for="YearQuarterId" class="text-danger"></span>
             </div>
 
             <div class="form-group">
-                <label for="Description">Description<span>*</span></label>
+                <label for="Description">@localizer["Description"]<span>*</span></label>
                 <textarea asp-for="Description" class="form-control"></textarea>
                 <span asp-validation-for="Description" class="text-danger"></span>
             </div>
 
             <div class="form-group">
-                <label for="Achievements">Achievements<span>*</span></label>
+                <label for="Achievements">@localizer["Achievements"]<span>*</span></label>
                 <textarea asp-for="Achievements" class="form-control"></textarea>
                 <span asp-validation-for="Achievements" class="text-danger"></span>
             </div>
@@ -130,7 +134,7 @@
                 <input type="hidden" asp-for="Status" value="@ViewBag.Status" />
             </div>
 
-            <button type="submit" class="btn btn-indigo">Submit Nomination</button>
+            <button type="submit" class="btn btn-indigo">@localizer["Submit Nomination"]</button>
         </form>
     </div>
 </div>

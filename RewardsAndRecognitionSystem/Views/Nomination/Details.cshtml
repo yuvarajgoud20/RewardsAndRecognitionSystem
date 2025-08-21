@@ -1,4 +1,8 @@
-﻿@model RewardsAndRecognitionSystem.ViewModels.NominationViewModel
+﻿@using Microsoft.Extensions.Localization
+@using RewardsAndRecognitionSystem.Localization
+
+@inject IStringLocalizer<SharedResource> localizer
+@model RewardsAndRecognitionSystem.ViewModels.NominationViewModel
 
 
 @{
@@ -6,33 +10,33 @@
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
-<h2 class="mb-4"><i class="bi bi-info-circle"></i> Nomination Details</h2>
+<h2 class="mb-4"><i class="bi bi-info-circle"></i> @localizer["Nomination Details"]</h2>
 
 <div class="card shadow p-4">
     <dl class="row">
-        <dt class="col-sm-3"><i class="bi bi-person-circle"></i> Nominee</dt>
+        <dt class="col-sm-3"><i class="bi bi-person-circle"></i> @localizer["Nominee"]</dt>
         <dd class="col-sm-9">@Model.Nominee?.Name</dd>
 
-        <dt class="col-sm-3"><i class="bi bi-people-fill"></i> Team</dt>
+        <dt class="col-sm-3"><i class="bi bi-people-fill"></i> @localizer["Team"]</dt>
         <dd class="col-sm-9">@Model.Nominee?.Team?.Name</dd>
 
-        <dt class="col-sm-3"><i class="bi bi-award"></i> Category</dt>
+        <dt class="col-sm-3"><i class="bi bi-award"></i> @localizer["Category"]</dt>
         <dd class="col-sm-9">@Model.Category?.Name</dd>
 
-        <dt class="col-sm-3"><i class="bi bi-card-text"></i> Description</dt>
+        <dt class="col-sm-3"><i class="bi bi-card-text"></i> @localizer["Description"]</dt>
         <dd class="col-sm-9">@Model.Description</dd>
 
-        <dt class="col-sm-3"><i class="bi bi-trophy"></i> Achievements</dt>
+        <dt class="col-sm-3"><i class="bi bi-trophy"></i>@localizer["Achievements"]</dt>
         <dd class="col-sm-9">@Model.Achievements</dd>
 
-        <dt class="col-sm-3"><i class="bi bi-info-circle"></i> Status</dt>
+        <dt class="col-sm-3"><i class="bi bi-info-circle"></i>@localizer["Status"]</dt>
         <dd class="col-sm-9">@Model.Status</dd>
 
-        <dt class="col-sm-3"><i class="bi bi-calendar3"></i> Created At</dt>
+        <dt class="col-sm-3"><i class="bi bi-calendar3"></i> @localizer["Created At"]</dt>
         <dd class="col-sm-9">@Model.CreatedAt.ToString("dd MMM yyyy")</dd>
     </dl>
 
     <div class="mt-4">
-        <a asp-action="Index" class="btn btn-secondary"><i class="bi bi-arrow-left-circle"></i> Back to List</a>
+        <a asp-action="Index" class="btn btn-secondary"><i class="bi bi-arrow-left-circle"></i> @localizer["Back to List"]</a>
     </div>
 </div>

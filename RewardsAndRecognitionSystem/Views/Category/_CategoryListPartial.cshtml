@@ -1,4 +1,10 @@
-﻿@model IEnumerable<RewardsAndRecognitionSystem.ViewModels.CategoryViewModel>
+﻿
+@using Microsoft.Extensions.Localization
+@using RewardsAndRecognitionSystem.Localization
+@inject IStringLocalizer<SharedResource> localizer
+@inject IStringLocalizer<RewardsAndRecognitionSystem.Localization.SharedResource> localizer
+@model IEnumerable<RewardsAndRecognitionSystem.ViewModels.CategoryViewModel>
+
 @{
     var usedCategoryIds = ViewBag.UsedCategoryIds as List<Guid> ?? new List<Guid>();
     bool showDeleted = ViewBag.ShowDeleted ?? false;
@@ -7,11 +13,11 @@
 <table class="table-custom">
     <thead>
         <tr>
-            <th><i class="bi bi-tag-fill"></i> Name</th>
-            <th class="desc-cell"><i class="bi bi-card-text"></i> Description</th>
-            <th><i class="bi bi-calendar-event"></i> Created Date</th>
-            <th><i class="bi bi-check-circle-fill"></i> Status</th>
-            <th><i class="bi bi-tools"></i> Actions</th>
+            <th><i class="bi bi-tag-fill"></i> @localizer["Name"]</th>
+            <th class="desc-cell"><i class="bi bi-card-text"></i> @localizer["Description"]</th>
+            <th><i class="bi bi-calendar-event"></i> @localizer["Created Date"]</th>
+            <th><i class="bi bi-check-circle-fill"></i> @localizer["Status"]</th>
+            <th><i class="bi bi-tools"></i> @localizer["Actions"]</th>
         </tr>
     </thead>
     <tbody>
@@ -21,11 +27,13 @@
                 <td colspan="5" class="text-center">
                     <div class="alert alert-warning m-0" role="alert">
                         <i class="bi bi-info-circle me-2"></i>
-                        @(showDeleted ? "No deleted categories found." : "No active categories found.")
-                    </div>
-                </td>
-            </tr>
-        }
+                        @(showDeleted
+                                            ? @localizer["No deleted categories found."]
+                                            : @localizer["No active categories found."])
+                </div>
+            </td>
+        </tr>
+                }
         else
         {
             foreach (var category in Model)
@@ -37,46 +45,46 @@
                     <td>
                         @if (category.IsDeleted)
                         {
-                            <span class="badge bg-danger"><i class="bi bi-x-circle-fill"></i> Deleted</span>
+                            <span class="badge bg-danger"><i class="bi bi-x-circle-fill"></i> @localizer["Deleted"]</span>
                         }
                         else if (category.isActive)
                         {
-                            <span class="badge bg-success"><i class="bi bi-check-circle-fill"></i> Active</span>
+                            <span class="badge bg-success"><i class="bi bi-check-circle-fill"></i> @localizer["Active"]</span>
                         }
                         else
                         {
-                            <span class="badge bg-secondary"><i class="bi bi-x-circle-fill"></i> Inactive</span>
+                            <span class="badge bg-secondary"><i class="bi bi-x-circle-fill"></i> @localizer["Inactive"]</span>
                         }
                     </td>
                     <td class="actions-cell">
                         @if (category.IsDeleted)
                         {
                             <button type="button" class="btn btn-secondary btn-sm" disabled>
-                                <i class="bi bi-pencil-fill"></i> Edit
+                                <i class="bi bi-pencil-fill"></i> @localizer["Edit"]
                             </button>
                             <button type="button" class="btn btn-danger btn-sm" disabled>
-                                <i class="bi bi-trash-fill"></i> Deleted
+                                <i class="bi bi-trash-fill"></i> @localizer["Deleted"]
                             </button>
                         }
                         else
                         {
                             <a asp-action="Edit" asp-route-id="@category.Id" class="btn btn-indigo btn-sm">
-                                <i class="bi bi-pencil-fill"></i> Edit
+                                <i class="bi bi-pencil-fill"></i> @localizer["Edit"]
                             </a>
                             <a asp-action="Details" asp-route-id="@category.Id" class="btn btn-secondary btn-sm">
-                                <i class="bi bi-eye-fill"></i> Details
+                                <i class="bi bi-eye-fill"></i> @localizer["Details"]
                             </a>
 
                             @if (usedCategoryIds.Contains(category.Id))
                             {
-                                <button type="button" class="btn btn-danger btn-sm" disabled title="Cannot delete - used in nomination">
-                                    <i class="bi bi-trash-fill"></i> Delete
+                                <button type="button" class="btn btn-danger btn-sm" disabled title="@localizer["Cannot delete - used in nomination"]">
+                                    <i class="bi bi-trash-fill"></i> @localizer["Delete"]
                                 </button>
                             }
                             else
                             {
                                 <button type="button" class="btn btn-danger btn-sm" onclick="confirmDelete('@category.Id')">
-                                    <i class="bi bi-trash-fill"></i> Delete
+                                    <i class="bi bi-trash-fill"></i> @localizer["Delete"]
                                 </button>
                             }
                         }

@@ -1,53 +1,56 @@
-﻿@model RewardsAndRecognitionSystem.ViewModels.TeamViewModel
+﻿@using Microsoft.Extensions.Localization
+@using RewardsAndRecognitionSystem.Localization
+@inject IStringLocalizer<SharedResource> localizer
+@model RewardsAndRecognitionSystem.ViewModels.TeamViewModel
 
 @{
     ViewData["Title"] = "Edit Team";
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
-<h2 class="mb-4">Edit Team</h2>
+<h2 class="mb-4">@localizer["Edit Team"]</h2>
 <div class="card shadow-sm border-0 p-4" style="max-width: 600px; margin: auto;">
     <form method="post" asp-action="Edit">
         @Html.AntiForgeryToken()
 
         <!-- Team Name -->
         <div class="form-group mb-3">
-            <label asp-for="Name" class="form-label fw-semibold">Team Name</label>
+            <label asp-for="Name" class="form-label fw-semibold">@localizer["Team Name"]</label>
             <input asp-for="Name" class="form-control border-dark-subtle" />
             <span asp-validation-for="Name" class="text-danger"></span>
         </div>
 
         <!-- Team Lead Dropdown -->
         <div class="form-group mb-3">
-            <label asp-for="TeamLeadId" class="form-label fw-semibold">Team Lead</label>
+            <label asp-for="TeamLeadId" class="form-label fw-semibold">@localizer["Team Lead"]</label>
             <select asp-for="TeamLeadId" asp-items="ViewBag.TeamLeads" class="form-select border-dark-subtle">
-                <option value="">-- Select Team Lead --</option>
+                <option value="">@localizer["-- Select Team Lead --"]</option>
             </select>
             <span asp-validation-for="TeamLeadId" class="text-danger"></span>
         </div>
 
         <!-- Manager Dropdown -->
         <div class="form-group mb-3">
-            <label asp-for="ManagerId" class="form-label fw-semibold">Manager</label>
+            <label asp-for="ManagerId" class="form-label fw-semibold">@localizer["Manager"]</label>
             <select asp-for="ManagerId" asp-items="ViewBag.Managers" class="form-select border-dark-subtle">
-                <option value="">-- Select Manager --</option>
+                <option value="">@localizer["-- Select Manager --"]</option>
             </select>
             <span asp-validation-for="ManagerId" class="text-danger"></span>
         </div>
 
         <!-- Director Dropdown -->
         <div class="form-group mb-3">
-            <label asp-for="DirectorId" class="form-label fw-semibold">Director</label>
+            <label asp-for="DirectorId" class="form-label fw-semibold">@localizer["Director"]</label>
             <select asp-for="DirectorId" asp-items="ViewBag.Directors" class="form-select border-dark-subtle">
-                <option value="">-- Select Director --</option>
+                <option value="">@localizer["-- Select Director --"]</option>
             </select>
             <span asp-validation-for="DirectorId" class="text-danger"></span>
         </div>
 
         <!-- Buttons -->
         <div class="d-flex justify-content-between">
-            <a href="@Url.Action("Index", "Team")" class="btn btn-outline-secondary px-4">Cancel</a>
-            <button type="submit" class="btn btn-dark px-4">Save Changes</button>
+            <a href="@Url.Action("Index", "Team")" class="btn btn-outline-secondary px-4">@localizer["Cancel"]</a>
+            <button type="submit" class="btn btn-dark px-4">@localizer["Save Changes"]</button>
         </div>
     </form>
 </div>

@@ -8,7 +8,9 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="AspNetCore.Localizer.Json" Version="1.0.2" />
     <PackageReference Include="AutoMapper" Version="15.0.1" />
+    <PackageReference Include="Cms.AspNetCore.JsonLocalizer" Version="1.0.6" />
     <PackageReference Include="DocumentFormat.OpenXml" Version="3.3.0" />
     <PackageReference Include="FluentValidation" Version="12.0.0" />
     <PackageReference Include="FluentValidation.AspNetCore" Version="11.3.1" />

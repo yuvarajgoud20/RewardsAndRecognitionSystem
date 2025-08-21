@@ -22,12 +22,17 @@ namespace RewardsAndRecognitionSystem.FluentValidators
                 .Matches(@"^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^a-zA-Z\d]).{6,}$")
                 .WithMessage("Password must be at least 6 characters long and include at least one uppercase letter, one lowercase letter, one digit, and one special character.");
 
+            //RuleFor(x => x.SelectedRole)
+            //    .NotEmpty().WithMessage("Please select a role.");
+            //     // Conditional validation for TeamId if role is Employee
+            //     RuleFor(x => x.TeamId)
+            //     .NotEmpty().WithMessage("Team must be selected for employees.")
+            //     .When(x => x.SelectedRole != null && x.SelectedRole.Equals("Employee", StringComparison.OrdinalIgnoreCase));
             RuleFor(x => x.SelectedRole)
-                .NotEmpty().WithMessage("Please select a role.");
-                 // Conditional validation for TeamId if role is Employee
-                 RuleFor(x => x.TeamId)
-                 .NotEmpty().WithMessage("Team must be selected for employees.")
-                 .When(x => x.SelectedRole != null && x.SelectedRole.Equals("Employee", StringComparison.OrdinalIgnoreCase));
+    .NotEmpty()
+    .WithMessage("Please select a role.");
+
+            // ✅ No validation for TeamId since it's not required for Employees
 
         }
     }

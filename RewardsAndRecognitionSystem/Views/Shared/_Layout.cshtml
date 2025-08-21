@@ -1,26 +1,23 @@
-﻿@inject Microsoft.AspNetCore.Identity.UserManager<RewardsAndRecognitionRepository.Models.User> UserManager
+@using Microsoft.Extensions.Localization
+@using RewardsAndRecognitionSystem.Localization
+@inject IStringLocalizer<SharedResource> localizer
+@inject Microsoft.AspNetCore.Identity.UserManager<RewardsAndRecognitionRepository.Models.User> UserManager
 @inject Microsoft.AspNetCore.Identity.SignInManager<RewardsAndRecognitionRepository.Models.User> SignInManager
 @using RewardsAndRecognitionRepository.Enums
-@using Microsoft.AspNetCore.Localization
 @using System.Globalization
-@{
-    var currentCulture = Context.Features.Get<IRequestCultureFeature>()?.RequestCulture.Culture?.Name ?? "en-US";
-    var returnUrl = Context.Request.Path + Context.Request.QueryString;
-}
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>@ViewData["Title"] - Rewards & Recognition</title>
-     <link rel="stylesheet" href="~/lib/Layout/bootstrap.min.css"/>
-     <link rel="stylesheet" href="~/lib/Layout/bootstrap-icons.css" />
+    <link rel="stylesheet" href="~/lib/Layout/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/lib/Layout/bootstrap-icons.css" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/RewardsAndRecognitionSystem.styles.css" asp-append-version="true" />
     <link href="~/lib/Layout/sweetalert2.min.css" rel="stylesheet">
     <script src="~/lib/Layout/sweetalert2@11.js"></script>
-   
+
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/jquery-validation/dist/jquery.validate.min.js"></script>
     <script src="~/lib/jquery-validation-unobtrusive/jquery.validate.unobtrusive.min.js"></script>
@@ -29,7 +26,7 @@
     <link rel="stylesheet" href="~/lib/Toaster/style.css" />
 
     <style>
-       
+        /* your existing styles */
         #toast-container > .toast-success {
             background-color: #008000 !important;
             opacity: 1 !important;
@@ -44,14 +41,12 @@
             padding-right: 10px !important;
         }
 
-            /* Left-aligned text, large font */
             #toast-container > .toast-success .toast-message {
                 text-align: left;
                 margin: 0;
                 font-size: 3rem;
             }
 
-            /* Simple close button, no hover effect */
             #toast-container > .toast-success .toast-close-button {
                 color: white !important;
                 opacity: 1 !important;
@@ -59,7 +54,6 @@
                 font-weight: bold;
                 font-size: 1.2rem;
                 padding: 0;
-                /* cursor: default; */
             }
 
         body {
@@ -72,28 +66,25 @@
             background: linear-gradient(to right, #3f51b5, #5c6bc0);
         }
 
-       /* Nav links and brand links styling */
-     .navbar-brand {
-    color: #fff !important;
-    font-weight: 500;
-     }
+        .navbar-brand {
+            color: #fff !important;
+            font-weight: 500;
+        }
 
-    /* Only anchor (.nav-link) hover should change color */
-    .nav-link {
-    color: #fff !important;
-    font-weight: 500;
-    transition: color 0.3s ease;
-     }
+        .nav-link {
+            color: #fff !important;
+            font-weight: 500;
+            transition: color 0.3s ease;
+        }
 
-    .nav-link:hover {
-        color: #ffd54f !important;
-    }
+            .nav-link:hover {
+                color: #ffd54f !important;
+            }
 
-   .nav-link.active-link {
+            .nav-link.active-link {
                 color: #ffd54f !important;
                 border-bottom: 2px solid #ffd54f;
-   }
-
+            }
 
         .container {
             padding-top: 30px;
@@ -144,11 +135,11 @@
     <header>
         <nav class="navbar navbar-expand-lg shadow-sm">
             <div class="container-fluid">
-               <span class="navbar-brand d-flex align-items-center gap-2">
-               <i class="bi bi-stars fs-4"></i> Rewards & Recognition
-               </span>
+                <span class="navbar-brand d-flex align-items-center gap-2">
+                    <i class="bi bi-stars fs-4"></i> @localizer["Rewards & Recognition"]
+                </span>
 
-                <button class="navbar-toggler text-white" type="button" data-bs-toggle="collapse" data-bs-target="#mainNavbar">
+                <button class="navbar-toggler text-white" type="button" data-bs-toggle="collapse" data-bs-target="#mainNavbar" aria-controls="mainNavbar" aria-expanded="false" aria-label="Toggle navigation">
                     <span class="navbar-toggler-icon"></span>
                 </button>
 
@@ -159,69 +150,76 @@
                         {
                             <li class="nav-item">
                                 <a class="nav-link" asp-controller="Home" asp-action="Index">
-                                    <i class="bi bi-house-door"></i> Home
+                                    <i class="bi bi-house-door"></i> @localizer["Home"]
                                 </a>
                             </li>
                         }
-                        
+
                         @if (User.IsInRole(nameof(Roles.Manager)) || User.IsInRole(nameof(Roles.TeamLead)) || User.IsInRole(nameof(Roles.Director)))
-
                         {
-
                             <li class="nav-item">
                                 <a class="nav-link @(ViewContext.RouteData.Values["controller"]?.ToString() == "Dashboard" ? "active-link" : "")" asp-controller="Dashboard" asp-action="Index">
-                                    <i class="bi bi-speedometer2"></i> Dashboard
+                                    <i class="bi bi-speedometer2"></i> @localizer["Dashboard"]
                                 </a>
                             </li>
                             <li class="nav-item">
                                 <a class="nav-link @(ViewContext.RouteData.Values["controller"]?.ToString() == "Nomination" ? "active-link" : "")" asp-controller="Nomination" asp-action="Index">
-                                    <i class="bi bi-award"></i> Nominations
+                                    <i class="bi bi-award"></i> @localizer["Nominations"]
                                 </a>
-                            </li>                           
+                            </li>
                         }
 
                         @if (User.IsInRole(nameof(Roles.Admin)))
                         {
-                            <li class="nav-item dropdown">
-                                <a class="nav-link dropdown-toggle" href="#" id="adminDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                    <i class="bi bi-gear-fill"></i> Admin
+                            <li class="nav-item">
+                                <a class="nav-link @(ViewContext.RouteData.Values["controller"]?.ToString() == "User" ? "active-link" : "")" asp-controller="User" asp-action="Index">
+                                    <i class="bi bi-person-lines-fill"></i> @localizer["Users"]
                                 </a>
-                                <ul class="dropdown-menu" aria-labelledby="adminDropdown">
-                                    <li>
-                                        <a class="dropdown-item" asp-controller="User" asp-action="Index">
-                                            <i class="bi bi-person-lines-fill"></i> Users
-                                        </a>
-                                    </li>
-                                    <li>
-                                        <a class="dropdown-item" asp-controller="Team" asp-action="Index">
-                                            <i class="bi bi-people-fill"></i> Teams
-                                        </a>
-                                    </li>
-                                    <li>
-                                        <a class="dropdown-item" asp-controller="Category" asp-action="Index">
-                                            <i class="bi bi-tags-fill"></i> Categories
-                                        </a>
-                                    </li>
-                                    <li>
-                                        <a class="dropdown-item" asp-controller="YearQuarter" asp-action="Index">
-                                            <i class="bi bi-calendar4-week"></i> Year Quarters
-                                        </a>
-                                    </li>
-                                </ul>
                             </li>
-                        }                    
-                    </ul>
-                    <partial name="_LoginPartial" />
-                    <form asp-controller="Culture" asp-action="SetCulture" method="post" class="ms-3">
-                        <input type="hidden" name="returnUrl" value="@returnUrl" />
-                        <select name="culture" class="form-select form-select-sm" onchange="this.form.submit()">
-                            <option value="en-US" selected="@(currentCulture == "en-US")">English</option>
-                            <option value="de-DE" selected="@(currentCulture == "de-DE")">German</option>
-                            <option value="hi-IN" selected="@(currentCulture == "hi-IN")">Hindi</option>
-                            <option value="ar-SA" selected="@(currentCulture == "ar-SA")">Arabic</option>
-                        </select>
-                    </form>
+                            <li class="nav-item">
+                                <a class="nav-link @(ViewContext.RouteData.Values["controller"]?.ToString() == "Team" ? "active-link" : "")" asp-controller="Team" asp-action="Index">
+                                    <i class="bi bi-people-fill"></i> @localizer["Teams"]
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link @(ViewContext.RouteData.Values["controller"]?.ToString() == "Category" ? "active-link" : "")" asp-controller="Category" asp-action="Index">
+                                    <i class="bi bi-tags-fill"></i> @localizer["Categories"]
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link @(ViewContext.RouteData.Values["controller"]?.ToString() == "YearQuarter" ? "active-link" : "")" asp-controller="YearQuarter" asp-action="Index">
+                                    <i class="bi bi-calendar4-week"></i> @localizer["Year Quarters"]
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link @(ViewContext.RouteData.Values["controller"]?.ToString() == "UserTeam" ? "active-link" : "")"
+                                   asp-controller="UserTeam" asp-action="Map">
+                                    <i class="bi bi-people"></i> @localizer["Map Users → Team"]
+                                </a>
+                            </li>
+                        }
 
+                    </ul>
+
+                    @* Language dropdown on right *@
+                    <ul class="navbar-nav ms-auto mb-2 mb-lg-0 align-items-center">
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle text-white" href="#" id="languageDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                🌐 @CultureInfo.CurrentUICulture.NativeName
+                            </a>
+                            <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="languageDropdown">
+                                <form asp-controller="Culture" asp-action="SetLanguage" method="post" class="px-2 py-1">
+                                    <input type="hidden" name="returnUrl" value="@Context.Request.Path" />
+                                    <button class="dropdown-item" type="submit" name="culture" value="en">English</button>
+                                    <button class="dropdown-item" type="submit" name="culture" value="fr">French</button>
+                                    <button class="dropdown-item" type="submit" name="culture" value="hi">Hindi</button>
+                                    <button class="dropdown-item" type="submit" name="culture" value="ar">Arabic</button>
+                                </form>
+                            </ul>
+                        </li>
+                    </ul>
+
+                    <partial name="_LoginPartial" />
                 </div>
             </div>
         </nav>
@@ -238,29 +236,29 @@
     @await RenderSectionAsync("Scripts", required: false)
 </body>
 </html>
+
 @if (TempData["message"] != null)
 {
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/Toaster/toaster.js"></script>
     <script>
         $(function(){
-                       toastr.options = {
-          closeButton: true,
-          progressBar: false,
-          positionClass: 'toast-top-right',
-          showMethod: 'show',          // Instant display
-          showDuration: 0,
-          hideMethod: 'hide',          // Instant hide
-          hideDuration: 0,
-          timeOut: 3000,               // Toast disappears after 3 seconds
-          extendedTimeOut: 1000,
+            toastr.options = {
+                closeButton: true,
+                progressBar: false,
+                positionClass: 'toast-top-right',
+                showMethod: 'show',
+                showDuration: 0,
+                hideMethod: 'hide',
+                hideDuration: 0,
+                timeOut: 3000,
+                extendedTimeOut: 1000,
+                newestOnTop: false,
+                preventDuplicates: false,
+                messageClass: 'toast-text-center'
+            };
 
-          newestOnTop: false,
-          preventDuplicates: false,
-          messageClass: 'toast-text-center'
-        };
-
-          toastr.success('@TempData["message"]');
+            toastr.success('@TempData["message"]');
         });
     </script>
 }

@@ -1,4 +1,7 @@
-﻿@model RewardsAndRecognitionSystem.ViewModels.YearQuarterViewModel
+﻿@using Microsoft.Extensions.Localization
+@using RewardsAndRecognitionSystem.Localization
+@inject IStringLocalizer<SharedResource> localizer
+@model RewardsAndRecognitionSystem.ViewModels.YearQuarterViewModel
 
 @{
     ViewData["Title"] = "Create Year Quarter";
@@ -26,7 +29,7 @@
         }
 </style>
 
-<h2 class="mb-4">Create Year Quarter</h2>
+<h2 class="mb-4">@localizer["Create Year Quarter"]</h2>
 
 <div class="card p-4 shadow-sm" style="max-width: 600px; margin: auto;">
     <form asp-action="Create" method="post">
@@ -34,39 +37,39 @@
         <!-- Validation summary for general errors -->
         @Html.ValidationSummary(true, "", new { @class = "text-danger mb-3" })
         <div class="mb-3">
-            <label asp-for="Year" class="form-label">Year</label><span class="text-danger">*</span>
+            <label asp-for="Year" class="form-label">@localizer["Year"]</label><span class="text-danger">*</span>
             <input asp-for="Year" class="form-control" />
             <span asp-validation-for="Year" class="text-danger"></span>
         </div>
 
         <div class="mb-3">
-            <label asp-for="Quarter" class="form-label">Quarter</label><span class="text-danger">*</span>
+            <label asp-for="Quarter" class="form-label">@localizer["Quarter"]</label><span class="text-danger">*</span>
             <select asp-for="Quarter" class="form-select" asp-items="ViewBag.Quarters">
-                <option value="">-- Select Quarter --</option>
+                <option value="">@localizer["-- Select Quarter --"]</option>
             </select>
             <span asp-validation-for="Quarter" class="text-danger"></span>
         </div>
 
         <div class="mb-3">
-            <label asp-for="StartDate" class="form-label">Start Date</label><span class="text-danger">*</span>
+            <label asp-for="StartDate" class="form-label">@localizer["Start Date"]</label><span class="text-danger">*</span>
             <input asp-for="StartDate" class="form-control" type="date" />
             <span asp-validation-for="StartDate" class="text-danger"></span>
         </div>
 
         <div class="mb-3">
-            <label asp-for="EndDate" class="form-label">End Date</label><span class="text-danger">*</span>
+            <label asp-for="EndDate" class="form-label">@localizer["End Date"]</label><span class="text-danger">*</span>
             <input asp-for="EndDate" class="form-control" type="date" />
             <span asp-validation-for="EndDate" class="text-danger"></span>
         </div>
 
         <div class="form-check mb-3">
             <input asp-for="IsActive" class="form-check-input" />
-            <label asp-for="IsActive" class="form-check-label">Is Active</label>
+            <label asp-for="IsActive" class="form-check-label">@localizer["Is Active"]</label>
         </div>
 
         <div class="d-flex justify-content-between">
-            <a asp-action="Index" class="btn btn-danger">Cancel</a>
-            <button type="submit" class="btn btn-indigo">Create</button>
+            <a asp-action="Index" class="btn btn-danger">@localizer["Cancel"]</a>
+            <button type="submit" class="btn btn-indigo">@localizer["Create"]</button>
         </div>
     </form>
 </div>

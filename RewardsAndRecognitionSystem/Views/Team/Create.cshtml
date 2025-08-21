@@ -1,68 +1,80 @@
-﻿@model RewardsAndRecognitionSystem.ViewModels.TeamViewModel
+﻿@using Microsoft.Extensions.Localization
+@using RewardsAndRecognitionSystem.Localization
+@inject IStringLocalizer<SharedResource> localizer
+@model RewardsAndRecognitionSystem.ViewModels.TeamViewModel
 @{
     ViewData["Title"] = "Create Team";
     Layout = "~/Views/Shared/_Layout.cshtml";
+    var returnUrl = Url.Action("Create", "Team");   // where to come back
 }
-<style>
-    .btn-indigo {
-        background: #303f9f;
-        color: white;
-    }
-
-        .btn-indigo:hover {
-            background: #303f9f;
-            color: white;
-        }
-
-    .btn-danger {
-        background: #c62828;
-        color: white;
-    }
-
-        .btn-danger:hover {
-            background: #b71c1c;
-            color: white
-        }
-</style>
-
-<h2 class="mb-4 text-center">Create New Team</h2>
+<h2 class="mb-4 text-center">@localizer["Create New Team"]</h2>
 
 <div class="card shadow-sm border-0 p-4" style="max-width: 600px; margin: auto;">
     <form asp-action="Create" method="post">
+
+        <!-- Team Name -->
         <div class="form-group mb-3">
-            <label asp-for="Name" class="form-label fw-semibold">Team Name</label><span class="text-danger">*</span>
+            <label asp-for="Name" class="form-label fw-semibold">@localizer["Team Name"]</label><span class="text-danger">*</span>
             <input asp-for="Name" class="form-control border-dark-subtle" />
             <span asp-validation-for="Name" class="text-danger"></span>
         </div>
 
+        <!-- Team Lead -->
         <div class="form-group mb-4">
-            <label asp-for="TeamLeadId" class="form-label fw-semibold">Team Lead</label><span class="text-danger">*</span>
-            <select asp-for="TeamLeadId" class="form-select border-dark-subtle" asp-items="@ViewBag.TeamLeads">
-                <option value="">-- Select Team Lead --</option>
-            </select>
+            <label asp-for="TeamLeadId" class="form-label fw-semibold">@localizer["Team Lead"]</label><span class="text-danger">*</span>
+            <div class="input-group">
+                <select asp-for="TeamLeadId" class="form-select border-dark-subtle" asp-items="@ViewBag.TeamLeads">
+                    <option value="">@localizer["-- Select Team Lead --"]</option>
+                </select>
+                <a class="btn btn-outline-secondary"
+                   asp-controller="User" asp-action="Create"
+                   asp-route-role="TeamLead"
+                   asp-route-returnUrl="@returnUrl"
+                   asp-route-targetField="TeamLeadId"
+                   title="@localizer["Add new Team Lead"]">+</a>
+            </div>
             <span asp-validation-for="TeamLeadId" class="text-danger"></span>
         </div>
 
+        <!-- Manager -->
         <div class="form-group mb-3">
-            <label asp-for="ManagerId" class="form-label fw-semibold">Manager</label><span class="text-danger">*</span>
-            <select asp-for="ManagerId" class="form-select border-dark-subtle" asp-items="@ViewBag.Managers">
-                <option value="">-- Select Manager --</option>
-            </select>
+            <label asp-for="ManagerId" class="form-label fw-semibold">@localizer["Manager"]</label><span class="text-danger">*</span>
+            <div class="input-group">
+                <select asp-for="ManagerId" class="form-select border-dark-subtle" asp-items="@ViewBag.Managers">
+                    <option value="">@localizer["-- Select Manager --"]</option>
+                </select>
+                <a class="btn btn-outline-secondary"
+                   asp-controller="User" asp-action="Create"
+                   asp-route-role="Manager"
+                   asp-route-returnUrl="@returnUrl"
+                   asp-route-targetField="ManagerId"
+                   title="@localizer["Add new Manager"]">+</a>
+            </div>
             <span asp-validation-for="ManagerId" class="text-danger"></span>
         </div>
 
+        <!-- Director -->
         <div class="form-group mb-4">
-            <label asp-for="DirectorId" class="form-label fw-semibold">Director</label><span class="text-danger">*</span>
-            <select asp-for="DirectorId" class="form-select border-dark-subtle" asp-items="@ViewBag.Directors">
-                <option value="">-- Select Director --</option>
-            </select>
+            <label asp-for="DirectorId" class="form-label fw-semibold">@localizer["Director"]</label><span class="text-danger">*</span>
+            <div class="input-group">
+                <select asp-for="DirectorId" class="form-select border-dark-subtle" asp-items="@ViewBag.Directors">
+                    <option value="">@localizer["-- Select Director --"]</option>
+                </select>
+                <a class="btn btn-outline-secondary"
+                   asp-controller="User" asp-action="Create"
+                   asp-route-role="Director"
+                   asp-route-returnUrl="@returnUrl"
+                   asp-route-targetField="DirectorId"
+                   title="@localizer["Add new Director"]">+</a>
+            </div>
             <span asp-validation-for="DirectorId" class="text-danger"></span>
         </div>
 
         <div class="d-flex justify-content-between">
-            <a asp-action="Index" class="btn btn-danger px-4">Cancel</a>
-            <button type="submit" class="btn btn-indigo px-4">Create</button>
+            <a asp-action="Index" class="btn btn-danger px-4">@localizer["Cancel"]</a>
+      
+            <button type="submit" class="btn btn-primary px-4">@localizer["Create"]</button>
+
         </div>
     </form>
 </div>
-

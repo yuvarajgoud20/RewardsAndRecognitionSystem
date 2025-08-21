@@ -1,19 +1,15 @@
-//home page language change
-//URL
-//example
-//https://localhost:7156/?ui-culture=de-DE
-//https://localhost:7156/?ui-culture=hi-IN
-using System.Globalization;
+//final code
+using AspNetCore.Localizer.Json.Localizer;
 using FluentValidation;
 using FluentValidation.AspNetCore;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Localization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
-using Microsoft.AspNetCore.Mvc.Razor;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Localization;
+using Microsoft.Extensions.Options;
 using RewardsAndRecognitionRepository.Dapper;
 using RewardsAndRecognitionRepository.Data;
 using RewardsAndRecognitionRepository.Interfaces;
@@ -132,31 +128,19 @@ internal class Program
                 .AddEntityFrameworkStores<ApplicationDbContext>()
                 .AddDefaultTokenProviders();
 
-            builder.Services.AddControllersWithViews().AddViewLocalization(LanguageViewLocationExpanderFormat.Suffix);
-            builder.Services.AddLocalization(options =>
-            {
-                options.ResourcesPath = "Resources";
-            });
+            builder.Services.AddControllersWithViews();
+            // Localization configuration
+            builder.Services.AddLocalization(options => options.ResourcesPath = "Localization");
+
             builder.Services.Configure<RequestLocalizationOptions>(options =>
             {
-                var supportedCultures = new[] {
-                new CultureInfo("en-US"),
-                new CultureInfo("de-DE"),
-                  new CultureInfo("hi-IN"),
-                 new CultureInfo("ar-SA")};
-                options.DefaultRequestCulture = new RequestCulture("en-US");
-                options.SupportedCultures = supportedCultures;
-                options.SupportedUICultures = supportedCultures;
-                // Priority: Query string ? Cookie ? Accept-Language header
-                options.RequestCultureProviders = new IRequestCultureProvider[]
-                {
-        new QueryStringRequestCultureProvider(),
-        new CookieRequestCultureProvider(),
-        new AcceptLanguageHeaderRequestCultureProvider()
-                };
-                //// Add cookie-based provider
-                //options.RequestCultureProviders.Insert(0, new CookieRequestCultureProvider());
+                var supportedCultures = new[] { "en", "fr", "ar","hi" };
+                options.SetDefaultCulture("en");
+                options.AddSupportedCultures(supportedCultures);
+                options.AddSupportedUICultures(supportedCultures);
+
             });
+
             builder.Services.AddScoped<DapperContext>();
             builder.Services.AddScoped<ISample, DapperNotification>();
 
@@ -181,9 +165,19 @@ internal class Program
             {
                 options.Filters.Add(new AutoValidateAntiforgeryTokenAttribute());
             });
+       
+
+          
+
+            builder.Services.AddSingleton<IStringLocalizerFactory, JsonStringLocalizerFactory>();
+            builder.Services.AddSingleton<IStringLocalizer>(sp =>
+            {
+                var factory = sp.GetRequiredService<IStringLocalizerFactory>();
+                return factory.Create(null);
+            });
 
             var app = builder.Build();
-            app.UseRequestLocalization();
+
             app.UseMiddleware<ExceptionHandlingMiddleware>();
 
             using (var scope = app.Services.CreateScope())
@@ -202,8 +196,14 @@ internal class Program
                 app.UseExceptionHandler("/Home/Error");
                 app.UseHsts();
             }
+            // Enable localization middleware
+            var locOptions = app.Services.GetRequiredService<IOptions<RequestLocalizationOptions>>();
+            app.UseRequestLocalization(locOptions.Value);
 
             app.UseRouting();
+            // Use localization middleware
+         
+          
             app.UseAuthentication();
             app.UseAuthorization();
 

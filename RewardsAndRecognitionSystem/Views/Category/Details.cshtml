@@ -1,24 +1,28 @@
-﻿@model RewardsAndRecognitionSystem.ViewModels.CategoryViewModel
+﻿@using Microsoft.Extensions.Localization
+@using RewardsAndRecognitionSystem.Localization
+@inject IStringLocalizer<SharedResource> localizer
+@inject IStringLocalizer<RewardsAndRecognitionSystem.Localization.SharedResource> localizer
+@model RewardsAndRecognitionSystem.ViewModels.CategoryViewModel
 @{
     ViewData["Title"] = "Category Details";
 }
 
-<h2 class="mb-4">Category Details</h2>
+<h2 class="mb-4">@localizer["Category Details"]</h2>
 
 <div class="card shadow-sm border-0 p-4" style="max-width: 600px; margin: auto;">
     <dl class="row">
-        <dt class="col-sm-4">Name</dt>
+        <dt class="col-sm-4">@localizer["Name"]</dt>
         <dd class="col-sm-8">@Model.Name</dd>
-        <dt class="col-sm-4">Description</dt>
+        <dt class="col-sm-4">@localizer["Description"]</dt>
         <dd class="col-sm-8">@Model.Description</dd>
-        <dt class="col-sm-4">Status</dt>
+        <dt class="col-sm-4">@localizer["Status"]</dt>
         <dd class="col-sm-8">@(Model.isActive ? "Active" : "InActive")</dd>
-        <dt class="col-sm-4">Created Date</dt>
+        <dt class="col-sm-4">@localizer["Created Date"]</dt>
         <dd class="col-sm-8">@Model.CreatedAt.ToString("f")</dd>
     </dl>
 
     <div class="d-flex justify-content-between mt-3">
-        <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-outline-primary">Edit</a>
-        <a asp-action="Index" class="btn btn-outline-secondary">Back</a>
+        <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-outline-primary">@localizer["Edit"]</a>
+        <a asp-action="Index" class="btn btn-outline-secondary">@localizer["Back"]</a>
     </div>
 </div>

@@ -1,4 +1,7 @@
-﻿@model IEnumerable<RewardsAndRecognitionRepository.Models.Nomination>
+﻿@using Microsoft.Extensions.Localization
+@using RewardsAndRecognitionSystem.Localization
+@inject IStringLocalizer<SharedResource> localizer
+@model IEnumerable<RewardsAndRecognitionRepository.Models.Nomination>
 @using RewardsAndRecognitionRepository.Enums
 
 @{
@@ -11,21 +14,21 @@
 
      justify-content: center; align-items: center;">
     <div class="spinner-border text-primary" role="status" style="width: 3rem; height: 3rem;">
-        <span class="visually-hidden">Loading...</span>
+        <span class="visually-hidden">@localizer{"Loading..."]</span>
     </div>
 </div>
-<h2 class="mb-4"><i class="bi bi-award"></i> Team Lead Dashboard</h2>
+<h2 class="mb-4"><i class="bi bi-award"></i> @localizer["Team Lead Dashboard"]</h2>
 <div class="row mb-4">
     <div class="col-md-3">
-        <label for="yearDropdown" class="form-label">Select Year:</label>
+        <label for="yearDropdown" class="form-label">@localizer["Select Year:"]</label>
         <select id="yearDropdown" class="form-select">
             <option value="">-- Select Year --</option>
         </select>
     </div>
     <div class="col-md-3">
-        <label for="quarterDropdown" class="form-label">Select Quarter:</label>
+        <label for="quarterDropdown" class="form-label">@localizer["Select Quarter:"]</label>
         <select id="quarterDropdown" class="form-select" disabled>
-            <option value="">-- Select Quarter --</option>
+            <option value="">@localizer["-- Select Quarter --"]</option>
         </select>
     </div>
 </div>
@@ -85,7 +88,7 @@
         <a href="javascript:void(0);" onclick="navigateToNominations('all')" class="clickable-card">
 
             <div class="dashboard-card">
-                <div class="dashboard-title">Total Nominations</div>
+                <div class="dashboard-title">@localizer["Total Nominations"]</div>
                 <div class="dashboard-value text-blue">@ViewBag.TotalNominations</div>
             </div>
         </a>
@@ -93,7 +96,7 @@
     <div class="col-md-3">
         <a href="javascript:void(0);" onclick="navigateToNominations('pending')" class="clickable-card">
             <div class="dashboard-card">
-                <div class="dashboard-title">Pending Reviews</div>
+                <div class="dashboard-title">@localizer["Pending Reviews"]</div>
                 <div class="dashboard-value text-orange">@ViewBag.PendingNominations</div>
             </div>
         </a>
@@ -101,7 +104,7 @@
     <div class="col-md-3">
         <a href="javascript:void(0);" onclick="navigateToNominations('directorapproved')" class="clickable-card">
             <div class="dashboard-card">
-                <div class="dashboard-title">Final Approved</div>
+                <div class="dashboard-title">@localizer["Final Approved"]</div>
                 <div class="dashboard-value text-green">@ViewBag.FinalApprovedNominations</div>
             </div>
         </a>
@@ -109,14 +112,14 @@
     <div class="col-md-3">
         <a href="javascript:void(0);" onclick="navigateToNominations('directorrejected')" class="clickable-card">
             <div class="dashboard-card">
-                <div class="dashboard-title">Final Rejected</div>
+                <div class="dashboard-title">@localizer["Final Rejected"]</div>
                 <div class="dashboard-value text-danger">@ViewBag.RejectedNominations</div>
             </div>
         </a>
     </div>
 </div>
 
-<h4 class="mt-5 mb-3 text-primary">Category-wise Breakdown</h4>
+<h4 class="mt-5 mb-3 text-primary">@localizer["Category-wise Breakdown"]</h4>
 <div id="teamLeadChartsContainer" class="row row-cols-1 row-cols-md-2 g-4 mb-5"></div>
 @section Scripts {
     <script src="~/lib/Charts/chart.js"></script>
@@ -138,8 +141,8 @@
                     container.append(`
                         <div class="col">
                             <div class="dashboard-card text-center p-4">
-                                <h5 class="text-muted mb-2">📉 No Data Available</h5>
-                                <p class="mb-0">No nominations found for the selected quarter.</p>
+                                <h5 class="text-muted mb-2">@localizer["📉 No Data Available"]</h5>
+                                <p class="mb-0">@localizer["No nominations found for the selected quarter."]</p>
                             </div>
                         </div>
                     `);
@@ -166,18 +169,23 @@
                     const ctx = document.getElementById(canvasId).getContext('2d');
                                                Chart.defaults.devicePixelRatio = 1; // add once globally
 
-        new Chart(ctx, {
-            type: 'bar',
-            data: {
-                labels: ['Approved', 'Pending', 'Rejected'],
-                datasets: [{
-                    label: item.category,
-                    data: [item.approved, item.pending, item.rejected],
-                    backgroundColor: ['#2E7D32', '#F9A825', '#D32F2F'],
-                    borderRadius: 6,
-                    barThickness:37
-                }]
-            },
+
+           new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: [
+                '@Html.Raw(localizer["Approved"])',  // Localized label for 'Approved'
+                '@Html.Raw(localizer["Pending"])',   // Localized label for 'Pending'
+                '@Html.Raw(localizer["Rejected"])'   // Localized label for 'Rejected'
+            ],
+            datasets: [{
+                label: item.category,
+                data: [item.approved, item.pending, item.rejected],
+                backgroundColor: ['#2E7D32', '#F9A825', '#D32F2F'],
+                borderRadius: 6,
+                barThickness: 37
+            }]
+        },
             options: {
                 responsive: true,
                 maintainAspectRatio: false,
@@ -225,10 +233,11 @@
             {
                      const quarterId = document.getElementById("quarterDropdown").value;
 
-                     if (!quarterId) {
-                         alert("Please select a quarter.");
-                         return;
-                     }
+                             if (!quarterId) {
+            alert("Please select a quarter.");
+            return;
+        }
+
 
                      const url = `/Nomination/Index?filter=${filter}&yearQuarterId=${quarterId}`;
                      window.location.href = url;
@@ -254,7 +263,7 @@
              function loadYears()
              {
                  $.get('/Dashboard/GetYears', function (years) {
-                     let options = '<option value="">-- Select Year --</option>';
+                     let options = '<option value="">@localizer["-- Select Year --"]</option>';
                      years.forEach(y => {
                          options += `<option value="${y}">${y}</option>`;
                      });
@@ -272,7 +281,7 @@
              function loadQuarters(year, selectedId) 
              {
                  $.get(`/Dashboard/GetQuarters?year=${year}`, function (quarters) {
-                     let options = '<option value="">-- Select Quarter --</option>';
+                     let options = '<option value="">@localizer["-- Select Quarter --"]</option>';
                      quarters.forEach(q => {
                          const isSel = q.id.toLowerCase() === (selectedId || '').toLowerCase();
                          options += `<option value="${q.id}" ${isSel ? 'selected' : ''}>${q.name}</option>`;

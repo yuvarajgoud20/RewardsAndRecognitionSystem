@@ -1,4 +1,8 @@
 ﻿@page "/Login"
+@using Microsoft.Extensions.Localization
+@using RewardsAndRecognitionSystem.Localization
+@inject IStringLocalizer<SharedResource> localizer
+
 @model LoginModel
 @{
     ViewData["Title"] = "Login";
@@ -109,26 +113,26 @@
         <!-- Left Section -->
         <div class="left-side text-center">
             <i class="fas fa-award"></i>
-            <h1>Welcome to</h1>
-            <h1>Rewards & Recognition</h1>
-            <p>Celebrate achievements. Empower talent. Reward excellence.</p>
+            <h1>@localizer["Welcome to"]</h1>
+            <h1>@localizer["Rewards & Recognition"]</h1>
+            <p>@localizer["Celebrate achievements. Empower talent. Reward excellence."]</p>
         </div>
 
         <!-- Right Section (Login Form) -->
         <div class="right-side">
-            <h2 class="mb-4 text-center">Login to Your Account</h2>
+            <h2 class="mb-4 text-center">@localizer["Login to Your Account"]</h2>
             <form id="account" method="post">
                 <div asp-validation-summary="ModelOnly" class="text-danger" role="alert"></div>
 
                 <div class="form-floating mb-3">
                     <input asp-for="Input.Email" class="form-control" autocomplete="username" placeholder="name@example.com" />
-                    <label asp-for="Input.Email">Email</label>
+                    <label asp-for="Input.Email">@localizer["Email"]</label>
                     <span asp-validation-for="Input.Email" class="text-danger"></span>
                 </div>
 
                 <div class="form-floating mb-3 position-relative">
                     <input asp-for="Input.Password" type="password" class="form-control" id="password" autocomplete="current-password" placeholder="Password" />
-                    <label asp-for="Input.Password">Password</label>
+                    <label asp-for="Input.Password">@localizer["Password"]</label>
                     <span asp-validation-for="Input.Password" class="text-danger"></span>
                     <i class="fa fa-eye position-absolute" id="togglePassword" style="top: 50%; right: 15px; transform: translateY(-50%); cursor: pointer;"></i>
                 </div>
@@ -137,11 +141,11 @@
                 <div class="checkbox mb-3">
                     <label>
                         <input asp-for="Input.RememberMe" class="form-check-input" />
-                        <label asp-for="Input.RememberMe">Remember Me</label>
+                        <label asp-for="Input.RememberMe">@localizer["Remember Me"]</label>
                     </label>
                 </div>
 
-                <button type="submit" class="w-100 btn btn-lg btn-primary">Log in</button>
+                <button type="submit" class="w-100 btn btn-lg btn-primary">@localizer["Log in"]</button>
 
 
             </form>

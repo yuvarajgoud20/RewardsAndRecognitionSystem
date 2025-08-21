@@ -1,27 +1,30 @@
-﻿@model RewardsAndRecognitionSystem.ViewModels.YearQuarterViewModel;
+﻿@using Microsoft.Extensions.Localization
+@using RewardsAndRecognitionSystem.Localization
+@inject IStringLocalizer<SharedResource> localizer
+@model RewardsAndRecognitionSystem.ViewModels.YearQuarterViewModel;
 
-<h2 class="mb-4">Year Quarter Details</h2>
+<h2 class="mb-4">@localizer["Year Quarter Details"]</h2>
 
 <div class="card p-4 shadow-sm" style="max-width: 600px; margin: auto;">
     <dl class="row">
-        <dt class="col-sm-4">Year</dt>
+        <dt class="col-sm-4">@localizer["Year"]</dt>
         <dd class="col-sm-8">@Model.Year</dd>
 
-        <dt class="col-sm-4">Quarter</dt>
+        <dt class="col-sm-4">@localizer["Quarter"]</dt>
         <dd class="col-sm-8">@Model.Quarter</dd>
 
-        <dt class="col-sm-4">Start Date</dt>
+        <dt class="col-sm-4">@localizer["Start Date"]</dt>
         <dd class="col-sm-8">@(Model.StartDate.HasValue? Model.StartDate.Value.ToShortDateString() : "")</dd>
 
-        <dt class="col-sm-4">End Date</dt>
+        <dt class="col-sm-4">@localizer["End Date"]</dt>
         <dd class="col-sm-8">@(Model.StartDate.HasValue? Model.EndDate.Value.ToShortDateString() : "")</dd>
 
-        <dt class="col-sm-4">Is Active</dt>
+        <dt class="col-sm-4">@localizer["Is Active"]</dt>
         <dd class="col-sm-8">@(Model.IsActive ? "Yes" : "No")</dd>
     </dl>
 
     <div class="d-flex justify-content-between">
-        <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-primary">Edit</a>
-        <a asp-action="Index" class="btn btn-outline-secondary">Back</a>
+        <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-primary">@localizer["Edit"]</a>
+        <a asp-action="Index" class="btn btn-outline-secondary">@localizer["Back"]</a>
     </div>
 </div>

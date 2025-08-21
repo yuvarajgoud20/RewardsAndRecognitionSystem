@@ -1,11 +1,15 @@
-﻿@using Microsoft.AspNetCore.Mvc.Localization
-@inject IViewLocalizer Localizer
+@inject IStringLocalizer<SharedResource> localizer
+
+@using Microsoft.Extensions.Localization
+@using RewardsAndRecognitionSystem.Localization
+@inject IStringLocalizer<SharedResource> localizer
 @model IEnumerable<RewardsAndRecognitionSystem.ViewModels.CategoryViewModel>
 
 @{
     ViewData["Title"] = "Categories";
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
+<meta charset="utf-8">
 
 <style>
     :root {
@@ -34,7 +38,7 @@
 
     .btn-indigo {
         background: var(--indigo-main);
-        color:white;
+        color: white;
     }
 
         .btn-indigo:hover {
@@ -44,12 +48,10 @@
 
     .btn-secondary {
         background: var(--gray);
-        
     }
 
         .btn-secondary:hover {
             background: #5a6268;
-            
         }
 
     .btn-danger {
@@ -59,7 +61,6 @@
 
         .btn-danger:hover {
             background: var(--danger-hover);
-            
         }
 
     .table-custom {
@@ -110,22 +111,22 @@
 
 
 <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
-    <h2 class="mb-4"><i class="bi bi-tags-fill me-2"></i> @Localizer["Categories"]</h2>
+    <h2 class="mb-4"><i class="bi bi-tags-fill me-2"></i> @localizer["Categories"]</h2>
 
-    <div></div>  
+    <div></div>
 
     <div class="d-flex align-items-center gap-3">
         <div class="form-check form-switch m-0">
             <input class="form-check-input" type="checkbox" role="switch" id="toggleCategoryFilter"
                    @(ViewBag.ShowDeleted ? "checked" : "") />
             <label class="form-check-label ms-2" for="toggleCategoryFilter">
-                @Localizer["Show_Deleted"]
+                @localizer["Show Deleted"]
 
             </label>
         </div>
 
         <a asp-action="Create" class="btn btn-indigo d-inline-flex align-items-center gap-2">
-            <i class="bi bi-plus-circle-fill"></i> @Localizer["New_Category"]
+            <i class="bi bi-plus-circle-fill"></i> @localizer["New_Category"]
         </a>
     </div>
 </div>
@@ -138,15 +139,16 @@
 </script>
 <script>
     var localizedTexts = {
-        areYouSure: '@Localizer["Are_You_Sure"]',
-        actionCannotBeUndone: '@Localizer["Action_Cannot_Be_Undone"]',
-        yesDeleteIt: '@Localizer["Yes_Delete_It"]',
-        noCancel: '@Localizer["No_Cancel"]',
-        failedToLoad: '@Localizer["Failed_To_Load_Category_Data"]'
+        areYouSure: '@localizer["Are_You_Sure"]',
+        actionCannotBeUndone:  '@Html.Raw(localizer["Action_Cannot_Be_Undone"])',
+
+        yesDeleteIt: '@localizer["Yes_Delete_It"]',
+        noCancel: '@localizer["No_Cancel"]',
+        failedToLoad: '@localizer["Failed_To_Load_Category_Data"]'
     };
 </script>
 <script>
-       function confirmDelete(categoryId) 
+       function confirmDelete(categoryId)
        {
             // Force blur the Delete button BEFORE the popup opens
             const activeBtn = document.activeElement;
